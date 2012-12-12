@@ -3,12 +3,12 @@ package com.keba.teachdroid.fragments;
 import com.keba.teachdroid.R;
 import com.keba.teachdroid.rc.RobotControlProxy;
 
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
 
 public class OverviewFragment extends Fragment {
