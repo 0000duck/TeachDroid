@@ -3,6 +3,7 @@ package com.keba.teachdroid;
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
 import com.keba.kemro.teach.dfl.KTcDfl;
 import com.keba.teachdroid.fragments.OverviewFragment;
+import com.keba.teachdroid.rc.RobotControlProxy;
 
 import android.app.ActionBar;
 import android.os.Bundle;
@@ -43,8 +44,7 @@ public class MainTeachView extends FragmentActivity implements
 						android.R.layout.simple_list_item_1,
 						android.R.id.text1, m_viewNames), this);
 
-		KvtSystemCommunicator.connect("10.150.52.202", 1000, "_global");
-		KTcDfl dfl= KvtSystemCommunicator.getTcDfl();
+		KTcDfl dfl= RobotControlProxy.connect("10.150.52.202", 1000, "_global");
 		
 	}
 
