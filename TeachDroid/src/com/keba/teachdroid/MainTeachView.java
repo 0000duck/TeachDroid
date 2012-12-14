@@ -1,10 +1,9 @@
 package com.keba.teachdroid;
 
-import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
-import com.keba.kemro.teach.dfl.KTcDfl;
-import com.keba.teachdroid.fragments.OverviewFragment;
-import com.keba.teachdroid.rc.RobotControlProxy;
-
+import keba.controlinterface.core.ControlInterface;
+import keba.controlinterface.interfaces.ControlInterfaceException;
+import keba.controlinterface.interfaces.ControlInterfaceTypes.ConnectResult;
+import keba.controlinterface.interfaces.Result;
 import android.app.ActionBar;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,6 +15,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import com.keba.teachdroid.fragments.OverviewFragment;
+import com.keba.teachdroid.fragments.ProgramsFragment;
 
 public class MainTeachView extends FragmentActivity implements
 		ActionBar.OnNavigationListener {
@@ -37,16 +39,17 @@ public class MainTeachView extends FragmentActivity implements
 		final ActionBar actionBar = getActionBar();
 		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		
 
 		actionBar.setListNavigationCallbacks(
 		// Specify a SpinnerAdapter to populate the dropdown list.
 				new ArrayAdapter<String>(actionBar.getThemedContext(),
 						android.R.layout.simple_list_item_1,
 						android.R.id.text1, m_viewNames), this);
-
-		KTcDfl dfl= RobotControlProxy.connect("10.150.52.202", 1000, "_global");
 		
 	}
+
+
 
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -76,6 +79,9 @@ public class MainTeachView extends FragmentActivity implements
 		switch (position) {
 		case 0:
 			fragment = new OverviewFragment();
+			break;
+		case 1:
+			fragment= new ProgramsFragment();
 			break;
 		default:
 			fragment = new DummySectionFragment();

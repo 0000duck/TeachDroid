@@ -21,15 +21,23 @@ public final class R {
     }
     public static final class id {
         public static final int container=0x7f080000;
-        public static final int kinematicSelectSpinner=0x7f080002;
-        public static final int menu_settings=0x7f080005;
-        public static final int textView1=0x7f080001;
-        public static final int textView2=0x7f080003;
-        public static final int toggleButton1=0x7f080004;
+        public static final int expandableListView1=0x7f080008;
+        public static final int grp_child=0x7f080001;
+        public static final int kinematicSelectSpinner=0x7f080004;
+        public static final int menu_settings=0x7f080009;
+        public static final int row_name=0x7f080002;
+        public static final int textView1=0x7f080003;
+        public static final int textView2=0x7f080005;
+        public static final int textView3=0x7f080007;
+        public static final int toggleButton1=0x7f080006;
     }
     public static final class layout {
         public static final int activity_main_teach_view=0x7f030000;
-        public static final int fragment_layout_overview=0x7f030001;
+        public static final int exp_list_view_childrow_layout=0x7f030001;
+        public static final int exp_list_view_group_layout=0x7f030002;
+        public static final int exp_list_view_layout=0x7f030003;
+        public static final int fragment_layout_overview=0x7f030004;
+        public static final int fragment_layout_programcontrol=0x7f030005;
     }
     public static final class menu {
         public static final int activity_main_teach_view=0x7f070000;
@@ -38,6 +46,8 @@ public final class R {
         public static final int app_name=0x7f050000;
         public static final int hello_world=0x7f050004;
         public static final int menu_settings=0x7f050005;
+        public static final int programTableHeader=0x7f05000a;
+        public static final int robotOperationMode=0x7f050009;
         public static final int robotPower=0x7f050008;
         public static final int selectKinematicLabelText=0x7f050007;
         public static final int title_activity_main_teach_view=0x7f050006;
