@@ -19,6 +19,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
+import com.keba.teachdroid.R;
 import com.keba.teachdroid.fragments.OverviewFragment;
 import com.keba.teachdroid.fragments.ProgramsFragment;
 
