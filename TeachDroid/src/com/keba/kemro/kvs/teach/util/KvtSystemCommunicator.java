@@ -21,7 +21,6 @@ import android.util.Log;
 
 import com.keba.kemro.teach.dfl.*;
 import com.keba.kemro.teach.network.*;
-import com.keba.teachdroid.MainTeachView.ConnectTask;
 
 /**
  * Class KSystemCommunicator

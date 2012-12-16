@@ -28,9 +28,9 @@ public class MainTeachView extends FragmentActivity implements
 
 	private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
 	private static String[] m_viewNames;
-	private String m_host= "10.150.52.202";
-	private static final String m_connectFormatString="Connecting {0} % complete";
-	protected ProgressDialog m_dlg;	
+	private String m_host = "10.150.52.202";
+	private static final String m_connectFormatString = "Connecting attempt {0}";
+	protected ProgressDialog m_dlg;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -38,38 +38,34 @@ public class MainTeachView extends FragmentActivity implements
 		m_viewNames = new String[] { getString(R.string.title_robotOverview),
 				getString(R.string.title_robotPrograms),
 				getString(R.string.title_robotJogging), };
-		
-		
+
 		setContentView(R.layout.activity_main_teach_view);
 
 		// Set up the action bar.
 		final ActionBar actionBar = getActionBar();
 		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		
 
 		actionBar.setListNavigationCallbacks(
 		// Specify a SpinnerAdapter to populate the dropdown list.
 				new ArrayAdapter<String>(actionBar.getThemedContext(),
 						android.R.layout.simple_list_item_1,
 						android.R.id.text1, m_viewNames), this);
-		
-		
-		m_dlg= ProgressDialog.show(this, "Connecting...", "Connecting to "+m_host, true,true);
-		ConnectTask con= new ConnectTask();
+
+		m_dlg = ProgressDialog.show(this, "Connecting...", "Connecting to "
+				+ m_host, true, true);
+		ConnectTask con = new ConnectTask();
 		con.execute(m_host);
-//		try {
-//			boolean isConnected= con.get().booleanValue();
-//
-//		} catch (InterruptedException e) {
-//			e.printStackTrace();
-//		} catch (ExecutionException e) {
-//			e.printStackTrace();
-//		}
-		
+		// try {
+		// boolean isConnected= con.get().booleanValue();
+		//
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// } catch (ExecutionException e) {
+		// e.printStackTrace();
+		// }
+
 	}
-
-
 
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -101,7 +97,7 @@ public class MainTeachView extends FragmentActivity implements
 			fragment = new OverviewFragment();
 			break;
 		case 1:
-			fragment= new ProgramsFragment();
+			fragment = new ProgramsFragment();
 			break;
 		default:
 			fragment = new DummySectionFragment();
@@ -117,29 +113,28 @@ public class MainTeachView extends FragmentActivity implements
 		return true;
 	}
 
-	public class ConnectTask extends AsyncTask<String, Integer, Boolean>{
+	protected class ConnectTask extends AsyncTask<String, Integer, Boolean> {
 
 		@Override
 		protected Boolean doInBackground(String... _params) {
-			final String host= _params[0];
-			
-			
-			for(int i=0; i<100; i++) {
+			final String host = _params[0];
+
+			for (int i = 0; i < 100; ++i) {
 				try {
-					publishProgress(i);
-					Thread.sleep(100);
+					if (i % 10 == 0)
+						publishProgress(i);
+					boolean isConnected = KvtSystemCommunicator.connectOnce(
+							host, 10000, "_global");
+					if (isConnected)
+						i = 100;
+
 					
+					Thread.sleep(100);
+
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-//			new Thread(new Runnable() {
-//				public void run() {
-//					KvtSystemCommunicator.connect(host, 1000, "_global", ConnectTask.this);
-//				}
-//			}).start();
-			
-
 			return KvtSystemCommunicator.isConnected();
 		}
 
@@ -150,14 +145,17 @@ public class MainTeachView extends FragmentActivity implements
 
 		@Override
 		protected void onPostExecute(final Boolean result) {
-			
+
 			super.onPostExecute(result);
-			
+
 			runOnUiThread(new Runnable() {
 				public void run() {
-//					m_dlg.dismiss();
+					// m_dlg.dismiss();
 
-					String msg= "Connection "+(result.booleanValue()?"established!!":"failed!!")+"\nPress back button to dismiss.";
+					String msg = "Connection "
+							+ (result.booleanValue() ? "established!!"
+									: "failed!!")
+							+ "\nPress back button to dismiss.";
 					m_dlg.setMessage(msg);
 				}
 			});
@@ -171,20 +169,21 @@ public class MainTeachView extends FragmentActivity implements
 		@Override
 		protected void onProgressUpdate(final Integer... values) {
 			super.onProgressUpdate(values);
-//			runOnUiThread(new Runnable() {
-//				public void run() {
-					m_dlg.setMessage(MessageFormat.format(m_connectFormatString, values[0]));
-//				}
-//			});
-			
+			// runOnUiThread(new Runnable() {
+			// public void run() {
+			m_dlg.setMessage(MessageFormat.format(m_connectFormatString,
+					values[0]));
+			// }
+			// });
+
 		}
 
 		public void progress(int _p) {
 			publishProgress(_p);
 		}
-		
+
 	}
-	
+
 	/**
 	 * A dummy fragment representing a section of the app, but that simply
 	 * displays dummy text.
