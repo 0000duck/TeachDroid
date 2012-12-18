@@ -320,14 +320,14 @@ public class KExecAdministrator {
 	 *            kinematic directory
 	 */
 	public void setGlobalFilter(String filter) {
-		synchronized (dfl.getLockObject()) {
+//		synchronized (dfl.getLockObject()) {
 			if (filter != null) {
 				globalFilter = filter.toLowerCase();
 			} else {
 				globalFilter = null;
 			}
 			filterChanged = true;
-		}
+//		}
 	}
 
 	/**

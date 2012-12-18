@@ -19,7 +19,9 @@ import java.util.*;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.kemro.teach.dfl.*;
+import com.keba.kemro.teach.dfl.dir.KDirectoryAdministrator;
 import com.keba.kemro.teach.network.*;
 
 /**
@@ -85,15 +87,18 @@ public class KvtSystemCommunicator {
 		m_hostName= _host;
 		TcClient client= null;
 		
-		client= TcConnectionManager.getTcClient("TeachDroid", m_hostName);
+		client= TcConnectionManager.getTcClient("Teachview", m_hostName);
 		if(client != null) {
 			client.setTimeout(_to);
 			client.setUserMode(false);
 			client.setWriteAccess(true);
 			clientID= client.getClientID();
 			dfl= new KTcDfl(client, _globalFilter);
+			Log.i("TC connection","Adding connection listener");
 			client.addConnectionListener(new KTcConnectionListener());
+			Log.i("TC connection","connection state update");
 			fireConnected();
+			KvtProjectAdministrator.reloadProjectList();
 			return true;
 		}
 		
@@ -179,7 +184,7 @@ public class KvtSystemCommunicator {
 	private static void fireConnected() {
 		for (int i = 0; i < m_connectionListeners.size(); i++) {
 			try {
-
+				Log.i("TC connection","notifying listener "+m_connectionListeners.elementAt(i));
 				((KvtTeachviewConnectionListener) (m_connectionListeners
 						.elementAt(i))).teachviewConnected();
 

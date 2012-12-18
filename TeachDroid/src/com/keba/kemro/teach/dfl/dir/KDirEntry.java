@@ -137,6 +137,8 @@ public class KDirEntry {
    	return dirEntry.hashCode();
    }
 
+   public String toString() {return getName();}
+   
    /**
     * Liefert den gepeicherten TcDirEntry 
     *

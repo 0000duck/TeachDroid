@@ -14,6 +14,8 @@
 *------------------------------------------------------------------------*/
 package com.keba.kemro.teach.dfl;
 
+import android.util.Log;
+
 import com.keba.kemro.teach.dfl.codepoint.*;
 import com.keba.kemro.teach.dfl.compilerError.*;
 import com.keba.kemro.teach.dfl.dir.*;
@@ -68,25 +70,40 @@ public class KTcDfl {
 	public KTcDfl(TcClient client, String globalFilter) {
 		this.globalFilter = globalFilter;
 		this.client = client;
+		Log.i("TC connection","Create directory admin");
 		directory = new DirectoryAdministrator(this);
+		Log.i("TC connection","Create structure admin");
 		structure = new StructAdministrator(this);
+		Log.i("TC connection","Create execution admin");
 		execution = new ExecAdministrator(this);
+		Log.i("TC connection","Create error admin");
 		error = new CompilerErrorAdministrator(this);
+		Log.i("TC connection","Create editor admin");
 		editor = new EditAdministrator(this);
 		codepoint = new CodePointAdministrator(this);
+		Log.i("TC connection","Create variable admin");
 		variable = new VariableAdministrator(this);
+		Log.i("TC connection","Init directory admin");
 		((DirectoryAdministrator) directory).init();
+		Log.i("TC connection","Init structure admin");
 		((StructAdministrator) structure).init();
+		Log.i("TC connection","Init exec admin");
 		((ExecAdministrator) execution).init();
+		Log.i("TC connection","Init error admin");
 		((CompilerErrorAdministrator) error).init();
+		Log.i("TC connection","Init editor admin");
 		((EditAdministrator) editor).init();
 		((CodePointAdministrator) codepoint).init();
+		Log.i("TC connection","Init variable admin");
 		((VariableAdministrator) variable).init();
+		Log.i("TC connection","Load global filters: directory");
 		//	1. reload dir entry list
 		directory.setGlobalFilter(globalFilter);
 		// 2. reload global structural project
+		Log.i("TC connection","Load global filters: structure");
 		structure.setGlobalFilter(globalFilter);
 		// 3. reload global execution project
+		Log.i("TC connection","Load global filters: execution");
 		execution.setGlobalFilter(globalFilter);
 	}
 	

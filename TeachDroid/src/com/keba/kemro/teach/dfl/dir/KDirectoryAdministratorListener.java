@@ -14,6 +14,10 @@
 *------------------------------------------------------------------------*/
 package com.keba.kemro.teach.dfl.dir;
 
+import java.util.Vector;
+
+import com.keba.kemro.kvs.teach.data.project.KvtProject;
+
 /**
  * Dieses Interface dient dazu um von Projektstrukturänderungen benachrichtigt
  * zu werden.
@@ -21,6 +25,7 @@ package com.keba.kemro.teach.dfl.dir;
 public interface KDirectoryAdministratorListener {
    /**
     * Wird aufgerufen wenn sich die Struktur der Dateien geändert hat.
+ * @return 
     */
-   public void directoryProjectsChanged ();
+   public Vector<KvtProject> directoryProjectsChanged ();
 }

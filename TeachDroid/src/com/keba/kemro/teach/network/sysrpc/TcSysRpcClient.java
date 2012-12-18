@@ -5,6 +5,8 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import android.util.Log;
+
 import com.keba.jrpc.rpc.RPCException;
 import com.keba.jrpc.rpc.XDR;
 import com.keba.kemro.plc.network.sysrpc.TCI.SysRpcTcClientInfo;
@@ -85,6 +87,7 @@ public class TcSysRpcClient extends TcClient {
 			client.setSoTimeout(TIMEOUT);
 			synchronized (SysRpcTcOpenTeachControlIn) {
 				SysRpcTcOpenTeachControlIn.clType.value = SysRpcTcClientType.rpcObserver;
+				Log.i("TC connection","open SysRPC connection");
 				client.SysRpcTcOpenTeachControl_1(SysRpcTcOpenTeachControlIn, SysRpcTcOpenTeachControlOut);
 				if (SysRpcTcOpenTeachControlOut.retVal) {
 					m_clientID = SysRpcTcOpenTeachControlOut.clientHnd;
@@ -102,11 +105,14 @@ public class TcSysRpcClient extends TcClient {
 						clientID = ip;
 					}
 					SysRpcTcSetClientNameIn.name = clientID;
+					Log.i("TC connection","set client name to "+clientID);
 					client.SysRpcTcSetClientName_1(SysRpcTcSetClientNameIn, SysRpcTcSetClientNameOut);
 					if (SysRpcTcSetClientNameOut.retVal) {
+						
 						client.SysRpcTcReadProjectPath_1(SysRpcTcReadProjectPathOut);
 						if (SysRpcTcReadProjectPathOut.retVal) {
 							setClientData(SysRpcTcOpenTeachControlOut.clientHnd, clientID, SysRpcTcOpenTeachControlOut.tcVersion.toString(), SysRpcTcReadProjectPathOut.pathLocal.toString());
+							Log.i("TC connection","TC project path is: "+SysRpcTcReadProjectPathOut.pathLocal.toString());
 							isConnected = true;
 							new KeepAliveThread();
 							return true;

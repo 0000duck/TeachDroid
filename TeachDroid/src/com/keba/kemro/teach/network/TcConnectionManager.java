@@ -14,6 +14,8 @@
  *------------------------------------------------------------------------*/
 package com.keba.kemro.teach.network;
 
+import android.util.Log;
+
 import com.keba.kemro.teach.network.rpc.TcRpcClient;
 import com.keba.kemro.teach.network.rpc.TcRpcDirectoryModel;
 import com.keba.kemro.teach.network.sysrpc.TcSysRpcClient;
@@ -43,6 +45,7 @@ public class TcConnectionManager {
 		} else if (SYSRPC_TYPE.equalsIgnoreCase(connectionType)) {
 			client = SysRpcClient.createSysRpcClient(application, server);
 		} else {
+			Log.i("TC connection","initializing SysRPC Client");
 			client = SysRpcClient.createSysRpcClient(application, server);
 
 
