@@ -14,11 +14,9 @@
 *------------------------------------------------------------------------*/
 package com.keba.kemro.teach.dfl.value;
 
-import java.util.Vector;
-import com.keba.kemro.teach.dfl.*;
-import com.keba.kemro.teach.dfl.execution.*;
-import com.keba.kemro.teach.dfl.util.KDflLogger;
-import com.keba.kemro.teach.network.*;
+import com.keba.kemro.teach.dfl.execution.KExecUnitRoutine;
+import com.keba.kemro.teach.network.TcAccessHandle;
+import com.keba.kemro.teach.network.TcExecutionUnit;
 
 
 /**
@@ -144,8 +142,8 @@ public class KRoutineVariableGroup extends KVariableGroup {
 	   super.refresh();
    }
 
-   protected boolean update() {
-	   
-	return super.update();
-   }
+	// protected boolean update() {
+	//
+	// return super.update();
+	// }
 }

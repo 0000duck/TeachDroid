@@ -16,12 +16,10 @@ package com.keba.kemro.teach.dfl.value;
 
 import java.util.Vector;
 
-import com.keba.kemro.teach.dfl.*;
-import com.keba.kemro.teach.network.*;
+import com.keba.kemro.teach.network.TcAccessHandle;
 
-/**
- * This variable group administrates map variables. The map target is
- * periodically polled and checked when the target has changed then variable
+/*
+ * en the target has changed then variable
  * group listener will be called. The default poll time is 2 seconds.
  */
 public class KMapToVariableGroup extends KVariableGroup {
@@ -44,7 +42,7 @@ public class KMapToVariableGroup extends KVariableGroup {
 	 * 
 	 * @see com.keba.kemro.teach.dfl.value.KVariableGroup#updateActualValues()
 	 */
-	protected boolean update() {
+	public boolean update() {
 		m_pollCounter = 0;
 //		System.out.println("Performing MapTo Update on "+m_addedVars.size()+" vars");
 		synchronized (m_addedVars) {

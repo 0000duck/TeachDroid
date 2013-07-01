@@ -1,6 +1,7 @@
-package com.keba.teachdroid;
+package com.keba.teachdroid.app;
 
 import java.text.MessageFormat;
+
 import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
@@ -20,21 +21,22 @@ import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
 import com.keba.teachdroid.R;
-import com.keba.teachdroid.fragments.OverviewFragment;
-import com.keba.teachdroid.fragments.ProgramsFragment;
+import com.keba.teachdroid.app.fragments.OverviewFragment;
+import com.keba.teachdroid.app.fragments.ProgramsFragment;
 
 public class MainTeachView extends FragmentActivity implements ActionBar.OnNavigationListener {
 
 	private static final String	STATE_SELECTED_NAVIGATION_ITEM	= "selected_navigation_item";
 	private static String[]		m_viewNames;
-	private String				m_host							= "10.0.0.5";
+	private String				m_host							= "10.150.52.202";
 	private static final String	m_connectFormatString			= "Connecting attempt {0}";
 	protected ProgressDialog	m_dlg;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		m_viewNames = new String[] { getString(R.string.title_robotOverview), getString(R.string.title_robotPrograms), getString(R.string.title_robotJogging), };
+		m_viewNames = new String[] { getString(R.string.title_robotOverview), getString(R.string.title_robotPrograms),
+				getString(R.string.title_robotJogging), };
 
 		setContentView(R.layout.activity_main_teach_view);
 
@@ -44,8 +46,9 @@ public class MainTeachView extends FragmentActivity implements ActionBar.OnNavig
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 
 		actionBar.setListNavigationCallbacks(
-		// Specify a SpinnerAdapter to populate the dropdown list.
-				new ArrayAdapter<String>(actionBar.getThemedContext(), android.R.layout.simple_list_item_1, android.R.id.text1, m_viewNames), this);
+				// Specify a SpinnerAdapter to populate the dropdown list.
+				new ArrayAdapter<String>(actionBar.getThemedContext(), android.R.layout.simple_list_item_1, android.R.id.text1, m_viewNames),
+				this);
 
 		// show the progress dialog
 		m_dlg = ProgressDialog.show(this, "Connecting...", "Connecting to " + m_host, true, true);
@@ -78,15 +81,15 @@ public class MainTeachView extends FragmentActivity implements ActionBar.OnNavig
 		Fragment fragment;
 
 		switch (position) {
-			case 0:
-				fragment = new OverviewFragment();
-				break;
-			case 1:
-				fragment = new ProgramsFragment();
-				break;
-			default:
-				fragment = new DummySectionFragment();
-				break;
+		case 0:
+			fragment = new OverviewFragment();
+			break;
+		case 1:
+			fragment = new ProgramsFragment();
+			break;
+		default:
+			fragment = new DummySectionFragment();
+			break;
 		}
 		Bundle args = new Bundle();
 		args.putString(DummySectionFragment.ARG_SECTION_NUMBER, m_viewNames[position]);
@@ -96,7 +99,7 @@ public class MainTeachView extends FragmentActivity implements ActionBar.OnNavig
 		return true;
 	}
 
-	protected class ConnectTask extends AsyncTask<String, Integer, Boolean> {
+	private class ConnectTask extends AsyncTask<String, Integer, Boolean> {
 
 		@Override
 		protected Boolean doInBackground(String... _params) {
@@ -104,11 +107,13 @@ public class MainTeachView extends FragmentActivity implements ActionBar.OnNavig
 			KvtProjectAdministrator.init();
 			for (int i = 1; i < 100; ++i) {
 				try {
-					if (i % 10 == 0)
+					if (i % 10 == 0) {
 						publishProgress(i);
+					}
 					boolean isConnected = KvtSystemCommunicator.connectOnce(host, 10000, "_global");
-					if (isConnected)
+					if (isConnected) {
 						i = 100;
+					}
 
 					Thread.sleep(100);
 
@@ -142,10 +147,8 @@ public class MainTeachView extends FragmentActivity implements ActionBar.OnNavig
 					}
 					m_dlg.cancel();
 
-					
-					
 					KvtProject[] prjList = KvtProjectAdministrator.getAllProjects();
-					
+
 					for (KvtProject prj : prjList) {
 						Log.i("Tc connection", "Project: " + prj.getName() + " has " + prj.getProgramCount() + " programs");
 					}

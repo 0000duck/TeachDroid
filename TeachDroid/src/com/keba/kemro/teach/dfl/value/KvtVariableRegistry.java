@@ -24,7 +24,7 @@ public class KvtVariableRegistry {
 	protected KVariableGroup	masterGroupSlow;
 	protected KVariableGroup	masterMapGroup;
 	protected KVariableGroup	masterRoutineGroup;
-	private static final int	POLL_CYCLE_FAST		= 200;			// ms
+	private static final int	POLL_CYCLE_FAST		= 100;			// ms
 	private static final int	POLL_CYCLE_MEDIUM	= 500;
 	private static final int	POLL_CYCLE_SLOW		= 800;
 	static final long			POLL_CYCLE_MAPTO	= 1000;
@@ -86,6 +86,7 @@ public class KvtVariableRegistry {
 			if (!v.isWriteOnly()) {
 				registerGroupForVar(_group, v); // add the variable to the var
 				grp.add(v);
+				v.readActualValue(null);
 				if (grp == masterRoutineGroup)
 					((KRoutineVariableGroup) grp).setExecRoutineNode(((KRoutineVariableGroup) _group).getExecRoutineNode());
 
@@ -327,7 +328,7 @@ public class KvtVariableRegistry {
 		masterGroupSlow.refresh();
 		masterMapGroup.refresh();
 		masterRoutineGroup.refresh();
-		setDirty(false);
+		// setDirty(false);
 	}
 
 	/**
@@ -381,9 +382,10 @@ public class KvtVariableRegistry {
 		if (masterRoutineGroup.shouldNotify()) {
 			masterRoutineGroup.notifyChanges();
 		}
+		// setDirty(false);
 	}
 
-	public synchronized boolean isDirty() {
+	public boolean isDirty() {
 		synchronized (dirtyLck) {
 			return m_dirtyflag;
 		}

@@ -7,9 +7,8 @@
  *------------------------------------------------------------------------*/
 package com.keba.kemro.teach.dfl.value;
 
-import com.keba.kemro.teach.dfl.*;
-import com.keba.kemro.teach.dfl.execution.*;
-import com.keba.kemro.teach.network.*;
+import com.keba.kemro.teach.dfl.execution.KExecUnitRoutine;
+import com.keba.kemro.teach.network.TcAccessHandle;
 
 
 /**
@@ -54,7 +53,7 @@ public class KMapToRoutineVariableGroup extends KMapToVariableGroup {
    /* (non-Javadoc)
     * @see com.keba.kemro.teach.dfl.value.KVariableGroup#updateActualValues()
     */
-   protected boolean update () {
+	public boolean update() {
       m_pollCounter = 0;
       synchronized (m_addedVars) {
       	// check all map targets

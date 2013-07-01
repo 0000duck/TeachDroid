@@ -141,7 +141,7 @@ public class KTcDfl {
    
    public void setGlobalFilter (String filter) {
    	if (((globalFilter == null) && (filter != null)) || ((globalFilter != null) && !globalFilter.equalsIgnoreCase(filter))) {
-   		globalFilter = (filter != null) ? filter.toLowerCase(): null;
+			globalFilter = (filter != null) ? filter/* .toLowerCase() */: null;
 			//	1. reload dir entry list
    		directory.setGlobalFilter(globalFilter);
 			// 2. reload global structural project

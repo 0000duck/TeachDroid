@@ -33,14 +33,26 @@ import com.keba.kemro.teach.network.TcDirEntry;
  * @author ede
  */
 public class KDirectoryAdministrator {
-	private final String GLOBAL = File.separator + "_GLOBAL";
+	private final String	GLOBAL			= File.separator + "_global";
 	private final Vector m_dirListener = new Vector();
+	/**
+	 * List that contains all projects of the currently selected robot including system and global
+	 */
 	private Vector m_projectList;
+	/**
+	 * List that contains all projects that exist on the CF card
+	 */
 	private Vector m_projectListAll;
+	/**
+	 * Contains the global projects of all robots
+	 */
 	private Vector m_globalList;
 	private final Hashtable m_programs = new Hashtable();
 	private KDirEntry root;
 	private final Object lock = new Object();
+	/**
+	 * Identifies the currently selected robot. All Projects whose paths start with that string are put in the {@link KDirectoryAdministrator#m_projectList} list
+	 */
 	private String globalFilter;
 
 	private KTcDfl dfl;
@@ -188,7 +200,7 @@ public class KDirectoryAdministrator {
 		while (e.hasMoreElements()) {
 			TcDirEntry entry = (TcDirEntry) e.nextElement();
 			String path = entry.getDirEntryPath();
-			if ((globalFilter == null) || path.startsWith(globalFilter + File.separatorChar) || entry.isSystem() || (GLOBAL.equals(globalFilter) && (path.indexOf(File.separatorChar, 1) == -1))) {
+			if ((globalFilter == null) || path.toLowerCase().startsWith(globalFilter.toLowerCase() + File.separatorChar) || entry.isSystem() || (GLOBAL.equals(globalFilter) && (path.indexOf(File.separatorChar, 1) == -1))) {
 				m_projectList.addElement(new KDirEntry(entry));
 			}
 			if (globalFilter != null) {// || path.startsWith(globalFilter +
@@ -235,9 +247,9 @@ public class KDirectoryAdministrator {
 		synchronized (lock) {
 			if (filter != null) {
 				if (filter.startsWith(File.separator)) {
-					globalFilter = filter.toUpperCase();
+					globalFilter = filter;// .toUpperCase();
 				} else {
-					globalFilter = File.separator + filter.toUpperCase();
+					globalFilter = File.separator + filter;// .toUpperCase();
 				}
 			} else {
 				globalFilter = null;
@@ -338,7 +350,7 @@ public class KDirectoryAdministrator {
 
 	private KDirEntry getProject(KDirEntry program, boolean includeOtherKin) {
 		String path = program.getDirEntryPath();
-		int end = path.indexOf(".TT");
+		int end = path.toLowerCase().indexOf(".tt");
 		if (0 < end) {
 			path = path.substring(0, end + 3);
 			synchronized (lock) {
@@ -492,6 +504,7 @@ public class KDirectoryAdministrator {
 			KDirEntry project = getProject(srcProgram, true);
 			int kind = srcProgram.getKind() == KDirEntry.PROGRAM ? TcDirEntry.DATA : TcDirEntry.USER_DATA;
 			KDirEntry entry = getDirEntry(project, srcProgram.getName(), kind, true);
+			int a = 0;
 			if (entry != null) {
 				dfl.client.directory.copy(entry.getTcDirEntry(), destProjectPath, newName);
 			}

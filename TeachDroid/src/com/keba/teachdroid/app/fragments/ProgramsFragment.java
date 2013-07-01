@@ -1,4 +1,4 @@
-package com.keba.teachdroid.fragments;
+package com.keba.teachdroid.app.fragments;
 
 import java.util.ArrayList;
 import java.util.HashMap;

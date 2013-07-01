@@ -14,14 +14,24 @@
  *------------------------------------------------------------------------*/
 package com.keba.kemro.teach.dfl.execution;
 
-import com.keba.kemro.teach.dfl.*;
-import com.keba.kemro.teach.dfl.structural.*;
-import com.keba.kemro.teach.dfl.structural.routine.*;
-import com.keba.kemro.teach.dfl.util.*;
-import com.keba.kemro.teach.dfl.value.*;
-import com.keba.kemro.teach.network.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
-import java.util.*;
+import com.keba.kemro.teach.dfl.KTcDfl;
+import com.keba.kemro.teach.dfl.structural.KStructNode;
+import com.keba.kemro.teach.dfl.structural.KStructProgram;
+import com.keba.kemro.teach.dfl.structural.KStructProject;
+import com.keba.kemro.teach.dfl.structural.routine.KStructRoutine;
+import com.keba.kemro.teach.dfl.util.KDflLogger;
+import com.keba.kemro.teach.dfl.value.KStructVarWrapper;
+import com.keba.kemro.teach.network.TcAccessHandle;
+import com.keba.kemro.teach.network.TcConnectionListener;
+import com.keba.kemro.teach.network.TcExecutionModel;
+import com.keba.kemro.teach.network.TcExecutionState;
+import com.keba.kemro.teach.network.TcExecutionUnit;
+import com.keba.kemro.teach.network.TcStructuralNode;
+import com.keba.kemro.teach.network.TcStructuralRoutineNode;
 
 /**
  * Verwaltung von Ausführungseinheiten. Eine Ausführungseinheit sind Projekte,
@@ -143,9 +153,10 @@ public class KExecAdministrator {
 	 * @param project
 	 *            Projekt
 	 */
-	public void loadProject(KStructProject project) {
-		dfl.client.execution.loadProject(project.getTcStructuralNode());
+	public boolean loadProject(KStructProject project) {
+		TcExecutionUnit u = dfl.client.execution.loadProject(project.getTcStructuralNode());
 		commandExecuted();
+		return u != null;
 	}
 
 	/**
@@ -154,9 +165,10 @@ public class KExecAdministrator {
 	 * @param project
 	 *            Projekt
 	 */
-	public void unloadProject(KExecUnitProject project) {
-		dfl.client.execution.unloadProject(project.getTcExecutionUnit());
+	public boolean unloadProject(KExecUnitProject project) {
+		boolean ret = dfl.client.execution.unloadProject(project.getTcExecutionUnit());
 		commandExecuted();
+		return ret;
 	}
 
 	/**
@@ -320,14 +332,14 @@ public class KExecAdministrator {
 	 *            kinematic directory
 	 */
 	public void setGlobalFilter(String filter) {
-//		synchronized (dfl.getLockObject()) {
+		synchronized (dfl.getLockObject()) {
 			if (filter != null) {
 				globalFilter = filter.toLowerCase();
 			} else {
 				globalFilter = null;
 			}
 			filterChanged = true;
-//		}
+		}
 	}
 
 	/**

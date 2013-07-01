@@ -14,12 +14,15 @@
  *------------------------------------------------------------------------*/
 package com.keba.kemro.teach.dfl.value;
 
-import java.util.*;
+import java.util.Vector;
 
-//import com.keba.kemro.kvs.teach.framework.util.KvtLogger;
-import com.keba.kemro.teach.dfl.*;
+import com.keba.kemro.teach.dfl.KTcDfl;
 import com.keba.kemro.teach.dfl.util.KDflLogger;
-import com.keba.kemro.teach.network.*;
+import com.keba.kemro.teach.network.TcAccessHandle;
+import com.keba.kemro.teach.network.TcValue;
+import com.keba.kemro.teach.network.TcVariableGroup;
+
+// import com.keba.kemro.kvs.teach.framework.util.KvtLogger;
 
 /**
  * Eine Variablengruppe verwaltet mehrere Variablen und stellt eine
@@ -31,45 +34,45 @@ public class KVariableGroup {
 	/**
 	 * 
 	 */
-	protected static final int TC_VAR_BATCHSIZE = 150;
+	protected static final int			TC_VAR_BATCHSIZE	= 150;
 
 	/**
 	 * 
 	 */
-	private static final int MAX_TC_VAR_AMOUNT = 150;
+	private static final int			MAX_TC_VAR_AMOUNT	= 150;
 
-	private static int groupCounter;
+	private static int					groupCounter;
 
-	protected String m_sGroupName;
-	protected KVariableGroupListener m_listener;
-	protected int m_pollCounter = 7;
-	private int m_pollInterval = 8;
+	protected String					m_sGroupName;
+	protected KVariableGroupListener	m_listener;
+	protected int						m_pollCounter		= 7;
+	private int							m_pollInterval		= 8;
 
 	// means 800ms
 
-	protected TcVariableGroup tcGroup;
-	protected String tcGroupName;
+	protected TcVariableGroup			tcGroup;
+	protected String					tcGroupName;
 
 	/** Alle Variablen einer Gruppe */
-	protected Vector m_variables = new Vector();
+	protected Vector					m_variables			= new Vector();
 	/** Variablen zu denen es Aktualwerte gibt. (Programm ist in Ausführung) */
-	protected Vector m_addedVars = new Vector();
+	protected Vector					m_addedVars			= new Vector();
 	/** Verschiedene Ausführungseinheiten der einzelnen Variablen */
-	protected Vector m_execUnits = new Vector();
+	protected Vector					m_execUnits			= new Vector();
 	/** Zugriffshandle für die einzelnen Variablen */
-	protected Vector m_accessHandles = new Vector();
+	protected Vector					m_accessHandles		= new Vector();
 	/** Variablenwerte */
-	protected Vector m_values = new Vector();
+	protected Vector					m_values			= new Vector();
 	// protected int[] variableIds;
-	protected int[] changedIds;
-	protected boolean firstChangeCall = true;
+	protected int[]						changedIds;
+	protected boolean					firstChangeCall		= true;
 
-	protected int refreshCnt;
-	protected long m_lastPollTime;
+	protected int						refreshCnt;
+	protected long						m_lastPollTime;
 
-	protected boolean m_shouldNotify;
+	protected boolean					m_shouldNotify;
 
-	protected static KTcDfl dfl;
+	protected static KTcDfl				dfl;
 
 	/**
 	 * Erzeugt eine Variablengruppe mit Namen und erfordert dabei die
@@ -238,7 +241,7 @@ public class KVariableGroup {
 	 * 
 	 * @return true if the values are successfully updated
 	 */
-	protected boolean update() {
+	public boolean update() {
 		m_pollCounter = 0;
 		boolean done = false;
 		synchronized (m_addedVars) {
@@ -251,16 +254,20 @@ public class KVariableGroup {
 					// changedIds.length + ")= variables");
 
 				} else {
+
 					changedIds = dfl.client.execution.getChangedVariableGroupValues(tcGroup, m_values);
-//					if (changedIds != null && changedIds.length > 0) {
-//						 KvtLogger.info(this,refreshCnt + ": " + m_sGroupName
-//						 + " updated " + changedIds.length + " variables");
-//						for (int i = 0; i < changedIds.length; i++) {
-//							 KvtLogger.info(this,"\t" +
-//							 getVariableForId(changedIds[i]).m_rootPathString);
-//						}
-//					}
-//					 }
+
+					if (changedIds != null && changedIds.length > 0) {
+						System.out.println(m_sGroupName + " -- addedVars: " + m_addedVars.size() + " changed: " + changedIds.length);
+						for (int i = 0; i < changedIds.length; i++) {
+							String s = getVariableForId(changedIds[i]).m_rootPathString;
+							System.out.println("\t" + s);
+						}
+					}
+					// if (changedIds != null && changedIds.length > 0) {
+					// System.out.println(refreshCnt + ": " + m_sGroupName + " updated " + changedIds.length + " variables ");
+
+					// }
 				}
 				done = true;
 			} else {
@@ -278,7 +285,7 @@ public class KVariableGroup {
 		return done;
 	}
 
-	protected boolean shouldNotify() {
+	protected synchronized boolean shouldNotify() {
 		return m_shouldNotify;
 	}
 
