@@ -1,21 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.keba.teachdroid"
+    package="com.keba.teachdroid.app"
     android:versionCode="1"
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="15"
-        android:targetSdkVersion="15" />
-    <uses-permission android:name="android.permission.INTERNET"/>
+        android:minSdkVersion="16"
+        android:targetSdkVersion="17" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@android:style/Theme.Holo">
+        android:theme="@style/AppTheme" >
         <activity
             android:name="com.keba.teachdroid.app.MainTeachView"
-            android:label="@string/title_activity_main_teach_view" >
-            
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

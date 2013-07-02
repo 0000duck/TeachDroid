@@ -4,23 +4,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.keba.teachdroid.R;
-
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
+
+import com.keba.teachdroid.app.R;
 
 public class ProgramsFragment extends Fragment {
 
 	public ProgramsFragment() {
 	}
 
+	@Override
 	public View onCreateView(LayoutInflater _inf, ViewGroup _container,
 			Bundle _savedInst) {
 

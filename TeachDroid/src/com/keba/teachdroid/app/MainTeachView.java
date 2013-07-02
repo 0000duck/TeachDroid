@@ -17,10 +17,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.keba.kemro.kvs.teach.data.program.KvtStatementAdministrator;
 import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
+import com.keba.kemro.kvs.teach.util.KvtMultiKinematikAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
-import com.keba.teachdroid.R;
 import com.keba.teachdroid.app.fragments.OverviewFragment;
 import com.keba.teachdroid.app.fragments.ProgramsFragment;
 
@@ -28,7 +29,7 @@ public class MainTeachView extends FragmentActivity implements ActionBar.OnNavig
 
 	private static final String	STATE_SELECTED_NAVIGATION_ITEM	= "selected_navigation_item";
 	private static String[]		m_viewNames;
-	private String				m_host							= "10.150.52.202";
+	private String				m_host							= "10.0.0.5";
 	private static final String	m_connectFormatString			= "Connecting attempt {0}";
 	protected ProgressDialog	m_dlg;
 
@@ -49,6 +50,7 @@ public class MainTeachView extends FragmentActivity implements ActionBar.OnNavig
 				// Specify a SpinnerAdapter to populate the dropdown list.
 				new ArrayAdapter<String>(actionBar.getThemedContext(), android.R.layout.simple_list_item_1, android.R.id.text1, m_viewNames),
 				this);
+
 
 		// show the progress dialog
 		m_dlg = ProgressDialog.show(this, "Connecting...", "Connecting to " + m_host, true, true);
@@ -105,6 +107,9 @@ public class MainTeachView extends FragmentActivity implements ActionBar.OnNavig
 		protected Boolean doInBackground(String... _params) {
 			final String host = _params[0];
 			KvtProjectAdministrator.init();
+			KvtStatementAdministrator.init();
+			KvtMultiKinematikAdministrator.init();
+
 			for (int i = 1; i < 100; ++i) {
 				try {
 					if (i % 10 == 0) {
@@ -113,6 +118,7 @@ public class MainTeachView extends FragmentActivity implements ActionBar.OnNavig
 					boolean isConnected = KvtSystemCommunicator.connectOnce(host, 10000, "_global");
 					if (isConnected) {
 						i = 100;
+
 					}
 
 					Thread.sleep(100);

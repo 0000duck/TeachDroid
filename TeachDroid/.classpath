@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry kind="lib" path="C:/Android/android-sdk/platforms/android-15/android.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="file:/C:/Android/android-sdk/docs/reference"/>
@@ -12,8 +12,6 @@
 			<accessrule kind="nonaccessible" pattern="com/android/internal/**"/>
 		</accessrules>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/android-support-v4.jar"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
-	<classpathentry kind="lib" path="libs/view2motion.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

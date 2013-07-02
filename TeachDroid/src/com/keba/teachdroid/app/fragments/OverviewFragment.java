@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
-import com.keba.teachdroid.R;
+import com.keba.teachdroid.app.R;
 import com.keba.teachdroid.app.data.RobotControlProxy;
 
 public class OverviewFragment extends Fragment {

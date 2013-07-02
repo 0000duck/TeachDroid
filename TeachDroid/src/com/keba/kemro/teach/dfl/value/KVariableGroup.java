@@ -427,7 +427,8 @@ public class KVariableGroup {
 	 * 
 	 */
 	protected void refresh() {
-		if (m_addedVars == null || m_addedVars.size() <= 0) {
+//		if (m_addedVars == null || m_addedVars.size() <= 0) {
+		if (tcGroup == null && tcGroupName == null) {
 			check();
 			return;
 		}
@@ -583,6 +584,7 @@ public class KVariableGroup {
 		return groupCounter;
 	}
 
+	@Override
 	public String toString() {
 		return "GroupName: \"" + m_sGroupName + "\" Listener: \"" + m_listener.getClass().getSimpleName();
 	}

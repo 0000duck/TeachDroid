@@ -37,7 +37,7 @@ public class TcConnectionManager {
 	public static final String KLINK_TYPE = "klink";
 
 	public static TcClient getTcClient(String application, String server) {
-		String connectionType = System.getProperty(CONNECTION_TYPE_PROP);
+		String connectionType = System.getProperty(CONNECTION_TYPE_PROP, "sysrpc");
 		TcClient client = null;
 
 		 if (RPC_TYPE.equalsIgnoreCase(connectionType)) {

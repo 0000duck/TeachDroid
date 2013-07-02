@@ -14,15 +14,27 @@
  *------------------------------------------------------------------------*/
 package com.keba.kemro.kvs.teach.data.project;
 
-import java.util.*;
+import java.util.Vector;
 
 import android.util.Log;
 
-import com.keba.kemro.kvs.teach.util.*;
-import com.keba.kemro.teach.dfl.*;
-import com.keba.kemro.teach.dfl.dir.*;
-import com.keba.kemro.teach.dfl.execution.*;
-import com.keba.kemro.teach.dfl.structural.*;
+import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
+import com.keba.kemro.kvs.teach.util.KvtTeachviewConnectionListener;
+import com.keba.kemro.teach.dfl.KTcDfl;
+import com.keba.kemro.teach.dfl.dir.KDirEntry;
+import com.keba.kemro.teach.dfl.dir.KDirectoryAdministratorListener;
+import com.keba.kemro.teach.dfl.execution.KExecAdministratorListener;
+import com.keba.kemro.teach.dfl.execution.KExecUnitNode;
+import com.keba.kemro.teach.dfl.execution.KExecUnitProject;
+import com.keba.kemro.teach.dfl.execution.KExecUnitRoutine;
+import com.keba.kemro.teach.dfl.execution.KExecUnitScope;
+import com.keba.kemro.teach.dfl.structural.KStructAdministratorListener;
+import com.keba.kemro.teach.dfl.structural.KStructNode;
+import com.keba.kemro.teach.dfl.structural.KStructNodeVector;
+import com.keba.kemro.teach.dfl.structural.KStructProgram;
+import com.keba.kemro.teach.dfl.structural.KStructProject;
+import com.keba.kemro.teach.dfl.structural.KStructRoot;
+import com.keba.kemro.teach.dfl.structural.KStructScope;
 
 /**
  * Diese Klasse liefert alle Methoden zur Bearbeitung von Projekten
@@ -412,6 +424,7 @@ public class KvtProjectAdministrator {
 					}
 					KvtProject prj = new KvtProject(entry, project, execUnit, d);
 					m_projects.add(prj);
+					Log.i("TC Connection", "project added: " + prj.getName());
 					tmp.add(prj);
 				}
 				m_projects = tmp;
@@ -707,6 +720,7 @@ public class KvtProjectAdministrator {
 
 	public static void reloadProjectList() {
 		new Thread() {
+			@Override
 			public void run() {
 				try {
 					Thread.sleep(200);
