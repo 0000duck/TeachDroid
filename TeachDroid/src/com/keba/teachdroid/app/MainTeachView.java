@@ -1,10 +1,10 @@
 package com.keba.teachdroid.app;
 
 import java.text.MessageFormat;
+import java.util.concurrent.ExecutionException;
 
 import android.app.ActionBar;
 import android.app.ProgressDialog;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -17,20 +17,20 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.keba.kemro.kvs.teach.data.program.KvtStatementAdministrator;
 import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
-import com.keba.kemro.kvs.teach.util.KvtMultiKinematikAdministrator;
-import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
+import com.keba.teachdroid.app.data.InitializationTask;
+import com.keba.teachdroid.app.data.InitializationTask.InitializationListener;
+import com.keba.teachdroid.app.data.RobotControlProxy;
 import com.keba.teachdroid.app.fragments.OverviewFragment;
 import com.keba.teachdroid.app.fragments.ProgramsFragment;
 
-public class MainTeachView extends FragmentActivity implements ActionBar.OnNavigationListener {
+public class MainTeachView extends FragmentActivity implements ActionBar.OnNavigationListener, InitializationListener {
 
 	private static final String	STATE_SELECTED_NAVIGATION_ITEM	= "selected_navigation_item";
 	private static String[]		m_viewNames;
 	private String				m_host							= "10.0.0.5";
-	private static final String	m_connectFormatString			= "Connecting attempt {0}";
+	static final String	m_connectFormatString			= "Connecting attempt {0}";
 	protected ProgressDialog	m_dlg;
 
 	@Override
@@ -54,8 +54,16 @@ public class MainTeachView extends FragmentActivity implements ActionBar.OnNavig
 
 		// show the progress dialog
 		m_dlg = ProgressDialog.show(this, "Connecting...", "Connecting to " + m_host, true, true);
-		ConnectTask con = new ConnectTask();
-		con.execute(m_host);
+		InitializationTask con = new InitializationTask(this);
+		try {
+			Boolean result = con.execute(m_host).get();
+
+			RobotControlProxy.setConnected(result);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -101,89 +109,6 @@ public class MainTeachView extends FragmentActivity implements ActionBar.OnNavig
 		return true;
 	}
 
-	private class ConnectTask extends AsyncTask<String, Integer, Boolean> {
-
-		@Override
-		protected Boolean doInBackground(String... _params) {
-			final String host = _params[0];
-			KvtProjectAdministrator.init();
-			KvtStatementAdministrator.init();
-			KvtMultiKinematikAdministrator.init();
-
-			for (int i = 1; i < 100; ++i) {
-				try {
-					if (i % 10 == 0) {
-						publishProgress(i);
-					}
-					boolean isConnected = KvtSystemCommunicator.connectOnce(host, 10000, "_global");
-					if (isConnected) {
-						i = 100;
-
-					}
-
-					Thread.sleep(100);
-
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			return KvtSystemCommunicator.isConnected();
-		}
-
-		@Override
-		protected void onCancelled(Boolean result) {
-			super.onCancelled(result);
-		}
-
-		@Override
-		protected void onPostExecute(final Boolean result) {
-
-			super.onPostExecute(result);
-
-			runOnUiThread(new Runnable() {
-				public void run() {
-					// m_dlg.dismiss();
-
-					String msg = "Connection " + (result.booleanValue() ? "established" : "failed!!") + "\nPress back button to dismiss dialog.";
-					m_dlg.setMessage(msg);
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					m_dlg.cancel();
-
-					KvtProject[] prjList = KvtProjectAdministrator.getAllProjects();
-
-					for (KvtProject prj : prjList) {
-						Log.i("Tc connection", "Project: " + prj.getName() + " has " + prj.getProgramCount() + " programs");
-					}
-				}
-			});
-		}
-
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-		}
-
-		@Override
-		protected void onProgressUpdate(final Integer... values) {
-			super.onProgressUpdate(values);
-			// runOnUiThread(new Runnable() {
-			// public void run() {
-			m_dlg.setMessage(MessageFormat.format(m_connectFormatString, values[0]));
-			// }
-			// });
-
-		}
-
-		public void progress(int _p) {
-			publishProgress(_p);
-		}
-
-	}
-
 	/**
 	 * A dummy fragment representing a section of the app, but that simply
 	 * displays dummy text.
@@ -203,4 +128,72 @@ public class MainTeachView extends FragmentActivity implements ActionBar.OnNavig
 			return textView;
 		}
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.teachdroid.app.data.InitializationTask.InitializationListener
+	 * #initializationBegin()
+	 */
+	public void initializationBegin() {
+
+		runOnUiThread(new Runnable() {
+
+			public void run() {
+				m_dlg.setMessage("Begin initialization...");
+				m_dlg.show();
+
+			}
+
+		});
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.teachdroid.app.data.InitializationTask.InitializationListener
+	 * #initializationComplete()
+	 */
+	public void initializationComplete(final boolean _success) {
+		runOnUiThread(new Runnable() {
+			public void run() {
+				// m_dlg.dismiss();
+
+				String msg = "Connection " + (_success ? "established" : "failed!!") + "\nPress back button to dismiss dialog.";
+
+				m_dlg.setMessage(msg);
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				m_dlg.cancel();
+
+				KvtProject[] prjList = KvtProjectAdministrator.getAllProjects();
+
+				for (KvtProject prj : prjList) {
+					Log.i("Tc connection", "Project: " + prj.getName() + " has " + prj.getProgramCount() + " programs");
+				}
+			}
+		});
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.teachdroid.app.data.InitializationTask.InitializationListener
+	 * #setInitializationProgress(int)
+	 */
+	public void setInitializationProgress(final int _progress) {
+		runOnUiThread(new Runnable() {
+			public void run() {
+				m_dlg.setMessage(MessageFormat.format(MainTeachView.m_connectFormatString, _progress));
+			}
+		});
+	}
+
 }

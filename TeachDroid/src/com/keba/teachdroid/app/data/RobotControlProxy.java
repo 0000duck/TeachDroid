@@ -5,6 +5,7 @@ import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 public class RobotControlProxy {
 
 	private static String clientID;
+	private static boolean	m_connected;
 
 	static {
 		KvtProjectAdministrator.init();
@@ -28,5 +29,15 @@ public class RobotControlProxy {
 
 	}
 
+	/**
+	 * @param _result
+	 */
+	public static void setConnected(boolean _result) {
+		m_connected = _result;
+	}
+
+	public static boolean isConnected() {
+		return m_connected;
+	}
 
 }
