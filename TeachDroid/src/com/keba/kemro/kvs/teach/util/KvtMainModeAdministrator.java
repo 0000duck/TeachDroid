@@ -23,7 +23,7 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 	private static KVariableGroup			m_varGroup;
 	private static KStructVarWrapper		m_mainModeVar;
 	private static KvtMainModeAdministrator	instance;
-	private static Vector					m_listeners;
+	private static Vector<KvtMainModeListener>	m_listeners;
 
 	protected KvtMainModeAdministrator() {
 		KvtSystemCommunicator.addConnectionListener(this);
@@ -143,6 +143,9 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 	 * @return true if the listener could be added, false if it already was registered
 	 */
 	public static boolean addListener(KvtMainModeListener _l) {
+		if (m_listeners == null)
+			m_listeners = new Vector<KvtMainModeListener>();
+
 		if (!m_listeners.contains(_l)) {
 			m_listeners.addElement(_l);
 			return true;

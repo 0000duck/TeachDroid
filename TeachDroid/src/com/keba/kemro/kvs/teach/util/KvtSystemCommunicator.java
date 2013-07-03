@@ -32,7 +32,7 @@ public class KvtSystemCommunicator {
 	private static boolean WRITE_ACCESS_ALLOWED = false;
 
 	/** Field m_connectionListeners */
-	private static final Vector m_connectionListeners = new Vector(10);
+	private static Vector<KvtTeachviewConnectionListener>	m_connectionListeners	= new Vector<KvtTeachviewConnectionListener>(10);
 	/** Field m_hostName */
 	private static String m_hostName;
 	private static String clientID;
@@ -167,8 +167,10 @@ public class KvtSystemCommunicator {
 	 * @param listener
 	 *            Verbindungslistener
 	 */
-	public static void addConnectionListener(
-			KvtTeachviewConnectionListener listener) {
+	public static void addConnectionListener(KvtTeachviewConnectionListener listener) {
+		if (m_connectionListeners == null)
+			m_connectionListeners = new Vector<KvtTeachviewConnectionListener>();
+
 		if (!m_connectionListeners.contains(listener)) {
 			m_connectionListeners.addElement(listener);
 		}

@@ -7,13 +7,19 @@
  *------------------------------------------------------------------------*/
 package com.keba.kemro.kvs.teach.data.project;
 
-import java.util.*;
+import java.util.Date;
+import java.util.Vector;
 
-import com.keba.kemro.teach.dfl.*;
-import com.keba.kemro.teach.dfl.dir.*;
-import com.keba.kemro.teach.dfl.execution.*;
-import com.keba.kemro.teach.dfl.structural.*;
-import com.keba.kemro.teach.dfl.structural.routine.*;
+import com.keba.kemro.teach.dfl.KTcDfl;
+import com.keba.kemro.teach.dfl.dir.KDirEntry;
+import com.keba.kemro.teach.dfl.execution.KExecUnitNode;
+import com.keba.kemro.teach.dfl.execution.KExecUnitProject;
+import com.keba.kemro.teach.dfl.execution.KExecUnitRoutine;
+import com.keba.kemro.teach.dfl.structural.KStructNode;
+import com.keba.kemro.teach.dfl.structural.KStructNodeVector;
+import com.keba.kemro.teach.dfl.structural.KStructProgram;
+import com.keba.kemro.teach.dfl.structural.KStructProject;
+import com.keba.kemro.teach.dfl.structural.routine.KStructRoutine;
 
 /**
  * Representation eines Projektes
@@ -134,6 +140,28 @@ public class KvtProject {
 	protected boolean isLoaded() {
 		synchronized (dfl.getLockObject()) {
 			return (programs != null);
+		}
+	}
+
+	/**
+	 * @return
+	 */
+	public String getProjectStateString() {
+		switch (state) {
+		case NOT_BUILDED:
+			return "not built";
+		case NOT_ALREADY_LOADED:
+			return "loading";
+		case BUILDED_WITHOUT_ERROR:
+			return "built";
+		case BUILDED_WITH_ERROR:
+			return "build error";
+		case SUCCESSFULLY_LOADED:
+			return "loaded";
+		case NOT_ALREADY_UNLOADED:
+			return "unloading";
+		default:
+			return "unknown";
 		}
 	}
 
@@ -282,6 +310,7 @@ public class KvtProject {
 	/**
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString() {
 		if (dirEntry != null){
 		   return this.getDirEntry().getName();
@@ -322,4 +351,5 @@ public class KvtProject {
 	public Date getProjectModificationDate() {
 		return dirEntry.getModifiedDate();
 	}
+
 }

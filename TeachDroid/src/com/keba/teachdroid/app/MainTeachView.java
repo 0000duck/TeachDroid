@@ -19,10 +19,10 @@ import android.widget.TextView;
 
 import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
-import com.keba.teachdroid.app.data.InitializationTask;
-import com.keba.teachdroid.app.data.InitializationTask.InitializationListener;
 import com.keba.teachdroid.app.fragments.OverviewFragment;
 import com.keba.teachdroid.app.fragments.ProgramsFragment;
+import com.keba.teachdroid.data.InitializationTask;
+import com.keba.teachdroid.data.InitializationTask.InitializationListener;
 
 public class MainTeachView extends FragmentActivity implements ActionBar.OnNavigationListener, InitializationListener {
 
@@ -135,6 +135,7 @@ public class MainTeachView extends FragmentActivity implements ActionBar.OnNavig
 	 * #initializationBegin()
 	 */
 	public void initializationBegin() {
+
 
 		runOnUiThread(new Runnable() {
 

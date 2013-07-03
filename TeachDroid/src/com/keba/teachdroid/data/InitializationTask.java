@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.keba.teachdroid.app.data;
+package com.keba.teachdroid.data;
 
 import android.os.AsyncTask;
 
@@ -11,6 +11,7 @@ import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtMotionModeAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtMultiKinematikAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
+import com.keba.kemro.serviceclient.alarm.KMessageService;
 
 public class InitializationTask extends AsyncTask<String, Integer, Boolean> {
 
@@ -37,6 +38,9 @@ public class InitializationTask extends AsyncTask<String, Integer, Boolean> {
 		KvtMultiKinematikAdministrator.init();
 		KvtMotionModeAdministrator.init();
 		KvtMainModeAdministrator.init();
+		KMessageService.connect(host, 5000);
+
+		RobotControlProxy.startup();
 
 		for (int i = 1; i < 100; ++i) {
 			try {

@@ -11,24 +11,22 @@ import com.keba.kemro.teach.dfl.value.KVariableGroup;
 import com.keba.kemro.teach.dfl.value.KVariableGroupListener;
 
 public class KvtMotionModeAdministrator implements KMultikinematicListener, KVariableGroupListener, KvtTeachviewConnectionListener {
-	private static KStructVarWrapper			progModeVar;
-	private static KStructVarWrapper			actRobotFlowHdlVar;
-	private static KStructVarWrapper			nextRobotFlowHdlVar;
-	private static KVariableGroup				varGroup;
-	private static int							progMode, actRobotFlowHdl, nextRobotFlowHdl;
-	private static KvtMotionModeAdministrator	admin;
-	private static Vector						m_listener			= new Vector();
-	private static boolean						changed				= false;
-	public static String						CONT_STR			= "CONT";
-	public static String						STEP_STR			= "STEP";
-	public static String						MOTION_STR			= "MSTP";
+	private static KStructVarWrapper				progModeVar;
+	private static KStructVarWrapper				actRobotFlowHdlVar;
+	private static KStructVarWrapper				nextRobotFlowHdlVar;
+	private static KVariableGroup					varGroup;
+	private static int								progMode, actRobotFlowHdl, nextRobotFlowHdl;
+	private static KvtMotionModeAdministrator		admin;
+	private static Vector<KvtMotionModeListener>	m_listener			= new Vector<KvtMotionModeListener>();
+	private static boolean							changed				= false;
+	public static String							CONT_STR			= "CONT";
+	public static String							STEP_STR			= "STEP";
+	public static String							MOTION_STR			= "MSTP";
 
-	private static final int					MODE_STEP			= 2;
-	private static final int					MODE_MOTION_STEP	= 3;
-	private static final int					MODE_CONT			= 1;
-	private static final int					MODE_BACK			= 4;
-
-
+	private static final int						MODE_STEP			= 2;
+	private static final int						MODE_MOTION_STEP	= 3;
+	private static final int						MODE_CONT			= 1;
+	private static final int						MODE_BACK			= 4;
 
 	public static String getMainFlowState(KExecUnitRoutine execRoutine) {
 		// if (execRoutine != null) {
@@ -37,29 +35,31 @@ public class KvtMotionModeAdministrator implements KMultikinematicListener, KVar
 		// }
 		// if (progMode == 3) {
 		// TcExecutionUnit execUnit = execRoutine.getTcExecutionUnit();
-		// if ((execUnit != null) && (actRobotFlowHdl == execUnit.getHandle()) || ((actRobotFlowHdl == 0) && (nextRobotFlowHdl == execUnit.getHandle()))) {
+		// if ((execUnit != null) && (actRobotFlowHdl == execUnit.getHandle())
+		// || ((actRobotFlowHdl == 0) && (nextRobotFlowHdl ==
+		// execUnit.getHandle()))) {
 		// return MOTION_STR;
 		// }
 		// }
 		// return CONT_STR;
 		// }
-		
-		
-		//@ltz: CR_0050518: motion mode icon in stateline controller and in the program mask's header label might get inconsistent
+
+		// @ltz: CR_0050518: motion mode icon in stateline controller and in the
+		// program mask's header label might get inconsistent
 		if (execRoutine != null) {
 			switch (progMode) {
-				case MODE_CONT:
-					return CONT_STR;
-				case MODE_STEP:
-					return STEP_STR;
-				case MODE_MOTION_STEP:
-					return MOTION_STR;
+			case MODE_CONT:
+				return CONT_STR;
+			case MODE_STEP:
+				return STEP_STR;
+			case MODE_MOTION_STEP:
+				return MOTION_STR;
 			}
 			// e.g. for Dürr-Teachview, where "progMode" is always 0
 			if (execRoutine.isMainFlowStepping())
 				return STEP_STR;
 			else
-			return CONT_STR;
+				return CONT_STR;
 		}
 		return "";
 	}
@@ -76,11 +76,15 @@ public class KvtMotionModeAdministrator implements KMultikinematicListener, KVar
 	}
 
 	public static void addListener(KvtMotionModeListener listener) {
+		if (m_listener == null)
+			m_listener = new Vector<KvtMotionModeListener>();
+
 		if (!m_listener.contains(listener)) {
 			m_listener.addElement(listener);
 		}
 		if (m_listener.size() > 0) {
-			varGroup.activate();
+			if (varGroup != null)
+				varGroup.activate();
 		}
 	}
 
@@ -100,10 +104,15 @@ public class KvtMotionModeAdministrator implements KMultikinematicListener, KVar
 			KTcDfl dfl = KvtSystemCommunicator.getTcDfl();
 			if (dfl != null) {
 				synchronized (dfl.getLockObject()) {
+					if (varGroup != null)
+						varGroup.release();
+
 					varGroup = dfl.variable.createVariableGroup("KvtMotionModeAdministrator");
 					varGroup.addListener(this);
 					varGroup.setPollInterval(250);
 					dfl.structure.addMultikinematikListener(this);
+					kinematikChanged();
+					varGroup.activate();
 				}
 			}
 		}
@@ -134,8 +143,10 @@ public class KvtMotionModeAdministrator implements KMultikinematicListener, KVar
 			if (dfl != null) {
 				int kin = KvtMultiKinematikAdministrator.getKinematicIndex();
 				if (kin >= 0) {
-					actRobotFlowHdlVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcDataRobot[" + kin + "].robotFlowHdl");
-					nextRobotFlowHdlVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcDataRobot[" + kin + "].nextRobotFlowHdl");
+					actRobotFlowHdlVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcDataRobot[" + kin
+							+ "].robotFlowHdl");
+					nextRobotFlowHdlVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcDataRobot[" + kin
+							+ "].nextRobotFlowHdl");
 					progModeVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcDataRobot[" + kin + "].progMode");
 					if ((progModeVar != null) && (actRobotFlowHdlVar != null) && (nextRobotFlowHdlVar != null)) {
 						varGroup.add(progModeVar);
@@ -167,7 +178,8 @@ public class KvtMotionModeAdministrator implements KMultikinematicListener, KVar
 			Number n = ((Number) nextRobotFlowHdlVar.getActualValue());
 			if (n != null) {
 				nextRobotFlowHdl = n.intValue();
-				// System.out.println("MotionModeAdmin: nextRobotFlowHdl= " + nextRobotFlowHdl);
+				// System.out.println("MotionModeAdmin: nextRobotFlowHdl= " +
+				// nextRobotFlowHdl);
 			}
 			changed = true;
 		} else if (actRobotFlowHdlVar == variable) {
@@ -175,7 +187,8 @@ public class KvtMotionModeAdministrator implements KMultikinematicListener, KVar
 			if (n != null) {
 
 				actRobotFlowHdl = n.intValue();
-				// System.out.println("MotionModeAdmin: actRobotFlowHdl= " + actRobotFlowHdl);
+				// System.out.println("MotionModeAdmin: actRobotFlowHdl= " +
+				// actRobotFlowHdl);
 			}
 			changed = true;
 		}
