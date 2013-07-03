@@ -21,7 +21,6 @@ import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.teachdroid.app.data.InitializationTask;
 import com.keba.teachdroid.app.data.InitializationTask.InitializationListener;
-import com.keba.teachdroid.app.data.RobotControlProxy;
 import com.keba.teachdroid.app.fragments.OverviewFragment;
 import com.keba.teachdroid.app.fragments.ProgramsFragment;
 
@@ -58,7 +57,6 @@ public class MainTeachView extends FragmentActivity implements ActionBar.OnNavig
 		try {
 			Boolean result = con.execute(m_host).get();
 
-			RobotControlProxy.setConnected(result);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		} catch (ExecutionException e) {

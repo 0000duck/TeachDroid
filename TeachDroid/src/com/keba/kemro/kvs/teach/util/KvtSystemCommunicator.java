@@ -14,15 +14,15 @@
  *------------------------------------------------------------------------*/
 package com.keba.kemro.kvs.teach.util;
 
-import java.util.*;
+import java.util.Vector;
 
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
-import com.keba.kemro.teach.dfl.*;
-import com.keba.kemro.teach.dfl.dir.KDirectoryAdministrator;
-import com.keba.kemro.teach.network.*;
+import com.keba.kemro.teach.dfl.KTcDfl;
+import com.keba.kemro.teach.network.TcClient;
+import com.keba.kemro.teach.network.TcConnectionListener;
+import com.keba.kemro.teach.network.TcConnectionManager;
 
 /**
  * Class KSystemCommunicator
@@ -103,6 +103,10 @@ public class KvtSystemCommunicator {
 		}
 		
 		return false;
+	}
+
+	public static String getClientID() {
+		return clientID;
 	}
 
 	public static void shutdown() {

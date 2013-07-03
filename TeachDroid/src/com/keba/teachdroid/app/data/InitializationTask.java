@@ -7,6 +7,8 @@ import android.os.AsyncTask;
 
 import com.keba.kemro.kvs.teach.data.program.KvtStatementAdministrator;
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
+import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator;
+import com.keba.kemro.kvs.teach.util.KvtMotionModeAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtMultiKinematikAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
 
@@ -33,6 +35,8 @@ public class InitializationTask extends AsyncTask<String, Integer, Boolean> {
 		KvtProjectAdministrator.init();
 		KvtStatementAdministrator.init();
 		KvtMultiKinematikAdministrator.init();
+		KvtMotionModeAdministrator.init();
+		KvtMainModeAdministrator.init();
 
 		for (int i = 1; i < 100; ++i) {
 			try {
