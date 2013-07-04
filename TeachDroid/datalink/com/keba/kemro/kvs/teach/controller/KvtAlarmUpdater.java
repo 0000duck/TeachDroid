@@ -22,7 +22,7 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 																						 */KvtMessageFilterListener {
 	private static Object m_actualMessage;
 	private static int m_actualMessageType;
-	private final Vector m_messages = new Vector();
+	private final Vector							m_messages			= new Vector();
 	private int[] m_alarmTypes;
 	private int MAX_MESSAGE_CLASSES = 32;
 	private boolean					LAST_MESSAGE_FIRST	= true;				// Config.getBooleanProperty("MsgDisplayNewest",
@@ -33,7 +33,7 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 	protected static final int INFO = 3;
 	protected static final int NONE = 0;
 	private static KvtAlarmUpdater updater;
-	private static Vector m_listener = new Vector(5);
+	private static Vector<KvtAlarmUpdaterListener>	m_listener			= new Vector<KvtAlarmUpdaterListener>(5);
 	
 	public static interface KvtAlarmUpdaterListener {
 		public void messageUpdated(int lastMessageType, Object lastMessage);
@@ -55,13 +55,13 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 		listener.messageUpdated(m_actualMessageType, m_actualMessage);
 	}
 
-	private KvtAlarmUpdater(){
+	private KvtAlarmUpdater() {
 		// UserManager.getSharedInstance().addUserChangedListener(this);
 		// LanguageManager.sharedInstance().addLanguageChangedListener(this);
 		KvtMessageFilterAdministrator.addCoordinateListener(this);
 		KMessageService.addConnectionListener(this);
 	}
-	
+
 	private void updateLastError() {
 		m_actualMessage = null;
 		int actualMessageId = -1;
@@ -71,7 +71,8 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 			int id = getTypeOf(msg.m_ClassId);
 			if (id >= 0) {
 				long time = msg.getTimeMSec();
-				if (((m_actualMessage == null) || (id < actualMessageId) || ((LAST_MESSAGE_FIRST) && (id == actualMessageId) && (time > actualMessageDate)) || ((!LAST_MESSAGE_FIRST)
+				if (((m_actualMessage == null) || (id < actualMessageId)
+						|| ((LAST_MESSAGE_FIRST) && (id == actualMessageId) && (time > actualMessageDate)) || ((!LAST_MESSAGE_FIRST)
 						&& (id == actualMessageId) && (time < actualMessageDate)))
 						&& isMessageValid(msg)) {
 					m_actualMessage = msg;
@@ -83,27 +84,26 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 		m_actualMessageType = NONE;
 		if ((actualMessageId >= 0) && (actualMessageId <= 100)) {
 			m_actualMessageType = ALARM;
-		} else if ((actualMessageId >= 100) && (actualMessageId <= 200) ) {
+		} else if ((actualMessageId >= 100) && (actualMessageId <= 200)) {
 			m_actualMessageType = WARNING;
-		} else if ((actualMessageId >= 200) && (actualMessageId <= 300) ) {
+		} else if ((actualMessageId >= 200) && (actualMessageId <= 300)) {
 			m_actualMessageType = INFO;
 		}
-		for (int i = 0 ; i < m_listener.size(); i ++){
-			((KvtAlarmUpdaterListener)m_listener.elementAt(i)).messageUpdated(m_actualMessageType, m_actualMessage);
+		for (int i = 0; i < m_listener.size(); i++) {
+			((KvtAlarmUpdaterListener) m_listener.elementAt(i)).messageUpdated(m_actualMessageType, m_actualMessage);
 		}
 	}
-	
-	public static Object getLastMessage(){
+
+	public static Object getLastMessage() {
 		return m_actualMessage;
 	}
-	
 
 	/**
 	 * @see com.keba.kemro.serviceclient.alarm.KAlarmConnectionListener#connected()
 	 */
 	public void connected() {
 		Vector buffers = KMessageService.getCreatedBuffers();
-		if (buffers != null){
+		if (buffers != null) {
 			for (int i = 0; i < buffers.size(); i++) {
 				KMessageBuffer buffer = (KMessageBuffer) buffers.elementAt(i);
 				if (buffer.isReportBuffer()) {
@@ -114,8 +114,6 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 		updateLastError();
 	}
 
-	
-	
 	/**
 	 * @see com.keba.kemro.serviceclient.alarm.KMessageChangeListener#messagesChanged(java.lang.String,
 	 *      java.util.Vector, java.util.Vector, java.util.Vector)
@@ -128,6 +126,10 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 			if (!m_messages.contains(msg)) {
 				m_messages.addElement(msg);
 			}
+
+			// notify listeners
+			for (KvtAlarmUpdaterListener l : m_listener)
+				l.messageAdded(bufferName, msg);
 		}
 		e = changedMessages.elements();
 		while (e.hasMoreElements()) {
@@ -137,16 +139,21 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 				KMessageService.clearMessageText(msg);
 				m_messages.insertElementAt(msg, 0);
 			}
+
+			// notify listeners
+			for (KvtAlarmUpdaterListener l : m_listener)
+				l.messageChanged(bufferName, msg);
 		}
 		e = removedMessages.elements();
 		while (e.hasMoreElements()) {
 			KMessage msg = (KMessage) e.nextElement();
 			m_messages.removeElement(msg);
+			// notify listeners
+			for (KvtAlarmUpdaterListener l : m_listener)
+				l.messageRemoved(bufferName, msg);
 		}
 		updateLastError();
 	}
-
-	
 
 	// public void languageChanged(LanguageChangedEvent event) {
 	// KMessageService.languageChanged();
@@ -169,7 +176,6 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 			}
 		});
 	}
-	
 
 	private int getClassString(int cId) { // Weiss der Geier warum, kopiert
 											// aus dem AlarmController !
@@ -201,7 +207,6 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 			index++;
 		}
 	}
-	
 
 	private int getTypeOf(int classId) {
 		int id = getClassString(classId);
@@ -233,7 +238,6 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 		updateLastError();
 	}
 
-	
 	private boolean isMessageValid(KMessage msg) {
 		int msgClass = (int) (Math.round(Math.log(msg.m_ClassId) / Math.log(2)) + 1);
 		int msgCompNr = msg.m_CompNr;
@@ -242,7 +246,6 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 		return KvtMessageFilterAdministrator.isMessageValid(msgClass, msgCompNr, msgNr, msgInstNr);
 	}
 
-	
 	/**
 	 * @see com.keba.kemro.serviceclient.alarm.KAlarmConnectionListener#disconnected()
 	 */
@@ -252,7 +255,5 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 		m_actualMessage = null;
 		updateLastError();
 	}
-
-
 
 }

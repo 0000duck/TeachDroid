@@ -199,19 +199,27 @@ public class RobotControlProxy implements KvtTeachviewConnectionListener, KvtMai
 		// add to unmodifiable history queue
 		synchronized (mMsgHistoryLock) {
 			List<KMessage> h = mMessageHistory.get(_bufferName);
+			if (h == null) {
+				mMessageHistory.put(_bufferName, new Vector<KMessage>());
+				h = mMessageHistory.get(_bufferName);
+			}
 			if (h != null) {
 				h.add(_msg);
-			} else
-				mMessageHistory.put(_bufferName, new Vector<KMessage>());
+			}
+
 		}
 
 		// add to temporary message buffer
 		synchronized (mMsgBufferLock) {
 			List<KMessage> q = mMessageQueue.get(_bufferName);
+			if (q == null) {
+				mMessageQueue.put(_bufferName, new Vector<KMessage>());
+				q = mMessageQueue.get(_bufferName);
+			}
 			if (q != null) {
 				q.add(_msg);
-			} else
-				mMessageQueue.put(_bufferName, new Vector<KMessage>());
+			}
+
 		}
 	}
 
@@ -243,12 +251,29 @@ public class RobotControlProxy implements KvtTeachviewConnectionListener, KvtMai
 		messageRemoved(_bufferName, _msg); // first remove the message...
 		synchronized (mMsgBufferLock) {
 			List<KMessage> q = mMessageQueue.get(_bufferName);
+			if (q == null) {
+				mMessageQueue.put(_bufferName, new Vector<KMessage>());
+				q = mMessageQueue.get(_bufferName);
+			}
 			if (q != null) {
 				q.add(_msg);
-			} else
-				mMessageQueue.put(_bufferName, new Vector<KMessage>());
+			}
 
 		}
 	}
 
+	/**
+	 * @return The project that is currently loaded (except system and global
+	 *         project), null if none is loaded
+	 */
+	public static KvtProject getLoadedProject() {
+
+		KvtProject[] list = KvtProjectAdministrator.getCurrentRunningProjects();
+		if (list != null) {
+			for (KvtProject proj : list)
+				if (proj != null && !proj.isGlobalProject() && !proj.isSystemProject())
+					return proj;
+		}
+		return null;
+	}
 }
