@@ -10,12 +10,22 @@ import com.keba.kemro.teach.dfl.value.KStructVarWrapper;
 import com.keba.kemro.teach.dfl.value.KVariableGroup;
 import com.keba.kemro.teach.dfl.value.KVariableGroupListener;
 
+/**
+ * Class that determines in which <em>motion mode</em> the robot currently is.
+ * That means, whether program execution is done in continuous ("CONT"),
+ * line-stepping ("STEP") or motion stepping ("MSTEP") mode.
+ * 
+ * @author ltz
+ * @date 05.07.2013
+ * 
+ */
 public class KvtMotionModeAdministrator implements KMultikinematicListener, KVariableGroupListener, KvtTeachviewConnectionListener {
 	private static KStructVarWrapper				progModeVar;
 	private static KStructVarWrapper				actRobotFlowHdlVar;
 	private static KStructVarWrapper				nextRobotFlowHdlVar;
+
 	private static KVariableGroup					varGroup;
-	private static int								progMode, actRobotFlowHdl, nextRobotFlowHdl;
+	private static int								progMode;
 	private static KvtMotionModeAdministrator		admin;
 	private static Vector<KvtMotionModeListener>	m_listener			= new Vector<KvtMotionModeListener>();
 	private static boolean							changed				= false;
@@ -26,8 +36,6 @@ public class KvtMotionModeAdministrator implements KMultikinematicListener, KVar
 	private static final int						MODE_STEP			= 2;
 	private static final int						MODE_MOTION_STEP	= 3;
 	private static final int						MODE_CONT			= 1;
-	private static final int						MODE_BACK			= 4;
-
 	public static String getMainFlowState(KExecUnitRoutine execRoutine) {
 		// if (execRoutine != null) {
 		// if (execRoutine.isMainFlowStepping()) {
@@ -177,18 +185,14 @@ public class KvtMotionModeAdministrator implements KMultikinematicListener, KVar
 		} else if (nextRobotFlowHdlVar == variable) {
 			Number n = ((Number) nextRobotFlowHdlVar.getActualValue());
 			if (n != null) {
-				nextRobotFlowHdl = n.intValue();
-				// System.out.println("MotionModeAdmin: nextRobotFlowHdl= " +
-				// nextRobotFlowHdl);
+				n.intValue();
 			}
 			changed = true;
 		} else if (actRobotFlowHdlVar == variable) {
 			Number n = ((Number) actRobotFlowHdlVar.getActualValue());
 			if (n != null) {
 
-				actRobotFlowHdl = n.intValue();
-				// System.out.println("MotionModeAdmin: actRobotFlowHdl= " +
-				// actRobotFlowHdl);
+				n.intValue();
 			}
 			changed = true;
 		}

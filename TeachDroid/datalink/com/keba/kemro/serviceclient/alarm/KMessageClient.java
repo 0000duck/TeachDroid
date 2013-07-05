@@ -46,7 +46,10 @@ public abstract class KMessageClient implements Runnable {
 
 	static {
 		m_maxNrEntries = 500;// Config.getIntProperty("MaxReportEntries", 500);
-		m_useLocalMessageInfo = false;// Config.getBooleanProperty("MsgAccessLocal",
+
+		// do not use message info from PLC --> network access on main thread
+		// prohibited in android!
+		m_useLocalMessageInfo = true;// Config.getBooleanProperty("MsgAccessLocal",
 										// false);
 	}
 

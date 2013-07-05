@@ -1,36 +1,71 @@
 package com.keba.teachdroid.app;
 
 import java.text.MessageFormat;
-import java.util.concurrent.ExecutionException;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.Menu;
+import android.widget.EditText;
 
 import com.keba.teachdroid.data.InitializationTask;
 import com.keba.teachdroid.data.InitializationTask.InitializationListener;
+import com.keba.teachdroid.data.RobotControlProxy;
 
 public class MainActivity extends Activity implements InitializationListener {
 
-	private String					m_host					= "10.0.0.5";
-	final String					m_connectFormatString	= "Connecting attempt {0}";
-	protected final ProgressDialog	m_dlg					= ProgressDialog.show(this, "Connecting...", "Connecting to " + m_host, true, true);
+	private String				m_host					= "10.0.0.5";
+	final String				m_connectFormatString	= "Connecting... attempt {0}";
+	protected ProgressDialog	m_dlg;													// ProgressDialog.show(this,
+																						// "Connecting...",
+																						// "Connecting to "
+																						// +
+																						// m_host,
+																						// true,
+																						// true);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		// show the progress dialog
-		InitializationTask con = new InitializationTask(this);
-		try {
-			Boolean result = con.execute(m_host).get();
 
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			e.printStackTrace();
-		}
+		setContentView(R.layout.activity_main);
+
+		InitializationTask itask = new InitializationTask(this);
+		itask.execute(m_host);
+
+		// AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>()
+		// {
+		// private ProgressDialog pd;
+		//
+		// @Override
+		// protected void onPreExecute() {
+		// pd = new ProgressDialog(MainActivity.this);
+		// pd.setTitle("Processing...");
+		// pd.setMessage("Please wait.");
+		// pd.setCancelable(false);
+		// pd.setIndeterminate(true);
+		// pd.show();
+		// }
+		//
+		// @Override
+		// protected Void doInBackground(Void... arg0) {
+		// try {
+		// // Do something...
+		// Thread.sleep(5000);
+		// } catch (InterruptedException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// return null;
+		// }
+		//
+		// @Override
+		// protected void onPostExecute(Void result) {
+		// pd.dismiss();
+		// }
+		// };
+		// task.execute((Void[]) null);
 
 	}
 
@@ -53,8 +88,17 @@ public class MainActivity extends Activity implements InitializationListener {
 		runOnUiThread(new Runnable() {
 
 			public void run() {
+
+				// m_dlg = ProgressDialog.show(MainActivity.this,
+				// "Connecting...", "Connecting to " + m_host, true, true);
+				m_dlg = new ProgressDialog(MainActivity.this, ProgressDialog.STYLE_SPINNER);
+				m_dlg.setTitle("Connecting...");
+				m_dlg.setMessage("Connecting to " + m_host);
+				m_dlg.setCancelable(false);
+				m_dlg.setIndeterminate(false);
 				m_dlg.show();
-				m_dlg.setMessage("Begin initialization...");
+
+				// m_dlg.setMessage("Begin initialization...");
 
 			}
 
@@ -83,10 +127,17 @@ public class MainActivity extends Activity implements InitializationListener {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				m_dlg.cancel();
+				m_dlg.dismiss();
 
 			}
 		});
+		List<String> l = RobotControlProxy.getMessageBacklog();
+		if (l != null) {
+			EditText v = (EditText) findViewById(R.id.alarmLogTextview);
+			for (String s : l) {
+				v.setText(s + "\n" + v.getText());
+			}
+		}
 	}
 
 	/*
@@ -99,7 +150,7 @@ public class MainActivity extends Activity implements InitializationListener {
 	public void setInitializationProgress(final int _progress) {
 		runOnUiThread(new Runnable() {
 			public void run() {
-				m_dlg.setMessage(MessageFormat.format(m_connectFormatString, _progress));
+				m_dlg.setTitle(MessageFormat.format(m_connectFormatString, _progress));
 			}
 		});
 	}
