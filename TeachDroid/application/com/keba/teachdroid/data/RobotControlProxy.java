@@ -51,7 +51,8 @@ public class RobotControlProxy {
 	private static RobotControlDataListener	mLocalInstance;
 
 	/**
-	 * Initializes all administrators which load information from the PLC
+	 * connects to all classes which load information from the PLC by
+	 * registering to them as a listener with the respective listener interfaces
 	 */
 	public static void startup() {
 		mLocalInstance = new RobotControlDataListener();
