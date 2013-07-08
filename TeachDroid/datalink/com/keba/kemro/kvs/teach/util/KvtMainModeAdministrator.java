@@ -13,36 +13,58 @@ import com.keba.kemro.teach.dfl.value.KVariableGroup;
 import com.keba.kemro.teach.dfl.value.KVariableGroupListener;
 
 /**
+ * Class that provides information about the currently selected main mode of
+ * operation (Automatic, manual, etc.) as well as the currently selected
+ * reference system, tool, and the state of the safety subsystem.
+ * 
  * @author ltz
  * 
  */
 public class KvtMainModeAdministrator implements KMultikinematicListener, KVariableGroupListener, KvtTeachviewConnectionListener {
 
-	private final Object					m_dlfLock			= new Object();
-	private int								m_actualMainMode	= -1;
-	private static KVariableGroup			m_varGroup;
-	private static KStructVarWrapper		m_mainModeVar;
-	private static KvtMainModeAdministrator	instance;
+	private final Object						m_dlfLock			= new Object();
+	private int									m_actualMainMode	= -1;
+	private int									mSafetyState		= -1;
+	private String								mChosenRefSys;
+	private String								mChosenTool;
+	private static KVariableGroup				mVarGroup;
+	private static KStructVarWrapper			mMainModeVar;
+	private static KStructVarWrapper			mChosenRefSysVar;
+	private static KStructVarWrapper			mChosenToolVar;
+	private static KStructVarWrapper			mSafetyStateVar;
+	private static KvtMainModeAdministrator		instance;
 	private static Vector<KvtMainModeListener>	m_listeners;
+
+	public static enum SafetyState {
+		eIconSafetyOK, eIconSafetyNOK, // obsolete (deprecated use detailed info
+										// icons instead)
+		eIconSafetyUnknown, eIconSafety2EStopInt, eIconSafety2EStopExt, eIconSafety2EStopBoth, eIconSafetyEStop, eIconSafetySafetyDoor, eIconSafetyEnableSwitch, eIconSafetyPowerRelease;
+		private static SafetyState[]	allValues	= values();
+
+		public static SafetyState fromOrdinal(int n) {
+			return allValues[n];
+		}
+	};
 
 	protected KvtMainModeAdministrator() {
 		KvtSystemCommunicator.addConnectionListener(this);
-		m_listeners = new Vector();
+		m_listeners = new Vector<KvtMainModeListener>();
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.keba.kemro.kvs.teach.util.KvtTeachviewConnectionListener#teachviewConnected()
+	 * @see com.keba.kemro.kvs.teach.util.KvtTeachviewConnectionListener#
+	 * teachviewConnected()
 	 */
 	public void teachviewConnected() {
 		synchronized (m_dlfLock) {
 			KTcDfl dfl = KvtSystemCommunicator.getTcDfl();
 			if (dfl != null) {
 				synchronized (dfl.getLockObject()) {
-					m_varGroup = dfl.variable.createVariableGroup("KvtMainModeAdministrator");
-					m_varGroup.addListener(this);
-					m_varGroup.setPollInterval(250);
+					mVarGroup = dfl.variable.createVariableGroup("KvtMainModeAdministrator");
+					mVarGroup.addListener(this);
+					mVarGroup.setPollInterval(250);
 					dfl.structure.addMultikinematikListener(this);
 				}
 			}
@@ -53,37 +75,87 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.keba.kemro.kvs.teach.util.KvtTeachviewConnectionListener#teachviewDisconnected()
+	 * @see com.keba.kemro.kvs.teach.util.KvtTeachviewConnectionListener#
+	 * teachviewDisconnected()
 	 */
 	public void teachviewDisconnected() {
 		KTcDfl dfl = KvtSystemCommunicator.getTcDfl();
 		if (dfl != null) {
 			dfl.structure.removeMultikinematicListener(this);
-			if (m_varGroup != null) {
-				m_varGroup.release();
+			if (mVarGroup != null) {
+				mVarGroup.release();
 			}
-			m_varGroup = null;
+			mVarGroup = null;
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.keba.kemro.teach.dfl.value.KVariableGroupListener#changed(com.keba.kemro.teach.dfl.value.KStructVarWrapper)
+	 * @see
+	 * com.keba.kemro.teach.dfl.value.KVariableGroupListener#changed(com.keba
+	 * .kemro.teach.dfl.value.KStructVarWrapper)
 	 */
 	public void changed(KStructVarWrapper _variable) {
-		if (_variable.equals(m_mainModeVar)) {
+		if (_variable.equals(mMainModeVar)) {
 			Number mode = (Number) _variable.getActualValue();
 			if (mode != null) {
 				m_actualMainMode = mode.intValue();
+
+			}
+		} else if (_variable.equals(mSafetyStateVar)) {
+			Object v = _variable.readActualValue(null);
+			if (v != null && v instanceof Number) {
+				mSafetyState = ((Number) v).intValue();
+				for (KvtMainModeListener l : m_listeners)
+					l.safetyStateChanged(SafetyState.fromOrdinal(mSafetyState));
+			}
+		} else if (_variable.equals(mChosenRefSysVar)) {
+			Object v = _variable.readActualValue(null);
+			if (v != null && v instanceof String) {
+				mChosenRefSys = (String) v;
+				for (KvtMainModeListener l : m_listeners)
+					l.chosenRefSysChanged(mChosenRefSys);
+
 			}
 		}
+
+		else if (_variable.equals(mChosenToolVar)) {
+			Object v = _variable.getActualValue();
+			if (v != null && v instanceof String) {
+				mChosenTool = (String) v;
+				for (KvtMainModeListener l : m_listeners)
+					l.chosenToolChanged(mChosenTool);
+			}
+		}
+	}
+
+	public int getActualMainMode() {
+		return m_actualMainMode;
+	}
+
+	public int getSafetyState() {
+		return mSafetyState;
+	}
+
+	public String getmChosenRefSys() {
+		return mChosenRefSys;
+	}
+
+	public String getChosenTool() {
+		return mChosenTool;
+	}
+
+	public static KStructVarWrapper getChosenToolVar() {
+		return mChosenToolVar;
 	}
 
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.keba.kemro.teach.dfl.value.KVariableGroupListener#allActualValuesUpdated()
+	 * @see
+	 * com.keba.kemro.teach.dfl.value.KVariableGroupListener#allActualValuesUpdated
+	 * ()
 	 */
 	public void allActualValuesUpdated() {
 		for (int i = 0; i < m_listeners.size(); i++) {
@@ -94,7 +166,9 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.keba.kemro.teach.dfl.structural.KMultikinematicListener#kinematikChanged()
+	 * @see
+	 * com.keba.kemro.teach.dfl.structural.KMultikinematicListener#kinematikChanged
+	 * ()
 	 */
 	public void kinematikChanged() {
 		createVariable();
@@ -104,43 +178,57 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 	 * 
 	 */
 	private synchronized void createVariable() {
-		if (m_varGroup != null) {
-			m_varGroup.release();
+		if (mVarGroup != null) {
+			mVarGroup.release();
 			KTcDfl dfl = KvtSystemCommunicator.getTcDfl();
 			if (dfl != null) {
 				int kin = KvtMultiKinematikAdministrator.getKinematicIndex();
 				if (kin >= 0) {
-					m_mainModeVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcData.selectedMainMode");
+					mMainModeVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcData.selectedMainMode");
 
-					if (m_mainModeVar == null) { // try the gRcData-path
-						m_mainModeVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcDataRobot[" + kin + "].selectedMainMode");
+					if (mMainModeVar == null) { // try the gRcData-path
+						mMainModeVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcDataRobot[" + kin
+								+ "].selectedMainMode");
 					}
 
-					if (m_mainModeVar != null) {
-						m_varGroup.add(m_mainModeVar);
-						m_varGroup.addListener(this);
-						m_varGroup.activate();
-						Object mm = m_mainModeVar.readActualValue(null);
+					mChosenRefSysVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX
+							+ "gRcSelectedRobotData.selectedRefSysName");
+
+					mChosenToolVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX
+							+ "gRcSelectedRobotData.selectedToolName");
+
+					mSafetyStateVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcData.userIcon[4]");
+
+					if (mMainModeVar != null) {
+						mVarGroup.add(mMainModeVar);
 					}
-					// actRobotFlowHdlVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcDataRobot[" + kin + "].robotFlowHdl");
-					// nextRobotFlowHdlVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcDataRobot[" + kin + "].nextRobotFlowHdl");
-					// progModeVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcDataRobot[" + kin + "].progMode");
-					// if ((progModeVar != null) && (actRobotFlowHdlVar != null) && (nextRobotFlowHdlVar != null)) {
-					// varGroup.add(progModeVar);
-					// varGroup.add(actRobotFlowHdlVar);
-					// varGroup.add(nextRobotFlowHdlVar);
-					// }
+					if (mChosenRefSysVar != null)
+						mVarGroup.add(mChosenRefSysVar);
+
+					if (mChosenToolVar != null)
+						mVarGroup.add(mChosenToolVar);
+
+					if (mSafetyStateVar != null) {
+						mVarGroup.add(mSafetyStateVar);
+					}
+
+					mVarGroup.addListener(this);
+					mVarGroup.activate();
+					Object mm = mMainModeVar.readActualValue(null);
+
 				}
 			}
 		}
 	}
 
 	/**
-	 * adds a listener to the administrator which is notified, whenever the main mode changes
+	 * adds a listener to the administrator which is notified, whenever the main
+	 * mode changes
 	 * 
 	 * @param _l
 	 *            the new listener
-	 * @return true if the listener could be added, false if it already was registered
+	 * @return true if the listener could be added, false if it already was
+	 *         registered
 	 */
 	public static boolean addListener(KvtMainModeListener _l) {
 		if (m_listeners == null)
@@ -168,6 +256,32 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 
 	public static interface KvtMainModeListener {
 		void mainModeChanged(int _newMainMode);
+
+		/**
+		 * Called when the chosen tool of the robot has changed
+		 * 
+		 * @param _mChosenTool
+		 *            The name of the new tool
+		 */
+		void chosenToolChanged(String _toolName);
+
+
+		/**
+		 * Called when the robot's geometric frame of reference has changed
+		 * 
+		 * @param _mChosenRefSys
+		 *            The name of the new reference system
+		 */
+		void chosenRefSysChanged(String _refsysName);
+
+		/**
+		 * Called when the safety state of the robot has changed (i.e. a safety
+		 * door violation is present)
+		 * 
+		 * @param _state
+		 *            The new {@link SafetyState}.
+		 */
+		void safetyStateChanged(SafetyState _state);
 	}
 
 	/**

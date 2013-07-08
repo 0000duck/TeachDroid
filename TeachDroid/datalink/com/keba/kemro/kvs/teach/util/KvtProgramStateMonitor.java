@@ -60,8 +60,8 @@ public class KvtProgramStateMonitor implements KvtTeachviewConnectionListener, K
 		public void programModeChanged(ProgramMode _newMode);
 
 		/**
-		 * The execution mode of the program, which is loaded for selected
-		 * robot, has changed.
+		 * The execution state of the loaded program, which is selected for
+		 * focussed robot, has changed.
 		 * 
 		 * @see {@link KvtProgramStateMonitor.ProgramState} for an enumeration
 		 *      of available execution states
@@ -72,28 +72,29 @@ public class KvtProgramStateMonitor implements KvtTeachviewConnectionListener, K
 		public void programStateChanged(ProgramState _newState);
 
 		/**
-		 * Tells if there is any program currently in execution. This variable
-		 * only changes its state
+		 * Tells if there is any program currently in execution. This method is
+		 * called, when there is a state change, i.e. if another program gets
+		 * loaded, it is not invoked.
 		 * 
 		 * @param _isAnyRunning
 		 *            true if there is a programm in execution, false if not
 		 */
-		public void isProgramRunning(boolean _isAnyRunning);
+		public void isAnyProgramRunning(boolean _isAnyRunning);
 
 	}
 
-	private static KvtProgramStateMonitor	mInstance;
+	private static KvtProgramStateMonitor			mInstance;
 
-	private final String					mRobotDataPrefix			= "_system.gRcDataRobot[{0}]";
-	private final String					mProgNamePostfix			= ".progName";
-	private final String					mProgStatePostfix			= ".progState";
-	private final String					mProgModePostfix			= ".progMode";
-	private final String					mNoProgramRunningPostfix	= ".noProgramRunning";
+	private final String							mRobotDataPrefix			= "_system.gRcDataRobot[{0}]";
+	private final String							mProgNamePostfix			= ".progName";
+	private final String							mProgStatePostfix			= ".progState";
+	private final String							mProgModePostfix			= ".progMode";
+	private final String							mNoProgramRunningPostfix	= ".noProgramRunning";
 
-	private KStructVarWrapper				mProgNameVar, mProgStateVar, mProgModeVar, mNoProgRunningVar;
+	private KStructVarWrapper						mProgNameVar, mProgStateVar, mProgModeVar, mNoProgRunningVar;
 
-	private KVariableGroup					mVarGroup;
-	private KTcDfl							mDfl;
+	private KVariableGroup							mVarGroup;
+	private KTcDfl									mDfl;
 	private static List<KvtProgramStateListener>	mListeners					= new Vector<KvtProgramStateListener>();
 
 	/**
@@ -168,7 +169,7 @@ public class KvtProgramStateMonitor implements KvtTeachviewConnectionListener, K
 
 		else if (_variable.equals(mNoProgRunningVar)) {
 			for (KvtProgramStateListener l : mListeners) {
-				l.isProgramRunning(!(Boolean) _variable.readActualValue(null));
+				l.isAnyProgramRunning(!(Boolean) _variable.readActualValue(null));
 			}
 		}
 	}

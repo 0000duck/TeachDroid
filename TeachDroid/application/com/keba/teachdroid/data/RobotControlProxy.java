@@ -20,6 +20,7 @@ import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor;
 import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener;
 import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.KvtMainModeListener;
+import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.SafetyState;
 import com.keba.kemro.kvs.teach.util.KvtMotionModeAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtMotionModeAdministrator.KvtMotionModeListener;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
@@ -33,11 +34,12 @@ import com.keba.kemro.serviceclient.alarm.KMessage;
 import com.keba.kemro.teach.dfl.KTcDfl;
 
 /**
- * Class that administrates all information related to the robot controller,
- * such as available programs, execution states, connection state, available
- * robots, etc. This class is also responsible for pulling up all internal
- * administrator classes and thus establishing data connections to the robot
- * controller.
+ * Class that administers all data related to the robot controller, such as
+ * available programs, execution states, connection state, available robots,
+ * etc. This class is also responsible for pulling up all internal administrator
+ * classes and thus establishing data connections to the robot controller.
+ * 
+ * From a MVC point of view, this class is the data model of any application
  * 
  * @author ltz
  * @since 04.07.2013
@@ -199,6 +201,39 @@ public class RobotControlProxy {
 	}
 
 	/**
+	 * Quits and dismisses the last alarm message that has been reported.
+	 * 
+	 * @return True if confirming the message was successful, false otherwise
+	 * 
+	 * @throws IllegalAccessException
+	 *             Thrown if the message cannot be quitted.
+	 */
+	public static boolean confirmLastMessage() throws IllegalAccessException {
+		// Object msg = KvtAlarmUpdater.getLastMessage();
+
+		KMessage msg = mLocalInstance.mLastMessage;
+		if (msg != null) {
+			final KMessage lMsg = (KMessage) msg;
+
+			if (lMsg.confirmAllowed()) {
+
+				new Thread(new Runnable() {
+
+					public void run() {
+						lMsg.quitMessage();
+					}
+				}).start();
+
+				return true;
+
+			} else
+				throw new IllegalAccessException("Confirming message " + lMsg + " not allowed!");
+		}
+		return false;
+
+	}
+
+	/**
 	 * General listener class, which consolidates all DFL listeners, thus
 	 * collects and processes all information coming from the PLC/robot
 	 * controller. All callback methods from those listeners must be
@@ -230,6 +265,7 @@ public class RobotControlProxy {
 		 * are confirmed via a button
 		 */
 		private Hashtable<String, List<KMessage>>	mMessageQueue		= new Hashtable<String, List<KMessage>>();
+		private KMessage							mLastMessage		= null;
 
 		public void teachviewConnected() {
 			mConnected = true;
@@ -362,8 +398,13 @@ public class RobotControlProxy {
 				if (q != null) {
 					q.add(_msg);
 				}
-
 			}
+
+			// set the last message
+			if (_bufferName.contains("RC"))
+				mLastMessage = _msg;
+			else
+				mLastMessage = null;
 		}
 
 		/*
@@ -375,9 +416,16 @@ public class RobotControlProxy {
 		 */
 		public void messageRemoved(String _bufferName, KMessage _msg) {
 			synchronized (mMsgBufferLock) {
+				// remove message from queue
 				List<KMessage> q = mMessageQueue.get(_bufferName);
 				if (q != null)
 					q.remove(_msg);
+
+				// update last message
+				if (q != null && !q.isEmpty() && _bufferName.contains("RC")) {
+					mLastMessage = q.get(0);
+				} else
+					mLastMessage = null;
 			}
 		}
 
@@ -502,7 +550,35 @@ public class RobotControlProxy {
 		 * @see com.keba.kemro.kvs.teach.util.KvtProgramStateMonitor.
 		 * KvtProgramStateListener#isProgramRunning(boolean)
 		 */
-		public void isProgramRunning(boolean _isAnyRunning) {
+		public void isAnyProgramRunning(boolean _isAnyRunning) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.
+		 * KvtMainModeListener#chosenToolChanged(java.lang.String)
+		 */
+		public void chosenToolChanged(String _toolName) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.
+		 * KvtMainModeListener#chosenRefSysChanged(java.lang.String)
+		 */
+		public void chosenRefSysChanged(String _refsysName) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.
+		 * KvtMainModeListener#safetyStateChanged(com.keba.kemro.kvs.teach.util.
+		 * KvtMainModeAdministrator.SafetyState)
+		 */
+		public void safetyStateChanged(SafetyState _state) {
 		}
 
 	}

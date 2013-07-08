@@ -4,9 +4,16 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.EditText;
 
 import com.keba.teachdroid.data.InitializationTask;
@@ -16,7 +23,7 @@ import com.keba.teachdroid.data.RobotControlProxy;
 public class MainActivity extends Activity implements InitializationListener {
 
 	private String				m_host					= "10.0.0.5";
-	final String				m_connectFormatString	= "Connecting... attempt {0}";
+	final String				m_connectFormatString	= "Connecting...  {0} % complete";
 	protected ProgressDialog	m_dlg;													// ProgressDialog.show(this,
 																						// "Connecting...",
 																						// "Connecting to "
@@ -31,42 +38,39 @@ public class MainActivity extends Activity implements InitializationListener {
 
 		setContentView(R.layout.activity_main);
 
-		InitializationTask itask = new InitializationTask(this);
-		itask.execute(m_host);
+		WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		if (wifi.isWifiEnabled()) {
 
-		// AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>()
-		// {
-		// private ProgressDialog pd;
-		//
-		// @Override
-		// protected void onPreExecute() {
-		// pd = new ProgressDialog(MainActivity.this);
-		// pd.setTitle("Processing...");
-		// pd.setMessage("Please wait.");
-		// pd.setCancelable(false);
-		// pd.setIndeterminate(true);
-		// pd.show();
-		// }
-		//
-		// @Override
-		// protected Void doInBackground(Void... arg0) {
-		// try {
-		// // Do something...
-		// Thread.sleep(5000);
-		// } catch (InterruptedException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// return null;
-		// }
-		//
-		// @Override
-		// protected void onPostExecute(Void result) {
-		// pd.dismiss();
-		// }
-		// };
-		// task.execute((Void[]) null);
+			InitializationTask itask = new InitializationTask(this);
+			itask.execute(m_host);
 
+			Button b = (Button) findViewById(R.id.button1);
+			if (b != null)
+				b.setOnClickListener(new OnClickListener() {
+
+					public void onClick(View _v) {
+						try {
+							RobotControlProxy.confirmLastMessage();
+						} catch (IllegalAccessException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+		} else {
+			AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
+
+			dlgAlert.setMessage("Please enable WiFi and restart the app !");
+
+			dlgAlert.setTitle("Warning");
+			dlgAlert.setPositiveButton("OK", new android.content.DialogInterface.OnClickListener() {
+				
+				public void onClick(DialogInterface _dialog, int _which) {
+					finish(); // not very clean -> should activate wifi!
+				}
+			});
+			dlgAlert.setCancelable(true);
+			dlgAlert.create().show();
+		}
 	}
 
 	@Override

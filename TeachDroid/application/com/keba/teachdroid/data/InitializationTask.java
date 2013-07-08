@@ -51,23 +51,34 @@ public class InitializationTask extends AsyncTask<String, Integer, Boolean> {
 		final String host = _params[0];
 
 		KvtProjectAdministrator.init();
+		publishProgress(10);
 		KvtStatementAdministrator.init();
+		publishProgress(20);
 		KvtMultiKinematikAdministrator.init();
+		publishProgress(30);
 		KvtMotionModeAdministrator.init();
+		publishProgress(40);
 		KvtMainModeAdministrator.init();
+		publishProgress(50);
 		KvtPositionMonitor.init();
+		publishProgress(60);
 		KvtDriveStateMonitor.init();
+		publishProgress(70);
 		KvtProgramStateMonitor.init();
+		publishProgress(80);
 		KMessageService.connect(host, 5000);
+		publishProgress(90);
 
 		RobotControlProxy.startup();
+		publishProgress(95);
 
 		for (int i = 1; i < 10; ++i) {
 			try {
 				// if (i % 10 == 0) {
-				publishProgress(i);
+				// publishProgress(i);
 				// }
 				boolean isConnected = KvtSystemCommunicator.connectOnce(host, 5000, "_global");
+				publishProgress(100);
 
 				if (isConnected) {
 					i = 100;
