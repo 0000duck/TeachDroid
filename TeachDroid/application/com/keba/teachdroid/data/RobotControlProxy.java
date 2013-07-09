@@ -3,6 +3,8 @@ package com.keba.teachdroid.data;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
@@ -18,6 +20,7 @@ import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministratorListener;
 import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor;
 import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener;
+import com.keba.kemro.kvs.teach.util.KvtExecutionMonitor;
 import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.KvtMainModeListener;
 import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.SafetyState;
@@ -50,22 +53,29 @@ public class RobotControlProxy {
 	private static final String				ROBOT_CONTROL_LOGTAG	= "RobotControl";
 	private static String					mClientID;
 	private static boolean					mConnected;
-	private static RobotControlDataListener	mLocalInstance;
+	private static RobotControlDataListener	mDataListener;
 
 	/**
 	 * connects to all classes which load information from the PLC by
 	 * registering to them as a listener with the respective listener interfaces
 	 */
 	public static void startup() {
-		mLocalInstance = new RobotControlDataListener();
+		mDataListener = new RobotControlDataListener();
+		mDataListener.addObserver(new Observer() {
+
+			public void update(Observable _observable, Object _data) {
+				// Log.d(ROBOT_CONTROL_LOGTAG, _observable + " updated!");
+			}
+		});
+
 		// add all listeners, consolidate here
-		KvtSystemCommunicator.addConnectionListener(mLocalInstance);
-		KvtMainModeAdministrator.addListener(mLocalInstance);
-		KvtMotionModeAdministrator.addListener(mLocalInstance);
-		KvtProjectAdministrator.addProjectListener(mLocalInstance);
-		KvtAlarmUpdater.addListener(mLocalInstance);
-		KvtPositionMonitor.addListener(mLocalInstance);
-		KvtDriveStateMonitor.addListener(mLocalInstance);
+		KvtSystemCommunicator.addConnectionListener(mDataListener);
+		KvtMainModeAdministrator.addListener(mDataListener);
+		KvtMotionModeAdministrator.addListener(mDataListener);
+		KvtProjectAdministrator.addProjectListener(mDataListener);
+		KvtAlarmUpdater.addListener(mDataListener);
+		KvtPositionMonitor.addListener(mDataListener);
+		KvtDriveStateMonitor.addListener(mDataListener);
 
 	}
 
@@ -106,7 +116,7 @@ public class RobotControlProxy {
 				protected List<String> doInBackground(Void... _params) {
 					String filter = "RC";
 
-					Set<Entry<String, List<KMessage>>> s = mLocalInstance.mMessageQueue.entrySet();
+					Set<Entry<String, List<KMessage>>> s = mDataListener.mMessageQueue.entrySet();
 
 					for (Entry<String, List<KMessage>> e : s) {
 						if (e.getKey().contains(filter)) {
@@ -149,7 +159,7 @@ public class RobotControlProxy {
 				protected List<String> doInBackground(Void... _params) {
 					String filter = "Info";
 
-					Set<Entry<String, List<KMessage>>> s = mLocalInstance.mMessageQueue.entrySet();
+					Set<Entry<String, List<KMessage>>> s = mDataListener.mMessageQueue.entrySet();
 
 					for (Entry<String, List<KMessage>> e : s) {
 						if (e.getKey().equals(filter)) {
@@ -200,6 +210,49 @@ public class RobotControlProxy {
 		return null;
 	}
 
+	public static String getRefsysName() {
+		// return KvtMainModeAdministrator.getChosenRefSys();
+		return mDataListener.mChosenRefsys;
+	}
+
+	public static String getToolName() {
+		// return KvtMainModeAdministrator.getChosenTool();
+		return mDataListener.mToolName;
+	}
+
+	public static SafetyState getSafetyState() {
+		// return KvtMainModeAdministrator.getSafetyState();
+		return mDataListener.mSafetyState;
+	}
+
+	public static int getOverride() {
+		return mDataListener.mOverride.intValue();
+	}
+
+	public static boolean drivesReady() {
+		return mDataListener.mDrivesReady;
+	}
+
+	public static boolean drivesReferenced() {
+		return mDataListener.mDrivesRerenced;
+	}
+
+	public static boolean drivesPower() {
+		return mDataListener.mHasPower;
+	}
+
+	public static ProgramMode getProgramMode() {
+		return mDataListener.mProgMode;
+	}
+
+	public static ProgramState getProgramState() {
+		return mDataListener.mProgState;
+	}
+
+	public static boolean isAnyProgramRunning() {
+		return mDataListener.mIsAnyProgRunning;
+	}
+
 	/**
 	 * Quits and dismisses the last alarm message that has been reported.
 	 * 
@@ -211,7 +264,7 @@ public class RobotControlProxy {
 	public static boolean confirmLastMessage() throws IllegalAccessException {
 		// Object msg = KvtAlarmUpdater.getLastMessage();
 
-		KMessage msg = mLocalInstance.mLastMessage;
+		KMessage msg = mDataListener.mLastMessage;
 		if (msg != null) {
 			final KMessage lMsg = (KMessage) msg;
 
@@ -233,6 +286,11 @@ public class RobotControlProxy {
 
 	}
 
+	public static void addObserver(Observer _obs) {
+		mDataListener.addObserver(_obs);
+	}
+
+
 	/**
 	 * General listener class, which consolidates all DFL listeners, thus
 	 * collects and processes all information coming from the PLC/robot
@@ -242,8 +300,9 @@ public class RobotControlProxy {
 	 * @author ltz
 	 * @since 04.07.2013
 	 */
-	private static class RobotControlDataListener implements KvtTeachviewConnectionListener, KvtMainModeListener, KvtMotionModeListener,
-			KvtProjectAdministratorListener, KvtAlarmUpdaterListener, KvtPositionMonitorListener, KvtDriveStateListener, KvtProgramStateListener {
+	private static class RobotControlDataListener extends Observable implements KvtTeachviewConnectionListener, KvtMainModeListener,
+			KvtMotionModeListener, KvtProjectAdministratorListener, KvtAlarmUpdaterListener, KvtPositionMonitorListener, KvtDriveStateListener,
+			KvtProgramStateListener {
 
 		/**
 		 * reference to the data function layer
@@ -266,12 +325,24 @@ public class RobotControlProxy {
 		 */
 		private Hashtable<String, List<KMessage>>	mMessageQueue		= new Hashtable<String, List<KMessage>>();
 		private KMessage							mLastMessage		= null;
+		private SafetyState							mSafetyState;
+		private String								mChosenRefsys;
+		private String								mToolName;
+		private boolean								mIsAnyProgRunning;
+		private ProgramState						mProgState;
+		private ProgramMode							mProgMode;
+		private String								mLoadedProgram;
+		private Boolean								mDrivesRerenced;
+		private Boolean								mDrivesReady;
+		private boolean								mHasPower;
+		private Number								mOverride;
 
 		public void teachviewConnected() {
 			mConnected = true;
 			mDfl = KvtSystemCommunicator.getTcDfl();
 			mClientID = KvtSystemCommunicator.getClientID();
 			Log.d(ROBOT_CONTROL_LOGTAG, "Teachview Connected, client-ID is " + mClientID);
+			notifyObservers();
 		}
 
 		/*
@@ -288,6 +359,7 @@ public class RobotControlProxy {
 			mMessageHistory.clear();
 			Log.d(ROBOT_CONTROL_LOGTAG, "Teachview Disconnected");
 
+			notifyObservers();
 		}
 
 		/*
@@ -298,6 +370,7 @@ public class RobotControlProxy {
 		 */
 		public void motionModeChanged(int _newProgmode) {
 			Log.d(ROBOT_CONTROL_LOGTAG, "Motion mode changed to " + _newProgmode);
+			notifyObservers();
 		}
 
 		/*
@@ -310,7 +383,9 @@ public class RobotControlProxy {
 			if (_newMainMode != mCurrentMainMode) {
 				Log.d(ROBOT_CONTROL_LOGTAG, "New Mainmode: " + _newMainMode);
 				mCurrentMainMode = _newMainMode;
+				notifyObservers();
 			}
+
 		}
 
 		/*
@@ -328,7 +403,7 @@ public class RobotControlProxy {
 				KvtProgram prg = _prj.getProgram(i);
 				Log.d(ROBOT_CONTROL_LOGTAG, "         -> " + _prj.getName() + "." + prg.getName() + " (" + prg.getProgramStateString() + ")");
 			}
-
+			notifyObservers();
 		}
 
 		/*
@@ -342,7 +417,11 @@ public class RobotControlProxy {
 		public void programStateChanged(KvtProgram _prg) {
 			Log.d(ROBOT_CONTROL_LOGTAG, "Program " + _prg.getName() + "'s state is " + _prg.getProgramStateString());
 
-			getLoadedProgram();
+			if (_prg.getProgramState() == KvtProgram.LOADED) {
+				KvtExecutionMonitor.getTextForProgram(_prg);
+			}
+
+			notifyObservers();
 		}
 
 		/*
@@ -354,6 +433,7 @@ public class RobotControlProxy {
 		 */
 		public void projectListChanged() {
 			Log.d(ROBOT_CONTROL_LOGTAG, "Project list hast changed!");
+			notifyObservers();
 		}
 
 		/*
@@ -405,6 +485,8 @@ public class RobotControlProxy {
 				mLastMessage = _msg;
 			else
 				mLastMessage = null;
+
+			notifyObservers();
 		}
 
 		/*
@@ -427,6 +509,7 @@ public class RobotControlProxy {
 				} else
 					mLastMessage = null;
 			}
+			notifyObservers();
 		}
 
 		/*
@@ -449,6 +532,7 @@ public class RobotControlProxy {
 				}
 
 			}
+			notifyObservers();
 		}
 
 		/*
@@ -460,6 +544,7 @@ public class RobotControlProxy {
 		 */
 		public void cartesianPositionChanged(String _compName, Number _value) {
 			Log.d("KvtPositionMonitor", "Component " + _compName + ": " + _value);
+			notifyObservers();
 		}
 
 		/*
@@ -471,6 +556,7 @@ public class RobotControlProxy {
 		 */
 		public void axisPositionChanged(int _axisNo, Number _value, String _axisName) {
 			Log.d("KvtPositionMonitor", "Axis " + (_axisNo + 1) + " [" + _axisNo + "] has position " + _value);
+			notifyObservers();
 		}
 
 		/*
@@ -481,6 +567,8 @@ public class RobotControlProxy {
 		 */
 		public void overrideChanged(Number _override) {
 			Log.d("KvtPositionMonitor", "Override of focussed robot changed to " + _override);
+			mOverride = _override;
+			notifyObservers();
 		}
 
 		/*
@@ -491,6 +579,9 @@ public class RobotControlProxy {
 		 * #drivePowerChanged(boolean)
 		 */
 		public void drivePowerChanged(boolean _hasPower) {
+			mHasPower = _hasPower;
+			notifyObservers();
+
 		}
 
 		/*
@@ -500,7 +591,9 @@ public class RobotControlProxy {
 		 * com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener
 		 * #driveIsReadyChanged(java.lang.Boolean)
 		 */
-		public void driveIsReadyChanged(Boolean _readActualValue) {
+		public void driveIsReadyChanged(Boolean _ready) {
+			mDrivesReady = _ready;
+			notifyObservers();
 		}
 
 		/*
@@ -510,7 +603,9 @@ public class RobotControlProxy {
 		 * com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener
 		 * #driveIsReferencedChanged(java.lang.Boolean)
 		 */
-		public void driveIsReferencedChanged(Boolean _readActualValue) {
+		public void driveIsReferencedChanged(Boolean _isRef) {
+			mDrivesRerenced = _isRef;
+			notifyObservers();
 		}
 
 		/*
@@ -519,7 +614,9 @@ public class RobotControlProxy {
 		 * @see com.keba.kemro.kvs.teach.util.KvtProgramStateMonitor.
 		 * KvtProgramStateListener#programNameChanged(java.lang.String)
 		 */
-		public void programNameChanged(String _programName) {
+		public void loadedProgramNameChanged(String _programName) {
+			mLoadedProgram = _programName;
+
 		}
 
 		/*
@@ -530,7 +627,9 @@ public class RobotControlProxy {
 		 * #programModeChanged(com.keba.kemro.kvs.teach.util
 		 * .KvtProgramStateMonitor.ProgramMode)
 		 */
-		public void programModeChanged(ProgramMode _newMode) {
+		public void loadedProgramModeChanged(ProgramMode _newMode) {
+			mProgMode = _newMode;
+			notifyObservers();
 		}
 
 		/*
@@ -541,7 +640,9 @@ public class RobotControlProxy {
 		 * #programStateChanged(com.keba.kemro.kvs.teach.util
 		 * .KvtProgramStateMonitor.ProgramState)
 		 */
-		public void programStateChanged(ProgramState _newState) {
+		public void loadedProgramStateChanged(ProgramState _newState) {
+			mProgState = _newState;
+			notifyObservers();
 		}
 
 		/*
@@ -551,6 +652,8 @@ public class RobotControlProxy {
 		 * KvtProgramStateListener#isProgramRunning(boolean)
 		 */
 		public void isAnyProgramRunning(boolean _isAnyRunning) {
+			mIsAnyProgRunning = _isAnyRunning;
+			notifyObservers();
 		}
 
 		/*
@@ -560,6 +663,8 @@ public class RobotControlProxy {
 		 * KvtMainModeListener#chosenToolChanged(java.lang.String)
 		 */
 		public void chosenToolChanged(String _toolName) {
+			mToolName = _toolName;
+			notifyObservers();
 		}
 
 		/*
@@ -569,6 +674,8 @@ public class RobotControlProxy {
 		 * KvtMainModeListener#chosenRefSysChanged(java.lang.String)
 		 */
 		public void chosenRefSysChanged(String _refsysName) {
+			mChosenRefsys = _refsysName;
+			notifyObservers();
 		}
 
 		/*
@@ -579,7 +686,30 @@ public class RobotControlProxy {
 		 * KvtMainModeAdministrator.SafetyState)
 		 */
 		public void safetyStateChanged(SafetyState _state) {
+			mSafetyState = _state;
+			notifyObservers();
 		}
 
+		@Override
+		public String toString() {
+			return "RobotControlDataListener @TC_ID " + mClientID;
+		}
+
+		@Override
+		public void notifyObservers() {
+			setChanged();
+			super.notifyObservers();
+		}
 	}
+
+
+	/**
+	 * Switches the drives' power either on or off, depending on the a-priori
+	 * state
+	 */
+	public static void toggleDrivesPower() {
+		KvtDriveStateMonitor.toggleDrivesPower();
+	}
+
+
 }

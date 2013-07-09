@@ -46,7 +46,7 @@ public class KvtProgramStateMonitor implements KvtTeachviewConnectionListener, K
 		 * @param _programName
 		 *            The name of the program which was just loaded
 		 */
-		public void programNameChanged(String _programName);
+		public void loadedProgramNameChanged(String _programName);
 
 		/**
 		 * The execution mode of the program, which is loaded for selected
@@ -57,7 +57,7 @@ public class KvtProgramStateMonitor implements KvtTeachviewConnectionListener, K
 		 * @param _newMode
 		 *            the new execution mode of the program
 		 */
-		public void programModeChanged(ProgramMode _newMode);
+		public void loadedProgramModeChanged(ProgramMode _newMode);
 
 		/**
 		 * The execution state of the loaded program, which is selected for
@@ -69,7 +69,7 @@ public class KvtProgramStateMonitor implements KvtTeachviewConnectionListener, K
 		 * @param _newState
 		 *            the new execution mode of the program
 		 */
-		public void programStateChanged(ProgramState _newState);
+		public void loadedProgramStateChanged(ProgramState _newState);
 
 		/**
 		 * Tells if there is any program currently in execution. This method is
@@ -155,15 +155,15 @@ public class KvtProgramStateMonitor implements KvtTeachviewConnectionListener, K
 	public void changed(KStructVarWrapper _variable) {
 		if (_variable.equals(mProgNameVar))
 			for (KvtProgramStateListener l : mListeners) {
-				l.programNameChanged((String) _variable.readActualValue(null));
+				l.loadedProgramNameChanged((String) _variable.readActualValue(null));
 			}
 		else if (_variable.equals(mProgModeVar)) {
 			for (KvtProgramStateListener l : mListeners) {
-				l.programModeChanged(ProgramMode.fromOrdinal((Integer) _variable.readActualValue(null)));
+				l.loadedProgramModeChanged(ProgramMode.fromOrdinal((Integer) _variable.readActualValue(null)));
 			}
 		} else if (_variable.equals(mProgStateVar)) {
 			for (KvtProgramStateListener l : mListeners) {
-				l.programStateChanged(ProgramState.fromOrdinal((Integer) _variable.readActualValue(null)));
+				l.loadedProgramStateChanged(ProgramState.fromOrdinal((Integer) _variable.readActualValue(null)));
 			}
 		}
 

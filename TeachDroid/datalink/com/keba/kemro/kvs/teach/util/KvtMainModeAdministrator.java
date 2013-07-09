@@ -22,6 +22,10 @@ import com.keba.kemro.teach.dfl.value.KVariableGroupListener;
  */
 public class KvtMainModeAdministrator implements KMultikinematicListener, KVariableGroupListener, KvtTeachviewConnectionListener {
 
+	public static String getChosenRefSys() {
+		return instance.mChosenRefSys;
+	}
+
 	private final Object						m_dlfLock			= new Object();
 	private int									m_actualMainMode	= -1;
 	private int									mSafetyState		= -1;
@@ -130,24 +134,13 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 		}
 	}
 
-	public int getActualMainMode() {
-		return m_actualMainMode;
+
+	public static SafetyState getSafetyState() {
+		return SafetyState.fromOrdinal(instance.mSafetyState);
 	}
 
-	public int getSafetyState() {
-		return mSafetyState;
-	}
-
-	public String getmChosenRefSys() {
-		return mChosenRefSys;
-	}
-
-	public String getChosenTool() {
-		return mChosenTool;
-	}
-
-	public static KStructVarWrapper getChosenToolVar() {
-		return mChosenToolVar;
+	public static String getChosenTool() {
+		return instance.mChosenTool;
 	}
 
 	/*
@@ -264,7 +257,6 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 		 *            The name of the new tool
 		 */
 		void chosenToolChanged(String _toolName);
-
 
 		/**
 		 * Called when the robot's geometric frame of reference has changed

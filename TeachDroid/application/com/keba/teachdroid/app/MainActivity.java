@@ -8,9 +8,11 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -24,13 +26,7 @@ public class MainActivity extends Activity implements InitializationListener {
 
 	private String				m_host					= "10.0.0.5";
 	final String				m_connectFormatString	= "Connecting...  {0} % complete";
-	protected ProgressDialog	m_dlg;													// ProgressDialog.show(this,
-																						// "Connecting...",
-																						// "Connecting to "
-																						// +
-																						// m_host,
-																						// true,
-																						// true);
+	protected ProgressDialog	m_dlg;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -38,39 +34,55 @@ public class MainActivity extends Activity implements InitializationListener {
 
 		setContentView(R.layout.activity_main);
 
-		WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		if (wifi.isWifiEnabled()) {
+		if (!RobotControlProxy.isConnected()) {
+			final WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+			if (!wifi.isWifiEnabled()) {
 
-			InitializationTask itask = new InitializationTask(this);
-			itask.execute(m_host);
+				AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
 
-			Button b = (Button) findViewById(R.id.button1);
-			if (b != null)
-				b.setOnClickListener(new OnClickListener() {
+				dlgAlert.setMessage("Click OK to enable WiFi, Cancel to quit app!");
 
-					public void onClick(View _v) {
-						try {
-							RobotControlProxy.confirmLastMessage();
-						} catch (IllegalAccessException e) {
-							e.printStackTrace();
-						}
+				dlgAlert.setTitle("Info");
+				dlgAlert.setPositiveButton("OK", new android.content.DialogInterface.OnClickListener() {
+
+					public void onClick(DialogInterface _dialog, int _which) {
+						wifi.setWifiEnabled(true);
+						connectToPlc();
 					}
 				});
-		} else {
-			AlertDialog.Builder dlgAlert = new AlertDialog.Builder(this);
+				dlgAlert.setNegativeButton("Cancel", new android.content.DialogInterface.OnClickListener() {
 
-			dlgAlert.setMessage("Please enable WiFi and restart the app !");
+					public void onClick(DialogInterface _dialog, int _which) {
+						finish();
+					}
+				});
+				dlgAlert.setCancelable(true);
+				dlgAlert.create().show();
 
-			dlgAlert.setTitle("Warning");
-			dlgAlert.setPositiveButton("OK", new android.content.DialogInterface.OnClickListener() {
-				
-				public void onClick(DialogInterface _dialog, int _which) {
-					finish(); // not very clean -> should activate wifi!
+			} else
+				connectToPlc();
+		}
+
+		Button b = (Button) findViewById(R.id.button1);
+		if (b != null)
+			b.setOnClickListener(new OnClickListener() {
+
+				public void onClick(View _v) {
+
+					RobotControlProxy.toggleDrivesPower();
+
 				}
 			});
-			dlgAlert.setCancelable(true);
-			dlgAlert.create().show();
-		}
+
+	}
+
+	/**
+	 * 
+	 */
+	private void connectToPlc() {
+		InitializationTask itask = new InitializationTask(this);
+		itask.execute(m_host);
+
 	}
 
 	@Override
@@ -78,6 +90,17 @@ public class MainActivity extends Activity implements InitializationListener {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem _item) {
+
+		if (_item.getTitle().equals(getString(R.string.menu_settings))) {
+			Intent settingsActivity = new Intent(getBaseContext(), SettingsActivity.class);
+			startActivity(settingsActivity);
+
+		}
+		return super.onOptionsItemSelected(_item);
 	}
 
 	/*
@@ -97,8 +120,11 @@ public class MainActivity extends Activity implements InitializationListener {
 				// "Connecting...", "Connecting to " + m_host, true, true);
 				m_dlg = new ProgressDialog(MainActivity.this, ProgressDialog.STYLE_SPINNER);
 				m_dlg.setTitle("Connecting...");
+				m_dlg.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+				m_dlg.setCancelable(true);
+				m_dlg.setCanceledOnTouchOutside(false);
 				m_dlg.setMessage("Connecting to " + m_host);
-				m_dlg.setCancelable(false);
+
 				m_dlg.setIndeterminate(false);
 				m_dlg.show();
 
@@ -123,14 +149,16 @@ public class MainActivity extends Activity implements InitializationListener {
 			public void run() {
 				// m_dlg.dismiss();
 
-				String msg = "Connection " + (_success ? "established" : "failed!!") + "\nPress back button to dismiss dialog.";
+				// String msg = "Connection " + (_success ? "established" :
+				// "failed!!");
 
-				m_dlg.setMessage(msg);
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
+				// m_dlg.setMessage(msg);
+				//
+				// try {
+				// Thread.sleep(2000);
+				// } catch (InterruptedException e) {
+				// e.printStackTrace();
+				// }
 				m_dlg.dismiss();
 
 			}
@@ -155,6 +183,7 @@ public class MainActivity extends Activity implements InitializationListener {
 		runOnUiThread(new Runnable() {
 			public void run() {
 				m_dlg.setTitle(MessageFormat.format(m_connectFormatString, _progress));
+				m_dlg.setProgress(_progress);
 			}
 		});
 	}

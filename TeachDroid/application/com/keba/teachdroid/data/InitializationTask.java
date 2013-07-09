@@ -3,11 +3,14 @@
  */
 package com.keba.teachdroid.data;
 
+import java.util.Random;
+
 import android.os.AsyncTask;
 
 import com.keba.kemro.kvs.teach.data.program.KvtStatementAdministrator;
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor;
+import com.keba.kemro.kvs.teach.util.KvtExecutionMonitor;
 import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtMotionModeAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtMultiKinematikAdministrator;
@@ -51,45 +54,39 @@ public class InitializationTask extends AsyncTask<String, Integer, Boolean> {
 		final String host = _params[0];
 
 		KvtProjectAdministrator.init();
-		publishProgress(10);
+
 		KvtStatementAdministrator.init();
-		publishProgress(20);
 		KvtMultiKinematikAdministrator.init();
-		publishProgress(30);
 		KvtMotionModeAdministrator.init();
-		publishProgress(40);
 		KvtMainModeAdministrator.init();
-		publishProgress(50);
 		KvtPositionMonitor.init();
-		publishProgress(60);
 		KvtDriveStateMonitor.init();
-		publishProgress(70);
 		KvtProgramStateMonitor.init();
-		publishProgress(80);
+		KvtExecutionMonitor.init();
+		publishProgress(10);
 		KMessageService.connect(host, 5000);
-		publishProgress(90);
-
 		RobotControlProxy.startup();
-		publishProgress(95);
 
-		for (int i = 1; i < 10; ++i) {
-			try {
-				// if (i % 10 == 0) {
-				// publishProgress(i);
-				// }
-				boolean isConnected = KvtSystemCommunicator.connectOnce(host, 5000, "_global");
-				publishProgress(100);
+		new Thread(new Runnable() {
 
-				if (isConnected) {
-					i = 100;
+			public void run() {
+
+				for (int i = 20; i < 99; i += 5) {
+					int sleepTime = (int) (new Random().nextDouble() * 750);
+					try {
+						Thread.sleep(sleepTime);
+						publishProgress(i);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				}
-
-				Thread.sleep(100);
-
-			} catch (InterruptedException e) {
-				e.printStackTrace();
 			}
-		}
+
+		}).start();
+
+		KvtSystemCommunicator.connectOnce(host, 5000, "_global");
+		publishProgress(100);
+
 		return KvtSystemCommunicator.isConnected();
 	}
 

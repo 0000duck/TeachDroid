@@ -55,11 +55,13 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener, KVa
 	private final String						mDrivePowerVarname		= "_system.gRcDataRobot[{0}].drivesOn";
 	private final String						mDriveIsReadyVarname	= "_system.gRcDataRobot[{0}].isReady";
 	private final String						mDriveIsRefVarname		= "_system.gRcDataRobot[{0}].isReferenced";
+	private final String						mDriveSwitchOnVarname	= "_system.RcHtControl.simuKeys.drivesOn";
 
 	private KStructVarWrapper					mDrivesPowerVar, mDriveIsReadyVar, mDriveIsRefVar;
 
 	private KTcDfl								mDfl;
 	private KVariableGroup						mVarGroup;
+	private KStructVarWrapper					mDrivesSwitchOnVar;
 	private static List<KvtDriveStateListener>	mListeners				= new Vector<KvtDriveStateListener>();
 
 	private static KvtDriveStateMonitor			mInstance;
@@ -151,9 +153,10 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener, KVa
 		String str3 = MessageFormat.format(mDrivePowerVarname, kin);
 		mDrivesPowerVar = mDfl.variable.createKStructVarWrapper(str3);
 		mVarGroup.add(mDrivesPowerVar);
+
+		mDrivesSwitchOnVar = mDfl.variable.createKStructVarWrapper(mDriveSwitchOnVarname);
+
 	}
-
-
 
 	/*
 	 * (non-Javadoc)
@@ -173,4 +176,17 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener, KVa
 			mListeners.add(_listener);
 	}
 
+	public static void toggleDrivesPower() {
+		if (mInstance.mDrivesSwitchOnVar != null) {
+			mInstance.mDrivesSwitchOnVar.setActualValue(true);
+
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			mInstance.mDrivesSwitchOnVar.setActualValue(false);
+		}
+
+	}
 }
