@@ -383,4 +383,10 @@ public class KvtExecutionMonitor implements KvtTeachviewConnectionListener,
 		// not needed
 	}
 
+	public static interface KvtExecutionListener {
+		void programCounterChanged(int _line);
+
+		void programCodeChanged(String _source);
+
+	}
 }

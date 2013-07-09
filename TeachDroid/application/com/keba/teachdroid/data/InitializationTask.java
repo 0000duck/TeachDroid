@@ -67,12 +67,13 @@ public class InitializationTask extends AsyncTask<String, Integer, Boolean> {
 		KMessageService.connect(host, 5000);
 		RobotControlProxy.startup();
 
+		// fake progress bar :-)
 		new Thread(new Runnable() {
 
 			public void run() {
 
 				for (int i = 20; i < 99; i += 5) {
-					int sleepTime = (int) (new Random().nextDouble() * 750);
+					int sleepTime = (int) (new Random().nextDouble() * 900);
 					try {
 						Thread.sleep(sleepTime);
 						publishProgress(i);
