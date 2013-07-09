@@ -41,14 +41,14 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener, KVa
 		public void drivePowerChanged(boolean _hasPower);
 
 		/**
-		 * @param _readActualValue
+		 * @param isReady
 		 */
-		public void driveIsReadyChanged(Boolean _readActualValue);
+		public void driveIsReadyChanged(Boolean isReady);
 
 		/**
-		 * @param _readActualValue
+		 * @param _isRef
 		 */
-		public void driveIsReferencedChanged(Boolean _readActualValue);
+		public void driveIsReferencedChanged(Boolean _isRef);
 
 	}
 

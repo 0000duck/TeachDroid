@@ -206,9 +206,11 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 		mListeners.remove(_listener);
 	}
 
-	public static interface KvtPositionMonitorListener {
-		public void cartesianPositionChanged(String _compName, Number _value);
+	
 
+	public static interface KvtPositionMonitorListener {
+
+		public void cartesianPositionChanged(String _compName, Number _value);
 		public void axisPositionChanged(int axisNo, Number _value, String _axisName);
 
 		public void overrideChanged(Number _override);
