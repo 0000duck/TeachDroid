@@ -22,19 +22,17 @@ import com.keba.kemro.teach.dfl.value.KVariableGroupListener;
  */
 public class KvtMainModeAdministrator implements KMultikinematicListener, KVariableGroupListener, KvtTeachviewConnectionListener {
 
-	public static String getChosenRefSys() {
-		return instance.mChosenRefSys;
-	}
+
 
 	private final Object						m_dlfLock			= new Object();
 	private int									m_actualMainMode	= -1;
 	private int									mSafetyState		= -1;
-	private String								mChosenRefSys;
-	private String								mChosenTool;
+
+
 	private static KVariableGroup				mVarGroup;
 	private static KStructVarWrapper			mMainModeVar;
-	private static KStructVarWrapper			mChosenRefSysVar;
-	private static KStructVarWrapper			mChosenToolVar;
+
+
 	private static KStructVarWrapper			mSafetyStateVar;
 	private static KvtMainModeAdministrator		instance;
 	private static Vector<KvtMainModeListener>	m_listeners;
@@ -114,24 +112,9 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 				for (KvtMainModeListener l : m_listeners)
 					l.safetyStateChanged(SafetyState.fromOrdinal(mSafetyState));
 			}
-		} else if (_variable.equals(mChosenRefSysVar)) {
-			Object v = _variable.readActualValue(null);
-			if (v != null && v instanceof String) {
-				mChosenRefSys = (String) v;
-				for (KvtMainModeListener l : m_listeners)
-					l.chosenRefSysChanged(mChosenRefSys);
-
-			}
 		}
 
-		else if (_variable.equals(mChosenToolVar)) {
-			Object v = _variable.getActualValue();
-			if (v != null && v instanceof String) {
-				mChosenTool = (String) v;
-				for (KvtMainModeListener l : m_listeners)
-					l.chosenToolChanged(mChosenTool);
-			}
-		}
+
 	}
 
 
@@ -139,9 +122,7 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 		return SafetyState.fromOrdinal(instance.mSafetyState);
 	}
 
-	public static String getChosenTool() {
-		return instance.mChosenTool;
-	}
+
 
 	/*
 	 * (non-Javadoc)
@@ -184,22 +165,18 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 								+ "].selectedMainMode");
 					}
 
-					mChosenRefSysVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX
-							+ "gRcSelectedRobotData.selectedRefSysName");
 
-					mChosenToolVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX
-							+ "gRcSelectedRobotData.selectedToolName");
+
+
 
 					mSafetyStateVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcData.userIcon[4]");
 
 					if (mMainModeVar != null) {
 						mVarGroup.add(mMainModeVar);
 					}
-					if (mChosenRefSysVar != null)
-						mVarGroup.add(mChosenRefSysVar);
 
-					if (mChosenToolVar != null)
-						mVarGroup.add(mChosenToolVar);
+
+
 
 					if (mSafetyStateVar != null) {
 						mVarGroup.add(mSafetyStateVar);
@@ -249,22 +226,6 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 
 	public static interface KvtMainModeListener {
 		void mainModeChanged(int _newMainMode);
-
-		/**
-		 * Called when the chosen tool of the robot has changed
-		 * 
-		 * @param _mChosenTool
-		 *            The name of the new tool
-		 */
-		void chosenToolChanged(String _toolName);
-
-		/**
-		 * Called when the robot's geometric frame of reference has changed
-		 * 
-		 * @param _mChosenRefSys
-		 *            The name of the new reference system
-		 */
-		void chosenRefSysChanged(String _refsysName);
 
 		/**
 		 * Called when the safety state of the robot has changed (i.e. a safety

@@ -79,7 +79,7 @@ public class KExecAdministrator {
 	private final int HIGH_PRIORITY = Thread.NORM_PRIORITY;
 	protected PollThread pollThread;
 	/** execution model listener */
-	private final Vector m_listenerList = new Vector(10);
+	private Vector<KExecAdministratorListener>	m_listenerList			= new Vector<KExecAdministratorListener>(10);
 	/** Alle Ausführungseinheiten */
 	private final Hashtable m_executionUnits = new Hashtable(501);
 
@@ -432,6 +432,8 @@ public class KExecAdministrator {
 	 *            Listener
 	 */
 	public void addListener(KExecAdministratorListener listener) {
+		if (m_listenerList == null)
+			m_listenerList = new Vector<KExecAdministratorListener>();
 		m_listenerList.addElement(listener);
 	}
 
@@ -811,6 +813,7 @@ public class KExecAdministrator {
 			super("KExecAdministrator");
 		}
 
+		@Override
 		public void run() {
 			try {
 				Thread.sleep(300);

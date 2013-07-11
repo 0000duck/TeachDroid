@@ -47,6 +47,8 @@ public class SettingsActivity extends PreferenceActivity {
 		setupActionBar();
 	}
 
+
+
 	/**
 	 * Set up the {@link android.app.ActionBar}, if the API is available.
 	 */
@@ -107,18 +109,19 @@ public class SettingsActivity extends PreferenceActivity {
 		addPreferencesFromResource(R.xml.pref_notification);
 
 		// Add 'data and sync' preferences, and a corresponding header.
-		fakeHeader = new PreferenceCategory(this);
-		fakeHeader.setTitle(R.string.pref_header_data_sync);
-		getPreferenceScreen().addPreference(fakeHeader);
-		addPreferencesFromResource(R.xml.pref_data_sync);
+		// fakeHeader = new PreferenceCategory(this);
+		// fakeHeader.setTitle(R.string.pref_header_data_sync);
+		// getPreferenceScreen().addPreference(fakeHeader);
+		// addPreferencesFromResource(R.xml.pref_data_sync);
 
 		// Bind the summaries of EditText/List/Dialog/Ringtone preferences to
 		// their values. When their values change, their summaries are updated
 		// to reflect the new value, per the Android Design guidelines.
-		bindPreferenceSummaryToValue(findPreference("example_text"));
-		bindPreferenceSummaryToValue(findPreference("example_list"));
+		// bindPreferenceSummaryToValue(findPreference("example_text"));
+		bindPreferenceSummaryToValue(findPreference("hostname_ip"));
+		// bindPreferenceSummaryToValue(findPreference("example_list"));
 		bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
-		bindPreferenceSummaryToValue(findPreference("sync_frequency"));
+		// bindPreferenceSummaryToValue(findPreference("sync_frequency"));
 	}
 
 	/** {@inheritDoc} */
@@ -329,8 +332,9 @@ public class SettingsActivity extends PreferenceActivity {
 			// to their values. When their values change, their summaries are
 			// updated to reflect the new value, per the Android Design
 			// guidelines.
-			bindPreferenceSummaryToValue(findPreference("example_text"));
-			bindPreferenceSummaryToValue(findPreference("example_list"));
+			// bindPreferenceSummaryToValue(findPreference("example_text"));
+			// bindPreferenceSummaryToValue(findPreference("example_list"));
+			bindPreferenceSummaryToValue(findPreference("hostname_ip"));
 		}
 	}
 
@@ -353,22 +357,25 @@ public class SettingsActivity extends PreferenceActivity {
 		}
 	}
 
+
+
 	/**
 	 * This fragment shows data and sync preferences only. It is used when the
 	 * activity is showing a two-pane settings UI.
 	 */
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public static class DataSyncPreferenceFragment extends PreferenceFragment {
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			addPreferencesFromResource(R.xml.pref_data_sync);
-
-			// Bind the summaries of EditText/List/Dialog/Ringtone preferences
-			// to their values. When their values change, their summaries are
-			// updated to reflect the new value, per the Android Design
-			// guidelines.
-			bindPreferenceSummaryToValue(findPreference("sync_frequency"));
-		}
-	}
+	// @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	// public static class DataSyncPreferenceFragment extends PreferenceFragment
+	// {
+	// @Override
+	// public void onCreate(Bundle savedInstanceState) {
+	// super.onCreate(savedInstanceState);
+	// addPreferencesFromResou rce(R.xml.pref_data_sync);
+	//
+	// // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+	// // to their values. When their values change, their summaries are
+	// // updated to reflect the new value, per the Android Design
+	// // guidelines.
+	// bindPreferenceSummaryToValue(findPreference("sync_frequency"));
+	// }
+	// }
 }

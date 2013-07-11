@@ -8,28 +8,32 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <EditText
-        android:id="@+id/alarmLogTextview"
+    <TextView
+        android:id="@+id/overrideLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignLeft="@+id/overrideBar"
         android:layout_alignParentTop="true"
-        android:ems="10"
-        android:enabled="false"
-        android:inputType="textMultiLine" >
+        android:layout_marginTop="23dp"
+        android:text="Override"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <requestFocus />
-    </EditText>
+    <SeekBar
+        android:id="@+id/overrideBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/overrideLabel"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp" />
 
-    <Button
-        android:id="@+id/button1"
+    <Switch
+        android:id="@+id/switch1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/alarmLogTextview"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="49dp"
-        android:text="confirm" />
+        android:layout_alignLeft="@+id/overrideBar"
+        android:layout_alignRight="@+id/overrideBar"
+        android:layout_below="@+id/overrideBar"
+        android:layout_marginTop="28dp"
+        android:text="Drives Power" />
 
 </RelativeLayout>

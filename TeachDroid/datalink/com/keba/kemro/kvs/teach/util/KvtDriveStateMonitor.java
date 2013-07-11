@@ -30,7 +30,8 @@ import com.keba.kemro.teach.dfl.value.KVariableGroupListener;
  * @author ltz
  * @since 04.07.2013
  */
-public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener, KVariableGroupListener {
+public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener,
+		KVariableGroupListener {
 
 	/**
 	 * @author ltz
@@ -65,6 +66,7 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener, KVa
 	private static List<KvtDriveStateListener>	mListeners				= new Vector<KvtDriveStateListener>();
 
 	private static KvtDriveStateMonitor			mInstance;
+
 
 	/**
 	 * Initializes the KvtDriveStateMonitor by taking note of
@@ -168,18 +170,27 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener, KVa
 	}
 
 	/**
-	 * @param _mLocalInsta
+	 * @param _listener
 	 */
-	public static void addListener(KvtDriveStateListener _listener) {
+	public static synchronized void addListener(KvtDriveStateListener _listener) {
+		if (mListeners == null)
+			mListeners = new Vector<KvtDriveStateMonitor.KvtDriveStateListener>();
 
 		if (!mListeners.contains(_listener))
 			mListeners.add(_listener);
+	}
+
+	public static boolean removeListener(KvtDriveStateListener _listener) {
+		if (mListeners != null)
+			return mListeners.remove(_listener);
+		return false;
 	}
 
 	public static void toggleDrivesPower() {
 		if (mInstance.mDrivesSwitchOnVar != null) {
 			mInstance.mDrivesSwitchOnVar.setActualValue(true);
 
+			// wait and reset
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {

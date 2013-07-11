@@ -257,6 +257,8 @@ public class KvtProgramStateMonitor implements KvtTeachviewConnectionListener, K
 	 *            an instance of a {@link KvtProgramStateListener}.
 	 */
 	public static void addListener(KvtProgramStateListener _l) {
+		if (mListeners == null)
+			mListeners = new Vector<KvtProgramStateMonitor.KvtProgramStateListener>();
 		if (!mListeners.contains(_l))
 			mListeners.add(_l);
 	}

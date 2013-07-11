@@ -59,7 +59,7 @@ public class RobotControlProxy {
 	 * connects to all classes which load information from the PLC by
 	 * registering to them as a listener with the respective listener interfaces
 	 */
-	public static void startup() {
+	public synchronized static void startup() {
 		mDataListener = new RobotControlDataListener();
 		mDataListener.addObserver(new Observer() {
 
@@ -215,6 +215,10 @@ public class RobotControlProxy {
 		return mDataListener.mChosenRefsys;
 	}
 
+	public static void setRefsysName(String _newRefsys) {
+		
+	}
+
 	public static String getToolName() {
 		// return KvtMainModeAdministrator.getChosenTool();
 		return mDataListener.mToolName;
@@ -225,7 +229,9 @@ public class RobotControlProxy {
 		return mDataListener.mSafetyState;
 	}
 
-	public static int getOverride() {
+	public synchronized static int getOverride() {
+		if (mDataListener == null)
+			return 0;
 		return mDataListener.mOverride.intValue();
 	}
 
@@ -335,7 +341,7 @@ public class RobotControlProxy {
 		private Boolean								mDrivesRerenced;
 		private Boolean								mDrivesReady;
 		private boolean								mHasPower;
-		private Number								mOverride;
+		private Number								mOverride			= 0;
 
 		public void teachviewConnected() {
 			mConnected = true;
@@ -700,6 +706,15 @@ public class RobotControlProxy {
 			setChanged();
 			super.notifyObservers();
 		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.keba.kemro.kvs.teach.util.KvtPositionMonitor.
+		 * KvtPositionMonitorListener#pathVelocityChanged(float)
+		 */
+		public void pathVelocityChanged(float _velocityMms) {
+		}
 	}
 
 
@@ -711,5 +726,16 @@ public class RobotControlProxy {
 		KvtDriveStateMonitor.toggleDrivesPower();
 	}
 
+	/**
+	 * @param _value
+	 * @throws IllegalArgumentException
+	 *             If the value is out of range [0...100]
+	 */
+	public static void setOverride(int _value) {
+		if (_value < 0 || _value > 100)
+			throw new IllegalArgumentException("Override value cannot be outside [0...100]!");
+
+		KvtPositionMonitor.setOverride(_value);
+	}
 
 }
