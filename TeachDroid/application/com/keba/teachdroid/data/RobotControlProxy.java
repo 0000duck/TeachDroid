@@ -216,7 +216,8 @@ public class RobotControlProxy {
 	}
 
 	public static void setRefsysName(String _newRefsys) {
-		
+		KvtPositionMonitor.buildModels();
+		// TODO: change
 	}
 
 	public static String getToolName() {

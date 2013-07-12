@@ -16,14 +16,14 @@ package com.keba.kemro.teach.dfl;
 
 import android.util.Log;
 
-import com.keba.kemro.teach.dfl.codepoint.*;
-import com.keba.kemro.teach.dfl.compilerError.*;
-import com.keba.kemro.teach.dfl.dir.*;
-import com.keba.kemro.teach.dfl.edit.*;
-import com.keba.kemro.teach.dfl.execution.*;
-import com.keba.kemro.teach.dfl.structural.*;
-import com.keba.kemro.teach.dfl.value.*;
-import com.keba.kemro.teach.network.*;
+import com.keba.kemro.teach.dfl.codepoint.KCodePointAdministrator;
+import com.keba.kemro.teach.dfl.compilerError.KCompilerErrorAdministrator;
+import com.keba.kemro.teach.dfl.dir.KDirectoryAdministrator;
+import com.keba.kemro.teach.dfl.edit.KEditAdministrator;
+import com.keba.kemro.teach.dfl.execution.KExecAdministrator;
+import com.keba.kemro.teach.dfl.structural.KStructAdministrator;
+import com.keba.kemro.teach.dfl.value.KVariableAdministrator;
+import com.keba.kemro.teach.network.TcClient;
 
 
 /*
@@ -124,6 +124,7 @@ public class KTcDfl {
 	 */
 	public Object getLockObject() {
 		return m_locker;
+		// return new Object();
 	}
 
    /**
@@ -155,6 +156,7 @@ public class KTcDfl {
 		protected DirectoryAdministrator (KTcDfl dfl) {
 			super(dfl);
 		}
+		@Override
 		protected void init() {
 			super.init();
 		}
@@ -163,10 +165,12 @@ public class KTcDfl {
 		protected StructAdministrator (KTcDfl dfl) {
 			super(dfl);
 		}
+		@Override
 		protected void init() {
 			super.init();
 		}
 		
+		@Override
 		protected void stop() {
 			super.stop();
 		}
@@ -175,9 +179,11 @@ public class KTcDfl {
 		protected ExecAdministrator (KTcDfl dfl) {
 			super(dfl);
 		}
+		@Override
 		protected void init() {
 			super.init();
 		}
+		@Override
 		protected void stop() {
 			super.stop();
 		}
@@ -186,6 +192,7 @@ public class KTcDfl {
 		protected CompilerErrorAdministrator (KTcDfl dfl) {
 			super(dfl);
 		}
+		@Override
 		protected void init() {
 			super.init();
 		}
@@ -194,6 +201,7 @@ public class KTcDfl {
 		protected EditAdministrator (KTcDfl dfl) {
 			super(dfl);
 		}
+		@Override
 		protected void init() {
 			super.init();
 		}
@@ -202,6 +210,7 @@ public class KTcDfl {
 		protected CodePointAdministrator (KTcDfl dfl) {
 			super(dfl);
 		}
+		@Override
 		protected void init() {
 			super.init();
 		}
@@ -210,9 +219,11 @@ public class KTcDfl {
 		protected VariableAdministrator (KTcDfl dfl) {
 			super(dfl);
 		}
+		@Override
 		protected void init() {
 			super.init();
 		}
+		@Override
 		protected void stop() {
 			super.stop();
 		}

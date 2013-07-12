@@ -7,7 +7,7 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Vector;
 
-import com.keba.kemro.kvs.teach.data.rc.KvtRcAdministrator;
+import com.keba.kemro.kvs.teach.model.DataModel;
 import com.keba.kemro.teach.dfl.KTcDfl;
 import com.keba.kemro.teach.dfl.value.KStructVarWrapper;
 import com.keba.kemro.teach.dfl.value.KVariableGroup;
@@ -28,21 +28,30 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	private final String							mCartPosNameVarnameStub		= "_system.gRcSelectedRobotData.cartCompName[{0}]";
 	private final String							mCartPosVarVarnameStub		= "_system.gRcSelectedRobotData.worldPosValue[{0}]";
 	private final String							mCartVelVarname				= "_system.gRcSelectedRobotData.cartPathVel";
+	private final String							mSelToolName				= "_system.gRcSelectedRobotData.selectedToolName";
+	private final String							mSelRefsysVarname			= "_system.gRcSelectedRobotData.selectedRefSysName";
+	private final String							mChosenRefsysVarname		= "_system.gRcSelectedRobotData.chosenRefSys";
+	private final String							mChosenToolVarname			= "_system.gRcSelectedRobotData.chosenTool";
 
 	private final String							mOverrideVarname			= "_system.gRcData.override";
 
-	private List<KStructVarWrapper>					mPositionVars				= new Vector<KStructVarWrapper>();
+	private List<KStructVarWrapper>					mAxisPositionVars			= new Vector<KStructVarWrapper>();
 	private List<KStructVarWrapper>					mNameVars					= new Vector<KStructVarWrapper>();
 
 	private List<KStructVarWrapper>					mCartPosVars				= new Vector<KStructVarWrapper>();
 	private List<KStructVarWrapper>					mCartNameVars				= new Vector<KStructVarWrapper>();
 	private KStructVarWrapper						mOverrideVar;
 	private KStructVarWrapper						mCartVelVar;
-	private static KStructVarWrapper				mChosenRefSysVar;
-	private static KStructVarWrapper				mChosenToolVar;
+	private KStructVarWrapper						mSelectedRefSysVar;
+	private KStructVarWrapper						mChosenRefSysVar;
+	private KStructVarWrapper						mChosenToolVar;
+	private KStructVarWrapper						mSelectedToolVar;
 
-	private String									mChosenRefSys;
+	private String									mSelectedRefSys;
 	private String									mChosenTool;
+	protected DataModel								mRefsysmodel;
+	protected DataModel								mToolmodel;
+	private float									mOldOvr;
 
 	private static List<KvtPositionMonitorListener>	mListeners					= new Vector<KvtPositionMonitor.KvtPositionMonitorListener>();
 
@@ -63,7 +72,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	 * .kemro.teach.dfl.value.KStructVarWrapper)
 	 */
 	public void changed(KStructVarWrapper _variable) {
-		int index = mPositionVars.indexOf(_variable);
+		int index = mAxisPositionVars.indexOf(_variable);
 		if (index >= 0) {
 			String name = mNameVars.get(index).readActualValue(null).toString();
 			for (KvtPositionMonitorListener l : mListeners)
@@ -84,22 +93,26 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 		}
 
 		if (_variable.equals(mOverrideVar)) {
-			for (KvtPositionMonitorListener l : mListeners)
-				l.overrideChanged(((Number) _variable.readActualValue(null)).floatValue() / 10);
+			float ovt = ((Number) _variable.readActualValue(null)).floatValue();
+			if (ovt != mOldOvr) {
+				mOldOvr = ovt;
+				for (KvtPositionMonitorListener l : mListeners)
+					l.overrideChanged(ovt / 10);
+			}
 		}
 
 		else if (_variable.equals(mCartVelVar))
 			for (KvtPositionMonitorListener l : mListeners)
 				l.pathVelocityChanged(((Number) _variable.readActualValue(null)).floatValue());
-		else if (_variable.equals(mChosenRefSysVar)) {
+		else if (_variable.equals(mSelectedRefSysVar)) {
 			Object v = _variable.readActualValue(null);
 			if (v != null && v instanceof String) {
-				mChosenRefSys = (String) v;
+				mSelectedRefSys = (String) v;
 				for (KvtPositionMonitorListener l : mListeners)
-					l.chosenRefSysChanged(mChosenRefSys);
+					l.chosenRefSysChanged(mSelectedRefSys);
 
 			}
-		} else if (_variable.equals(mChosenToolVar)) {
+		} else if (_variable.equals(mSelectedToolVar)) {
 			Object v = _variable.getActualValue();
 			if (v != null && v instanceof String) {
 				mChosenTool = (String) v;
@@ -117,6 +130,12 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	 * ()
 	 */
 	public void allActualValuesUpdated() {
+		for (KvtPositionMonitorListener l : mListeners) {
+			changed(mCartVelVar);
+			changed(mSelectedRefSysVar);
+			changed(mSelectedToolVar);
+			changed(mOverrideVar);
+		}
 	}
 
 	protected int getNumAxes() {
@@ -140,6 +159,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 			mVarGroup = mDfl.variable.createVariableGroup("KvtPositionMonitor");
 			mVarGroup.addListener(this);
 
+			// create variable wrappers
 			createAxisPosVariables();
 			createCartVariables();
 			createOverrideVariables();
@@ -147,7 +167,25 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 			// activate
 			mVarGroup.setPollInterval(100);
 			mVarGroup.activate();
+
 		}
+	}
+
+	/**
+	 * 
+	 */
+	public static void buildModels() {
+		new Thread(new Runnable() {
+			public void run() {
+				// TODO: Move this to a setter method
+				// create data models for the refsys and the tool
+				if (mInstance.mRefsysmodel == null)
+					mInstance.mRefsysmodel = DataModel.createMapToModel(mInstance.mChosenRefSysVar, true, null, null);
+				if (mInstance.mToolmodel == null)
+					mInstance.mToolmodel = DataModel.createMapToModel(mInstance.mChosenToolVar, true, null, null);
+				System.out.println("Models for tool and refsys built!");
+			}
+		}, "ModelBuilderThread").start();
 	}
 
 	/**
@@ -177,13 +215,19 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 		if (mCartVelVar != null)
 			mVarGroup.add(mCartVelVar);
 
-		mChosenRefSysVar = mDfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcSelectedRobotData.selectedRefSysName");
-		if (mChosenRefSysVar != null)
-			mVarGroup.add(mChosenRefSysVar);
+		mChosenRefSysVar = mDfl.variable.createKStructVarWrapper(mChosenRefsysVarname);
+		mVarGroup.add(mChosenRefSysVar);
 
-		mChosenToolVar = mDfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcSelectedRobotData.selectedToolName");
-		if (mChosenToolVar != null)
-			mVarGroup.add(mChosenToolVar);
+		mChosenToolVar = mDfl.variable.createKStructVarWrapper(mChosenToolVarname);
+		mVarGroup.add(mChosenToolVar);
+
+		mSelectedRefSysVar = mDfl.variable.createKStructVarWrapper(mSelRefsysVarname);
+		if (mSelectedRefSysVar != null)
+			mVarGroup.add(mSelectedRefSysVar);
+
+		mSelectedToolVar = mDfl.variable.createKStructVarWrapper(mSelToolName);
+		if (mSelectedToolVar != null)
+			mVarGroup.add(mSelectedToolVar);
 	}
 
 	/**
@@ -198,7 +242,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 			String posVar = MessageFormat.format(mAxisPosValueVarnameStub, i);
 			KStructVarWrapper wrpP = mDfl.variable.createKStructVarWrapper(posVar);
 			if (wrpP != null) {
-				mPositionVars.add(wrpP);
+				mAxisPositionVars.add(wrpP);
 				mVarGroup.add(wrpP);
 			}
 
@@ -229,7 +273,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	 */
 	public void teachviewDisconnected() {
 
-		mPositionVars.clear();
+		mAxisPositionVars.clear();
 		mNameVars.clear();
 
 		mVarGroup.release();
@@ -279,7 +323,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	}
 
 	public static String getChosenRefSys() {
-		return mInstance.mChosenRefSys;
+		return mInstance.mSelectedRefSys;
 	}
 
 	public static String getChosenTool() {

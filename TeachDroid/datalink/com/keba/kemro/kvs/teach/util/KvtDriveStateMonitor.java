@@ -108,6 +108,9 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener,
 	 * ()
 	 */
 	public void allActualValuesUpdated() {
+		changed(mDriveIsReadyVar);
+		changed(mDriveIsRefVar);
+		changed(mDrivesPowerVar);
 	}
 
 	/*
@@ -192,7 +195,7 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener,
 
 			// wait and reset
 			try {
-				Thread.sleep(100);
+				Thread.sleep(200);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

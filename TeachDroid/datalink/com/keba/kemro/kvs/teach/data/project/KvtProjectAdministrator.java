@@ -63,7 +63,12 @@ public class KvtProjectAdministrator {
 				dfl.directory.addDirectoryAdminListener(listener);
 				dfl.structure.addStructAdministratorListener(listener);
 				dfl.execution.addListener(listener);
-				listener.directoryProjectsChanged();
+				// new Thread(new Runnable() {
+				// public void run() {
+						listener.directoryProjectsChanged();
+				// }
+				// }, "KProjectListener.directoryProjectsChanged()").start();
+
 				Log.i("TC connection", "Project administrator connected!");
 				// }
 			}
@@ -110,7 +115,9 @@ public class KvtProjectAdministrator {
 			synchronized (d.getLockObject()) {
 				for (int i = 0; i < m_projects.size(); i++) {
 					KvtProject project = (KvtProject) m_projects.elementAt(i);
-					if (project.toString().equalsIgnoreCase(name) || (project.isGlobalProject() && (project.getStructProject() != null) && (project.getStructProject().getKey().equals(name)))) { // Multikin
+					if (project.toString().equalsIgnoreCase(name)
+							|| (project.isGlobalProject() && (project.getStructProject() != null) && (project.getStructProject().getKey()
+									.equals(name)))) { // Multikin
 						return project;
 					}
 				}
@@ -552,7 +559,8 @@ public class KvtProjectAdministrator {
 						eup = (KExecUnitProject) exeNode.getParent();
 					}
 					if (eup != null) {
-						if ((cachedProject == null) || (cachedProject.getStructProject() == null) || !cachedProject.getStructProject().equals(eup.getKStructNode())) {
+						if ((cachedProject == null) || (cachedProject.getStructProject() == null)
+								|| !cachedProject.getStructProject().equals(eup.getKStructNode())) {
 							cachedProject = getKvtProject((KStructProject) eup.getKStructNode());
 						}
 						if (cachedProject != null) {

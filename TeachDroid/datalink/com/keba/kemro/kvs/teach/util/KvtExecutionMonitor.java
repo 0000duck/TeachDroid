@@ -198,8 +198,10 @@ public class KvtExecutionMonitor implements KvtTeachviewConnectionListener,
 			}
 		}
 
-		int mf = m_execRoutine.getMainFlowLine();
-		mRoutineModel.setMainFlowPointer(mf);
+		if (m_execRoutine != null) {
+			int mf = m_execRoutine.getMainFlowLine();
+			mRoutineModel.setMainFlowPointer(mf);
+		}
 	}
 
 	/**

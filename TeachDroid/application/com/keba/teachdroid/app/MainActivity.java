@@ -12,6 +12,7 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.SeekBar;
@@ -136,6 +137,10 @@ public class MainActivity extends Activity implements InitializationListener, Kv
 
 		}
 		return super.onOptionsItemSelected(_item);
+	}
+
+	public void onGenericButtonClick(View _view) {
+		RobotControlProxy.setRefsysName("foo");
 	}
 
 	/*

@@ -29,15 +29,15 @@ import com.keba.kemro.teach.network.TcConnectionManager;
  */
 public class KvtSystemCommunicator {
 	/** Field AS_CONTROLLER */
-	private static boolean WRITE_ACCESS_ALLOWED = false;
+	private static boolean									WRITE_ACCESS_ALLOWED	= false;
 
 	/** Field m_connectionListeners */
 	private static Vector<KvtTeachviewConnectionListener>	m_connectionListeners	= new Vector<KvtTeachviewConnectionListener>(10);
 	/** Field m_hostName */
-	private static String m_hostName;
-	private static String clientID;
+	private static String									m_hostName;
+	private static String									clientID;
 
-	private static KTcDfl dfl;
+	private static KTcDfl									dfl;
 
 	public static KTcDfl getTcDfl() {
 		return dfl;
@@ -50,25 +50,25 @@ public class KvtSystemCommunicator {
 	 *            Name des Hosts
 	 * @param timeout
 	 *            Timeout int ms
-	 * @param _progressPublisher 
-	 * @param _progressPublisher 
+	 * @param _progressPublisher
+	 * @param _progressPublisher
 	 * @param automaticReconnect
 	 *            Automatisches Reconnect bei Verbindungsabbruch
 	 */
 	public static void connect(String hostName, int timeout, String globalFilter) {
 		m_hostName = hostName;
 
-		TcClient client = null; //TcConnectionManager.getTcClient("Teachview",m_hostName);
+		TcClient client = null; // TcConnectionManager.getTcClient("Teachview",m_hostName);
 
 		int i = 0;
-		while ((client == null) && (i < 100)) { //20 seconds connect timeout
+		while ((client == null) && (i < 100)) { // 20 seconds connect timeout
 			try {
 				Thread.sleep(200);
 			} catch (InterruptedException ie) {
 			}
 			i++;
 			client = TcConnectionManager.getTcClient("TeachDroid", m_hostName);
-			
+
 		}
 		if (client != null) {
 			client.setTimeout(timeout);
@@ -82,26 +82,35 @@ public class KvtSystemCommunicator {
 
 		}
 	}
-	
+
 	public static boolean connectOnce(String _host, int _to, String _globalFilter) {
-		m_hostName= _host;
-		TcClient client= null;
-		
-		client= TcConnectionManager.getTcClient("Teachview", m_hostName);
-		if(client != null) {
+		m_hostName = _host;
+		TcClient client = null;
+
+		client = TcConnectionManager.getTcClient("Teachview", m_hostName);
+		if (client != null) {
 			client.setTimeout(_to);
 			client.setUserMode(false);
 			client.setWriteAccess(true);
-			clientID= client.getClientID();
-			dfl= new KTcDfl(client, _globalFilter);
-			Log.i("TC connection","Adding connection listener");
+			clientID = client.getClientID();
+			dfl = new KTcDfl(client, _globalFilter);
+			Log.i("TC connection", "Adding connection listener");
 			client.addConnectionListener(new KTcConnectionListener());
-			Log.i("TC connection","connection state update");
+
+			// new Thread(new Runnable() {
+			//
+			// public void run() {
+			// Log.i("TC connection", "connection state update");
+			// fireConnected();
+			// KvtProjectAdministrator.reloadProjectList();
+			// }
+			// }, "Connection state notifier thread").start();
+			Log.i("TC connection", "connection state update");
 			fireConnected();
 			KvtProjectAdministrator.reloadProjectList();
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -182,22 +191,22 @@ public class KvtSystemCommunicator {
 	 * @param listener
 	 *            Verbindungslistener
 	 */
-	public static void removeConnectionListener(
-			KvtTeachviewConnectionListener listener) {
+	public static void removeConnectionListener(KvtTeachviewConnectionListener listener) {
 		m_connectionListeners.removeElement(listener);
 	}
 
 	private static void fireConnected() {
 		for (int i = 0; i < m_connectionListeners.size(); i++) {
 			try {
-				Log.i("TC connection","notifying listener "+m_connectionListeners.elementAt(i));
-				((KvtTeachviewConnectionListener) (m_connectionListeners
-						.elementAt(i))).teachviewConnected();
+				Log.i("TC connection", "notifying listener " + m_connectionListeners.elementAt(i));
+
+				KvtTeachviewConnectionListener listener = (KvtTeachviewConnectionListener) (m_connectionListeners.elementAt(i));
+				listener.teachviewConnected();
+
 
 			} catch (Exception ex) {
 				Log.e(KvtSystemCommunicator.class.toString(),
-						"Error in Call of KTeachviewConnectionListener.connected "
-								+ m_connectionListeners.elementAt(i), ex);
+						"Error in Call of KTeachviewConnectionListener.connected " + m_connectionListeners.elementAt(i), ex);
 			}
 		}
 	}
@@ -205,12 +214,10 @@ public class KvtSystemCommunicator {
 	private static void fireDisconnected() {
 		for (int i = 0; i < m_connectionListeners.size(); i++) {
 			try {
-				((KvtTeachviewConnectionListener) (m_connectionListeners
-						.elementAt(i))).teachviewDisconnected();
+				((KvtTeachviewConnectionListener) (m_connectionListeners.elementAt(i))).teachviewDisconnected();
 			} catch (Exception ex) {
-				Log.e(KvtSystemCommunicator.class.toString(),
-						"Error in Call of KTeachviewConnectionListener.disconnected "
-								+ m_connectionListeners.elementAt(i), ex);
+				Log.e(KvtSystemCommunicator.class.toString(), "Error in Call of KTeachviewConnectionListener.disconnected "
+						+ m_connectionListeners.elementAt(i), ex);
 			}
 		}
 	}
@@ -223,9 +230,7 @@ public class KvtSystemCommunicator {
 			if (isConnected) {
 			} else {
 				if (dfl != null) {
-					Log.i(getClass().toString(),
-							"Disconnected to TeachControl - Client ID: "
-									+ clientID);
+					Log.i(getClass().toString(), "Disconnected to TeachControl - Client ID: " + clientID);
 					dfl = null;
 					fireDisconnected();
 				}

@@ -127,10 +127,10 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 		KvtSystemCommunicator.addConnectionListener(new KvtTeachviewConnectionListener() {
 			public void teachviewConnected() {
 				dfl = KvtSystemCommunicator.getTcDfl();
-				synchronized (dfl.getLockObject()) {
+				// synchronized (dfl.getLockObject()) {
 					dfl.structure.addStructAdministratorListener(m_admin);
 					m_admin.treeChanged(dfl.structure.getRoot());
-				}
+				// }
 			}
 
 			public void teachviewDisconnected() {

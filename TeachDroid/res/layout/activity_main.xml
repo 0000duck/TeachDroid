@@ -36,4 +36,14 @@
         android:layout_marginTop="28dp"
         android:text="Drives Power" />
 
+    <Button
+        android:id="@+id/button1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/switch1"
+        android:layout_below="@+id/switch1"
+        android:layout_marginTop="50dp"
+        android:onClick="onGenericButtonClick"
+        android:text="Button" />
+
 </RelativeLayout>
