@@ -297,7 +297,6 @@ public class RobotControlProxy {
 		mDataListener.addObserver(_obs);
 	}
 
-
 	/**
 	 * General listener class, which consolidates all DFL listeners, thus
 	 * collects and processes all information coming from the PLC/robot
@@ -343,6 +342,7 @@ public class RobotControlProxy {
 		private Boolean								mDrivesReady;
 		private boolean								mHasPower;
 		private Number								mOverride			= 0;
+		private List<KvtProject>					mProjects			= new Vector<KvtProject>();
 
 		public void teachviewConnected() {
 			mConnected = true;
@@ -405,6 +405,8 @@ public class RobotControlProxy {
 		 */
 		public void projectStateChanged(KvtProject _prj) {
 			Log.d(ROBOT_CONTROL_LOGTAG, "Project " + _prj.getName() + "'s state is " + _prj.getProjectStateString());
+			if (_prj.isSystemProject())
+				return;
 			int prgCount = _prj.getProgramCount();
 			for (int i = 0; i < prgCount; i++) {
 				KvtProgram prg = _prj.getProgram(i);
@@ -438,9 +440,20 @@ public class RobotControlProxy {
 		 * com.keba.kemro.kvs.teach.data.project.KvtProjectAdministratorListener
 		 * #projectListChanged()
 		 */
-		public void projectListChanged() {
+		public synchronized void projectListChanged() {
 			Log.d(ROBOT_CONTROL_LOGTAG, "Project list hast changed!");
 			notifyObservers();
+			KvtProject[] list = KvtProjectAdministrator.getAllProjects();
+
+			mProjects.clear();
+			for (KvtProject p : list) {
+				for (int i = 0; i < p.getProgramCount(); i++) {
+					KvtProgram proj = p.getProgram(i);
+				}
+				if (!p.isSystemProject() && !mProjects.contains(p))
+					mProjects.add(p);
+			}
+
 		}
 
 		/*
@@ -718,7 +731,6 @@ public class RobotControlProxy {
 		}
 	}
 
-
 	/**
 	 * Switches the drives' power either on or off, depending on the a-priori
 	 * state
@@ -737,6 +749,13 @@ public class RobotControlProxy {
 			throw new IllegalArgumentException("Override value cannot be outside [0...100]!");
 
 		KvtPositionMonitor.setOverride(_value);
+	}
+
+	/**
+	 * @return
+	 */
+	public static List<KvtProject> getProjects() {
+		return mDataListener.mProjects;
 	}
 
 }

@@ -54,6 +54,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	private float									mOldOvr;
 
 	private static List<KvtPositionMonitorListener>	mListeners					= new Vector<KvtPositionMonitor.KvtPositionMonitorListener>();
+	private static Object							mInstancelock				= new Object();
 
 	public static void init() {
 		mInstance = new KvtPositionMonitor();
@@ -175,14 +176,20 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	 * 
 	 */
 	public static void buildModels() {
+
 		new Thread(new Runnable() {
 			public void run() {
-				// TODO: Move this to a setter method
-				// create data models for the refsys and the tool
-				if (mInstance.mRefsysmodel == null)
-					mInstance.mRefsysmodel = DataModel.createMapToModel(mInstance.mChosenRefSysVar, true, null, null);
-				if (mInstance.mToolmodel == null)
-					mInstance.mToolmodel = DataModel.createMapToModel(mInstance.mChosenToolVar, true, null, null);
+				synchronized (mInstancelock) {
+
+					// TODO: Move this to a setter method
+					// create data models for the refsys and the tool
+					if (mInstance.mRefsysmodel == null)
+						mInstance.mRefsysmodel = DataModel.createMapToModel(mInstance.mChosenRefSysVar, null, null);
+					if (mInstance.mToolmodel == null)
+						mInstance.mToolmodel = DataModel.createMapToModel(mInstance.mChosenToolVar, null, null);
+					System.out.println("notifyAll()!");
+					mInstancelock.notifyAll();
+				}
 				System.out.println("Models for tool and refsys built!");
 			}
 		}, "ModelBuilderThread").start();
@@ -336,5 +343,40 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	public static void setOverride(int _value) {
 		if (mInstance.mOverrideVar != null)
 			mInstance.mOverrideVar.setActualValue(_value * 10);
+	}
+
+	/**
+	 * @return
+	 * 
+	 */
+	public static List<?> getAvailableRefsys() {
+		synchronized (mInstancelock) {
+			try {
+				if (mInstance.mRefsysmodel == null) {
+					System.out.println("refsys wait()");
+					mInstancelock.wait();
+				}
+				return mInstance.mRefsysmodel.getData();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+	}
+
+	public synchronized static List<?> getAvailableTools() {
+		synchronized (mInstancelock) {
+			try {
+				if (mInstance.mToolmodel == null) {
+					System.out.println("tool wait()");
+					mInstancelock.wait();
+				}
+				return mInstance.mToolmodel.getData();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
 	}
 }

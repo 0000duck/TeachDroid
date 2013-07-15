@@ -13,16 +13,17 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
     <application
+        android:name="com.keba.teachdroid.TeachdroidApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" 
-        android:name="com.keba.teachdroid.TeachdroidApplication">
+        android:theme="@style/AppTheme" >
         <activity
             android:name="com.keba.teachdroid.app.MainActivity"
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -33,6 +34,22 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.keba.teachdroid.app.MainActivity" />
+        </activity>
+        <activity
+            android:name="com.keba.teachdroid.app.projectview.ProjectListActivity"
+            android:label="@string/title_project_list"
+            android:parentActivityName="com.keba.teachdroid.app.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.keba.teachdroid.app.MainActivity" />
+        </activity>
+        <activity
+            android:name="com.keba.teachdroid.app.projectview.ProjectDetailActivity"
+            android:label="@string/title_project_detail"
+            android:parentActivityName=".ProjectListActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".ProjectListActivity" />
         </activity>
     </application>
 

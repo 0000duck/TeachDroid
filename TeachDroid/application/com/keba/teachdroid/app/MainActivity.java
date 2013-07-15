@@ -1,6 +1,7 @@
 package com.keba.teachdroid.app;
 
 import java.text.MessageFormat;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -8,15 +9,19 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -24,6 +29,9 @@ import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor;
 import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener;
+import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
+import com.keba.kemro.kvs.teach.util.KvtTeachviewConnectionListener;
+import com.keba.teachdroid.app.projectview.ProjectListActivity;
 import com.keba.teachdroid.data.InitializationTask;
 import com.keba.teachdroid.data.InitializationTask.InitializationListener;
 import com.keba.teachdroid.data.RobotControlProxy;
@@ -32,7 +40,7 @@ import com.keba.teachdroid.util.PreferenceManager;
 public class MainActivity extends Activity implements InitializationListener, KvtDriveStateListener, KvtPositionMonitorListener {
 
 	// private String m_host = "10.0.0.5";s
-	final String				m_connectFormatString	= "Connecting...  {0} % complete";
+	final String				m_connectFormatString	= "Connecting... ";
 	protected ProgressDialog	m_dlg;
 
 	@Override
@@ -42,6 +50,39 @@ public class MainActivity extends Activity implements InitializationListener, Kv
 		// add listeners for rc data
 		KvtPositionMonitor.addListener(this);
 		KvtDriveStateMonitor.addListener(this);
+		KvtSystemCommunicator.addConnectionListener(new KvtTeachviewConnectionListener() {
+			
+			public void teachviewDisconnected() {
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						ImageView v = (ImageView) findViewById(R.id.connStateIcon);
+						if (v != null) {
+							Resources res = getResources();
+							// v.setImageResource(R.drawable.conn);
+							v.setImageDrawable(res.getDrawable(R.drawable.disconn));
+							v.invalidate();
+						}
+					}
+				});
+
+			}
+			
+			public void teachviewConnected() {
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						ImageView v = (ImageView) findViewById(R.id.connStateIcon);
+						if (v != null) {
+							Resources res = getResources();
+							v.setImageDrawable(res.getDrawable(R.drawable.conn));
+							// v.setImageResource(R.drawable.disconn);
+							v.invalidate();
+						}
+					}
+				});
+			}
+		});
 		setContentView(R.layout.activity_main);
 
 		// setup override seekbar
@@ -63,17 +104,27 @@ public class MainActivity extends Activity implements InitializationListener, Kv
 			}
 		});
 
+		
 		// drives power switch
 		Switch sw = (Switch) findViewById(R.id.switch1);
 		sw.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			public void onCheckedChanged(CompoundButton _buttonView, boolean _isChecked) {
-				if (RobotControlProxy.isConnected()) {
-					RobotControlProxy.toggleDrivesPower();
-				}
+				// if (RobotControlProxy.isConnected()) {
+				// RobotControlProxy.toggleDrivesPower();
+				// }
 			}
 		});
+		sw.setClickable(false);
 
+		checkWifiAndConnect();
+
+	}
+
+	/**
+	 * 
+	 */
+	private void checkWifiAndConnect() {
 		if (!RobotControlProxy.isConnected()) {
 			final WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 			if (!wifi.isWifiEnabled()) {
@@ -106,7 +157,6 @@ public class MainActivity extends Activity implements InitializationListener, Kv
 			} else
 				connectToPlc();
 		}
-
 	}
 
 	/**
@@ -135,12 +185,55 @@ public class MainActivity extends Activity implements InitializationListener, Kv
 			Intent settingsActivity = new Intent(getBaseContext(), SettingsActivity.class);
 			startActivity(settingsActivity);
 
+		} else if (_item.getTitle().equals(getString(R.string.action_connect))) {
+			if (!RobotControlProxy.isConnected()) {
+				checkWifiAndConnect();
+			} else {
+				disconnectFromPLC();
+			}
 		}
 		return super.onOptionsItemSelected(_item);
 	}
 
+	/**
+	 * 
+	 */
+	private void disconnectFromPLC() {
+		KvtSystemCommunicator.disconnect();
+	}
+
+	public void onConnStateClick(View _v) {
+		if (RobotControlProxy.isConnected()) {
+			disconnectFromPLC();
+		} else
+			checkWifiAndConnect();
+	}
+
+	public void onPowerToggle(View _v) {
+		RobotControlProxy.toggleDrivesPower();
+	}
+
+	public void onShowProjects(View _v) {
+		Intent projectsActivity = new Intent(this, ProjectListActivity.class);
+		// projectsActivity.putExtra("projects",
+		// RobotControlProxy.getProjects());
+		startActivity(projectsActivity);
+	}
+
 	public void onGenericButtonClick(View _view) {
 		RobotControlProxy.setRefsysName("foo");
+		List rs = KvtPositionMonitor.getAvailableRefsys();
+		List ts = KvtPositionMonitor.getAvailableTools();
+
+		ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, ts);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		Spinner toolSel = (Spinner) findViewById(R.id.toolSelectionCB);
+		toolSel.setAdapter(adapter);
+
+		ArrayAdapter adapter2 = new ArrayAdapter(this, android.R.layout.simple_spinner_item, rs);
+		adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		Spinner refsyssel = (Spinner) findViewById(R.id.refsysSelectionCB);
+		refsyssel.setAdapter(adapter2);
 	}
 
 	/*
@@ -160,12 +253,13 @@ public class MainActivity extends Activity implements InitializationListener, Kv
 				// "Connecting...", "Connecting to " + m_host, true, true);
 				m_dlg = new ProgressDialog(MainActivity.this, ProgressDialog.STYLE_SPINNER);
 				m_dlg.setTitle("Connecting...");
-				m_dlg.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+				// m_dlg.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+
 				m_dlg.setCancelable(true);
 				m_dlg.setCanceledOnTouchOutside(false);
 				m_dlg.setMessage("Connecting to " + PreferenceManager.getInstance().getHostname());
 
-				m_dlg.setIndeterminate(false);
+				m_dlg.setIndeterminate(true);
 				m_dlg.show();
 
 				// m_dlg.setMessage("Begin initialization...");
@@ -201,11 +295,19 @@ public class MainActivity extends Activity implements InitializationListener, Kv
 	 * com.keba.teachdroid.app.data.InitializationTask.InitializationListener
 	 * #setInitializationProgress(int)
 	 */
-	public void setInitializationProgress(final int _progress) {
+	public void setInitializationProgress(final Object _progress) {
 		runOnUiThread(new Runnable() {
 			public void run() {
-				m_dlg.setTitle(MessageFormat.format(m_connectFormatString, _progress));
-				m_dlg.setProgress(_progress);
+				if (_progress instanceof Integer)
+					m_dlg.setProgress((Integer) _progress);
+				else
+					m_dlg.setTitle(MessageFormat.format(m_connectFormatString
+ + "{0}"/*
+																					 * %
+																					 * complete
+																					 * "
+																					 */, _progress));
+
 			}
 		});
 	}
@@ -224,6 +326,13 @@ public class MainActivity extends Activity implements InitializationListener, Kv
 			public void run() {
 				Switch sw = (Switch) findViewById(R.id.switch1);
 				sw.setChecked(_hasPower);
+
+				ImageView iv = (ImageView) findViewById(R.id.powerStateIcon);
+				if (iv != null) {
+					Resources res = getResources();
+					iv.setImageDrawable(_hasPower ? res.getDrawable(R.drawable.power_on) : res.getDrawable(R.drawable.power_off));
+					iv.invalidate();
+				}
 			}
 		});
 

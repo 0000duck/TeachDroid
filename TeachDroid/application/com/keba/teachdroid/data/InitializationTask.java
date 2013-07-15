@@ -3,8 +3,6 @@
  */
 package com.keba.teachdroid.data;
 
-import java.util.Random;
-
 import android.os.AsyncTask;
 
 import com.keba.kemro.kvs.teach.data.program.KvtStatementAdministrator;
@@ -34,7 +32,7 @@ import com.keba.kemro.serviceclient.alarm.KMessageService;
  * @author ltz
  * 
  */
-public class InitializationTask extends AsyncTask<String, Integer, Boolean> {
+public class InitializationTask extends AsyncTask<String, Object, Boolean> {
 
 	private final InitializationListener	mListener;
 
@@ -55,6 +53,7 @@ public class InitializationTask extends AsyncTask<String, Integer, Boolean> {
 
 		KvtProjectAdministrator.init();
 
+		publishProgress("adminstrators");
 		KvtStatementAdministrator.init();
 		KvtMultiKinematikAdministrator.init();
 		KvtMotionModeAdministrator.init();
@@ -63,28 +62,29 @@ public class InitializationTask extends AsyncTask<String, Integer, Boolean> {
 		KvtDriveStateMonitor.init();
 		KvtProgramStateMonitor.init();
 		KvtExecutionMonitor.init();
-		publishProgress(10);
+		publishProgress("message service");
 		KMessageService.connect(host, 5000);
 		RobotControlProxy.startup();
 
 		// fake progress bar :-)
-		new Thread(new Runnable() {
+		// new Thread(new Runnable() {
+		//
+		// public void run() {
+		//
+		// for (int i = 20; i < 99; i += 5) {
+		// int sleepTime = (int) (new Random().nextDouble() * 900);
+		// try {
+		// Thread.sleep(sleepTime);
+		// publishProgress(i);
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+		// }
+		// }
+		//
+		// }).start();
 
-			public void run() {
-
-				for (int i = 20; i < 99; i += 5) {
-					int sleepTime = (int) (new Random().nextDouble() * 900);
-					try {
-						Thread.sleep(sleepTime);
-						publishProgress(i);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-
-		}).start();
-
+		publishProgress("teachcontrol");
 		KvtSystemCommunicator.connectOnce(host, 5000, "_global");
 		publishProgress(100);
 
@@ -112,7 +112,7 @@ public class InitializationTask extends AsyncTask<String, Integer, Boolean> {
 	}
 
 	@Override
-	protected void onProgressUpdate(final Integer... values) {
+	protected void onProgressUpdate(final Object... values) {
 		super.onProgressUpdate(values);
 		// runOnUiThread(new Runnable() {
 		// public void run() {
@@ -156,7 +156,7 @@ public class InitializationTask extends AsyncTask<String, Integer, Boolean> {
 		 * 
 		 * @param _progress
 		 */
-		public void setInitializationProgress(int _progress);
+		public void setInitializationProgress(Object _progress);
 
 		/**
 		 * Called after the initialization task has completed.

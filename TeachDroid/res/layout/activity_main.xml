@@ -26,15 +26,70 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp" />
 
+    <ImageView
+        android:id="@+id/connStateIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:onClick="onConnStateClick"
+        android:src="@drawable/disconn" />
+
     <Switch
         android:id="@+id/switch1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/overrideBar"
-        android:layout_alignRight="@+id/overrideBar"
         android:layout_below="@+id/overrideBar"
-        android:layout_marginTop="28dp"
-        android:text="Drives Power" />
+        android:layout_marginTop="26dp"
+        android:layout_toLeftOf="@+id/powerStateIcon"
+        android:text="Drives Power State" />
+
+    <ImageView
+        android:id="@+id/powerStateIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button1"
+        android:layout_alignRight="@+id/overrideBar"
+        android:layout_marginRight="12dp"
+        android:src="@drawable/power_off" />
+
+    <Spinner
+        android:id="@+id/refsysSelectionCB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/switch1"
+        android:layout_below="@+id/button1" 
+        android:prompt="@string/toolname_prompt"/>
+<!--         tools:listitem="@android:layout/simple_spinner_item" -->
+        
+
+    <Spinner
+        android:id="@+id/toolSelectionCB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/switch1"
+        android:layout_below="@+id/refsysSelectionCB"
+        android:prompt="@string/refsysname_prompt" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/powerStateIcon"
+        android:layout_below="@+id/switch1"
+        android:layout_marginTop="21dp"
+        android:onClick="onPowerToggle"
+        android:text="Power" />
+
+    <Button
+        android:id="@+id/button3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/overrideBar"
+        android:onClick="onShowProjects"
+        android:text="projects" />
 
     <Button
         android:id="@+id/button1"
@@ -42,7 +97,6 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/switch1"
         android:layout_below="@+id/switch1"
-        android:layout_marginTop="50dp"
         android:onClick="onGenericButtonClick"
         android:text="Button" />
 

@@ -14,5 +14,22 @@
     <string name="programTableHeader">Available Programs</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="action_settings">Settings</string>
+    <string name="action_connect">Connect</string>
+    <string name="toolname_prompt">Select tool</string>
+    <string name="refsysname_prompt">Select RefSysKaini + 1
+Peda
+Fliesi
+Duschi
+Peter (kl. Latzi)Kaini + 1
+Peda
+Fliesi
+Duschi
+Peter (kl. Latzi)Kaini + 1
+Peda
+Fliesi
+Duschi
+Peter (kl. Latzi)</string>
+    <string name="title_project_list">Projects</string>
+    <string name="title_project_detail">Project Detail</string>
 
 </resources>

@@ -37,7 +37,7 @@ public class KvtProject {
 	KExecUnitProject execUnitProject;
 	private int state;
 
-	private Vector programs;
+	private Vector			programs;
 	private KTcDfl dfl;
 
 	/**
@@ -350,6 +350,19 @@ public class KvtProject {
 	 */
 	public Date getProjectModificationDate() {
 		return dirEntry.getModifiedDate();
+	}
+
+	/**
+	 * @return
+	 */
+	public KvtProgram[] getPrograms() {
+		
+		KvtProgram[] arr = new KvtProgram[programs.size()];
+		int i = 0;
+		for (Object p : programs)
+			arr[i++] = (KvtProgram) p;
+
+		return arr;
 	}
 
 }
