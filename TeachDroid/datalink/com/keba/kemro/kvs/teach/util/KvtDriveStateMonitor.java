@@ -39,15 +39,31 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener,
 	 */
 	public interface KvtDriveStateListener {
 
+		/**
+		 * Called when a drive compound (i.e. robot) has gained or lost power
+		 * supply.
+		 * 
+		 * @param _hasPower
+		 *            indicates whether the respective robot now has power or
+		 *            not
+		 */
 		public void drivePowerChanged(boolean _hasPower);
 
 		/**
+		 * Called when the ready-state of at least one drive has changed
+		 * 
 		 * @param isReady
+		 *            indicates whether the drive compound is now referenced of
+		 *            not
 		 */
 		public void driveIsReadyChanged(Boolean isReady);
 
 		/**
+		 * Called when the referenced-state of a at least one drive has changed.
+		 * 
 		 * @param _isRef
+		 *            indicates whether the drive compound is now referenced or
+		 *            not
 		 */
 		public void driveIsReferencedChanged(Boolean _isRef);
 

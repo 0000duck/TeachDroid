@@ -386,8 +386,18 @@ public class KvtExecutionMonitor implements KvtTeachviewConnectionListener,
 	}
 
 	public static interface KvtExecutionListener {
+		/**
+		 * Called when the position of the program counter has changed
+		 * 
+		 * @param _line
+		 *            the line number to which it has changed
+		 */
 		void programCounterChanged(int _line);
 
+		/**
+		 * 
+		 * @param _source
+		 */
 		void programCodeChanged(String _source);
 
 	}
