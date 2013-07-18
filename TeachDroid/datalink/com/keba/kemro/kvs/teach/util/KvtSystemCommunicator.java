@@ -105,7 +105,7 @@ public class KvtSystemCommunicator {
 			// KvtProjectAdministrator.reloadProjectList();
 			// }
 			// }, "Connection state notifier thread").start();
-			Log.i("TC connection", "connection state update");
+			Log.i("TC connection", "about to fireConnected()");
 			fireConnected();
 			KvtProjectAdministrator.reloadProjectList();
 			return true;
@@ -198,17 +198,24 @@ public class KvtSystemCommunicator {
 	private static void fireConnected() {
 		for (int i = 0; i < m_connectionListeners.size(); i++) {
 			try {
-				Log.i("TC connection", "notifying listener " + m_connectionListeners.elementAt(i));
+				long start = System.currentTimeMillis();
 
 				KvtTeachviewConnectionListener listener = (KvtTeachviewConnectionListener) (m_connectionListeners.elementAt(i));
+				String classname = listener.getClass().toString().substring(listener.getClass().toString().lastIndexOf("."));
 				listener.teachviewConnected();
+				long dur = System.currentTimeMillis() - start;
 
+				Log.i("KvtSystemCommunicator", "notifying listener " + classname + " took "
+						+ dur
+						+ " ms");
 
 			} catch (Exception ex) {
 				Log.e(KvtSystemCommunicator.class.toString(),
 						"Error in Call of KTeachviewConnectionListener.connected " + m_connectionListeners.elementAt(i), ex);
 			}
+
 		}
+		Log.i("KvtSystemCommunicator", "notifying listeners done");
 	}
 
 	private static void fireDisconnected() {

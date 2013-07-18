@@ -14,6 +14,9 @@
 *------------------------------------------------------------------------*/
 package com.keba.kemro.teach.dfl;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import android.util.Log;
 
 import com.keba.kemro.teach.dfl.codepoint.KCodePointAdministrator;
@@ -47,7 +50,7 @@ public class KTcDfl {
 	/** End user variable file extention */
 	public static String USER_VAR_FILE_EXTENSION = ".TID";
 
-	private static final Object m_locker = new Object();
+	private static final Lock			m_locker					= new ReentrantLock();
 
 	private String globalFilter;
 	public TcClient client;
@@ -122,7 +125,7 @@ public class KTcDfl {
 	 *
 	 * @return Lock-Objekt 
 	 */
-	public Object getLockObject() {
+	public Lock getLockObject() {
 		return m_locker;
 		// return new Object();
 	}

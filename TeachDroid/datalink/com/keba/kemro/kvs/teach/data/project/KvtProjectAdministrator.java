@@ -15,6 +15,7 @@
 package com.keba.kemro.kvs.teach.data.project;
 
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 import android.util.Log;
 
@@ -59,17 +60,26 @@ public class KvtProjectAdministrator {
 			public void teachviewConnected() {
 				dfl = KvtSystemCommunicator.getTcDfl();
 				// synchronized (dfl.getLockObject()) {
-				Log.i("TC connection", "Project administrator connecting...");
-				dfl.directory.addDirectoryAdminListener(listener);
-				dfl.structure.addStructAdministratorListener(listener);
-				dfl.execution.addListener(listener);
-				// new Thread(new Runnable() {
-				// public void run() {
-						listener.directoryProjectsChanged();
-				// }
-				// }, "KProjectListener.directoryProjectsChanged()").start();
+				try {
+					if (dfl.getLockObject().tryLock(10L, TimeUnit.SECONDS)) {
+						Log.i("TC connection", "Project administrator connecting...");
+						dfl.directory.addDirectoryAdminListener(listener);
+						dfl.structure.addStructAdministratorListener(listener);
+						dfl.execution.addListener(listener);
 
-				Log.i("TC connection", "Project administrator connected!");
+
+
+						// dfl.getLockObject().unlock();
+						Log.i("TC connection", "Project administrator connected!");
+					} else
+						Log.e("KvtProjectAdministrator", "acquiring dfl lock not successful!");
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} finally {
+					dfl.getLockObject().unlock();
+				}
+				// placed outside dfl lock
+				listener.directoryProjectsChanged();
 				// }
 			}
 

@@ -22,7 +22,6 @@ import android.view.View;
 import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
-import com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener;
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
 import com.keba.teachdroid.app.fragments.ConnectFragment;
 import com.keba.teachdroid.app.fragments.OverviewFragment;
@@ -35,7 +34,7 @@ import com.keba.teachdroid.data.InitializationTask.InitializationListener;
 import com.keba.teachdroid.data.RobotControlProxy;
 import com.keba.teachdroid.util.PreferenceManager;
 
-public class MainActivity extends FragmentActivity implements InitializationListener, KvtPositionMonitorListener, Callbacks, IConnectCallback {
+public class MainActivity extends FragmentActivity implements InitializationListener, Callbacks, IConnectCallback {
 
 	/**
 	 * 
@@ -65,9 +64,6 @@ public class MainActivity extends FragmentActivity implements InitializationList
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// add listeners for rc data
-		KvtPositionMonitor.addListener(this);
-
 		setContentView(R.layout.activity_main);
 
 		// Create the adapter that will return a fragment for each of the three
@@ -80,9 +76,10 @@ public class MainActivity extends FragmentActivity implements InitializationList
 	}
 
 	/**
+	 * @param _host
 	 * 
 	 */
-	private void checkWifiAndConnect() {
+	private void checkWifiAndConnect(final String _host) {
 		if (!RobotControlProxy.isConnected()) {
 			final WifiManager wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 			if (!wifi.isWifiEnabled()) {
@@ -96,7 +93,7 @@ public class MainActivity extends FragmentActivity implements InitializationList
 
 					public void onClick(DialogInterface _dialog, int _which) {
 						wifi.setWifiEnabled(true);
-						connectToPlc();
+						connectToPlc(_host);
 					}
 				});
 				dlgAlert.setNegativeButton("Cancel", /*
@@ -112,21 +109,23 @@ public class MainActivity extends FragmentActivity implements InitializationList
 				dlgAlert.setCancelable(true);
 				dlgAlert.create().show();
 
-			} else
-				connectToPlc();
+			} else {
+				connectToPlc(_host);
+			}
 		}
 	}
 
 	/**
+	 * @param _host
 	 * 
 	 */
-	private void connectToPlc() {
+	private void connectToPlc(String _host) {
 		// always read host from preferences, just in case someone has modified
 		// it in the meantime
-		String host = PreferenceManager.getInstance().getHostname();
+		// String host = PreferenceManager.getInstance().getHostname();
 		mStartTime = System.currentTimeMillis();
 		InitializationTask itask = new InitializationTask(this);
-		itask.execute(host);
+		itask.execute(_host);
 
 	}
 
@@ -146,7 +145,8 @@ public class MainActivity extends FragmentActivity implements InitializationList
 
 		} else if (_item.getTitle().equals(getString(R.string.action_connect))) {
 			if (!RobotControlProxy.isConnected()) {
-				checkWifiAndConnect();
+				String host = PreferenceManager.getInstance().getHostname();
+				checkWifiAndConnect(host);
 			} else {
 				disconnectFromPLC();
 			}
@@ -164,8 +164,11 @@ public class MainActivity extends FragmentActivity implements InitializationList
 	public void onConnStateClick(View _v) {
 		if (RobotControlProxy.isConnected()) {
 			disconnectFromPLC();
-		} else
-			checkWifiAndConnect();
+		} else {
+			String host = PreferenceManager.getInstance().getHostname();
+			checkWifiAndConnect(host);
+		}
+
 	}
 
 	public void onShowProjects(View _v) {
@@ -270,84 +273,17 @@ public class MainActivity extends FragmentActivity implements InitializationList
 		});
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
-	 * #cartesianPositionChanged(java.lang.String, java.lang.Number)
-	 */
-	public void cartesianPositionChanged(String _compName, Number _value) {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
-	 * #axisPositionChanged(int, java.lang.Number, java.lang.String)
-	 */
-	public void axisPositionChanged(int _axisNo, Number _value, String _axisName) {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
-	 * #overrideChanged(java.lang.Number)
-	 */
-	public void overrideChanged(final Number _override) {
-		runOnUiThread(new Runnable() {
-
-			public void run() {
-				// set override label'S text
-				// TextView t = (TextView) findViewById(R.id.overrideLabel);
-				// t.setText("Override " + _override + "%");
-				// ((SeekBar)
-				// findViewById(R.id.overrideBar)).setProgress(_override.intValue());
-			}
-		});
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
-	 * #pathVelocityChanged(float)
-	 */
-	public void pathVelocityChanged(float _velocityMms) {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
-	 * #chosenRefSysChanged(java.lang.String)
-	 */
-	public void chosenRefSysChanged(String _refsysName) {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
-	 * #chosenToolChanged(java.lang.String)
-	 */
-	public void chosenToolChanged(String _toolName) {
-	}
-
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
 	 * one of the sections/tabs/pages.
 	 */
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+		private Fragment[]	mFragments;
+
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
+
 		}
 
 		@Override
@@ -356,38 +292,65 @@ public class MainActivity extends FragmentActivity implements InitializationList
 			// Return a DummySectionFragment (defined as a static inner class
 			// below) with the page number as its lone argument.
 
-			Fragment fragment;
-			Bundle args = new Bundle();
+			// Fragment fragment;
+			// Bundle args = new Bundle();
+			//
+			// switch (position) {
+			// case 0:
+			// fragment = new ConnectFragment();
+			//
+			// args.putSerializable("connector", MainActivity.this);
+			// fragment.setArguments(args);
+			// break;
+			// case 1:
+			// fragment = new OverviewFragment();
+			// break;
+			// case 2:
+			// fragment = new ProjectListFragment();
+			// break;
+			// case 3:
+			// fragment = new ProjectDetailFragment();
+			// KvtProject p =
+			// KvtProjectAdministrator.getProject(mSelectedProject);
+			// if (p != null) {
+			//
+			// args = new Bundle();
+			// args.putSerializable("project", p);
+			// fragment.setArguments(args);
+			// }
+			// break;
+			//
+			// default:
+			// fragment = new Fragment();
+			// break;
+			// }
+			// return fragment;
 
-			switch (position) {
-			case 0:
-				fragment = new ConnectFragment();
+			if (position > getCount() - 1)
+				return null;
+
+			if (mFragments == null) {
+				Bundle args = new Bundle();
+
+				mFragments = new Fragment[] { new ConnectFragment(), new OverviewFragment(), new ProjectListFragment(),
+						new ProjectDetailFragment() };
 
 				args.putSerializable("connector", MainActivity.this);
-				fragment.setArguments(args);
-				break;
-			case 1:
-				fragment = new OverviewFragment();
-				break;
-			case 2:
-				fragment = new ProjectListFragment();
-				break;
-			case 3:
-				KvtProject p = KvtProjectAdministrator.getProject(mSelectedProject);
-				if (p != null) {
-					fragment = new ProjectDetailFragment();
-					args = new Bundle();
-					args.putSerializable("project", p);
-					fragment.setArguments(args);
-				} else
-					fragment = new Fragment();// show empty screen
-				break;
-
-			default:
-				fragment = new Fragment();
-				break;
+				mFragments[0].setArguments(args);
 			}
-			return fragment;
+
+			// if (position == 3 && mSelectedProject != null) {
+			// KvtProject p =
+			// KvtProjectAdministrator.getProject(mSelectedProject);
+			// if (p != null) {
+			//
+			// Bundle args = new Bundle();
+			// args.putSerializable("project", p);
+			// mFragments[3].setArguments(args);
+			// }
+			// }
+
+			return mFragments[position];
 		}
 
 		@Override
@@ -405,9 +368,11 @@ public class MainActivity extends FragmentActivity implements InitializationList
 			case 1:
 				return getString(R.string.title_section_overview);
 			case 2:
+				return getString(R.string.title_section_projects);
+			case 3:
 				return getString(R.string.title_section_programs);
 			default:
-				return "section_" + position;
+				return "NOT_DEFINED_" + position;
 			}
 		}
 	}
@@ -417,9 +382,9 @@ public class MainActivity extends FragmentActivity implements InitializationList
 	 * 
 	 * @see com.keba.teachdroid.app.ConnectCallback#connect()
 	 */
-	public void connect() {
+	public void connect(String _host) {
 		mSelectedProject = null;
-		checkWifiAndConnect();
+		checkWifiAndConnect(_host);
 	}
 
 	/*

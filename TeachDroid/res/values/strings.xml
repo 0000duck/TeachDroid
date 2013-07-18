@@ -22,6 +22,7 @@
     <string name="title_section_connect">Connection</string>
     <string name="title_section_overview">Overview</string>
     <string name="title_section_programs">Programs</string>
+    <string name="title_section_projects">Projects</string>
     <string name="action_disconnect">Disconnect</string>
 
 </resources>

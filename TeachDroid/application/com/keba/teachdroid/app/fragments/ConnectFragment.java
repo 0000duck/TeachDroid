@@ -82,8 +82,10 @@ public class ConnectFragment extends Fragment {
 				if (mCallback != null) {
 					if (RobotControlProxy.isConnected())
 						mCallback.disconnect();
-					else
-						mCallback.connect();
+					else {
+						String ip = ((EditText) mRootView.findViewById(R.id.ipAddress)).getText().toString();
+						mCallback.connect(ip);
+					}
 				}
 
 				// switch to next section

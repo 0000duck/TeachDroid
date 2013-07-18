@@ -119,7 +119,13 @@ public class KvtMotionModeAdministrator implements KMultikinematicListener, KVar
 					varGroup.addListener(this);
 					varGroup.setPollInterval(250);
 					dfl.structure.addMultikinematikListener(this);
-					kinematikChanged();
+					// new Thread(new Runnable() {
+					// public void run() {
+							kinematikChanged();
+					// }
+					// },
+					// "KvtMotionModeAdministrator.kinematicChanged()").start();
+
 					varGroup.activate();
 				}
 			}

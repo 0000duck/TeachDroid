@@ -81,7 +81,7 @@ public class ProjectDetailFragment extends Fragment {
 	 */
 	private void updateUI() {
 		// Show the dummy content as text in a TextView.
-		if (mItem != null) {
+		if (mItem != null && mRootView != null) {
 			// ((TextView)
 			// rootView.findViewById(R.id.project_detail)).setText(mItem.content);
 			// ((TextView)

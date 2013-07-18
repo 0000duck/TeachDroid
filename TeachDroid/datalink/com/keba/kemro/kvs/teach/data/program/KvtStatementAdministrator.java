@@ -18,6 +18,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.concurrent.TimeUnit;
 
 import android.util.Log;
 
@@ -64,9 +65,9 @@ import com.keba.kemro.teach.dfl.value.KStructVarWrapper;
  */
 public class KvtStatementAdministrator implements KStructAdministratorListener {
 	public static interface ChangeListener {
-		public static int CHANGE = 0;
-		public static int REMOVE = 1;
-		public static int INSERT = 2;
+		public static int	CHANGE	= 0;
+		public static int	REMOVE	= 1;
+		public static int	INSERT	= 2;
 
 		public void statementChanged(int type, int line, int count, String oldStatement);
 	}
@@ -74,25 +75,25 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 	// manages types and variables of specified type
 	// private static KvtVarManager m_varManager = new KvtVarManager();
 	// public static final String VAR_TYPES_RESOURCE = "vartypes";
-	public static final String GLOBAL_VAR_PRG = KvtProjectAdministrator.GLOBAL_VAR_PRG;
+	public static final String						GLOBAL_VAR_PRG		= KvtProjectAdministrator.GLOBAL_VAR_PRG;
 	// /////////////////////////////////////////////
 	// constant string parts for insert statement
 	// /////////////////////////////////////////////
-	private final static String LEFT_BRACKET = "(";
-	private final static String RIGHT_BRACKET = ")";
-	private final static String SEPARATOR = ",";
-	private final static String SEMICOLON = ";";
-	private final static String CAR_RET = "\n";
-	private static final String UNNAMED = "*";
-	private static final Vector m_listener = new Vector(3);
-	private static final KvtStatementAdministrator m_admin = new KvtStatementAdministrator();
+	private final static String						LEFT_BRACKET		= "(";
+	private final static String						RIGHT_BRACKET		= ")";
+	private final static String						SEPARATOR			= ",";
+	private final static String						SEMICOLON			= ";";
+	private final static String						CAR_RET				= "\n";
+	private static final String						UNNAMED				= "*";
+	private static final Vector						m_listener			= new Vector(3);
+	private static final KvtStatementAdministrator	m_admin				= new KvtStatementAdministrator();
 
-	private static KStructProgram tableScope;
-	private static final Hashtable routineLockUpTable = new Hashtable(300);
-	private static Hashtable reuseVariables = new Hashtable();
+	private static KStructProgram					tableScope;
+	private static final Hashtable					routineLockUpTable	= new Hashtable(300);
+	private static Hashtable						reuseVariables		= new Hashtable();
 
-	public static boolean projectScope = true;
-	private static KTcDfl dfl;
+	public static boolean							projectScope		= true;
+	private static KTcDfl							dfl;
 
 	/**
 	 * adds a reuse variable to internal cache
@@ -128,9 +129,19 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 			public void teachviewConnected() {
 				dfl = KvtSystemCommunicator.getTcDfl();
 				// synchronized (dfl.getLockObject()) {
-					dfl.structure.addStructAdministratorListener(m_admin);
-					m_admin.treeChanged(dfl.structure.getRoot());
-				// }
+				try {
+					if (dfl.getLockObject().tryLock(10, TimeUnit.SECONDS)) {
+						dfl.structure.addStructAdministratorListener(m_admin);
+						m_admin.treeChanged(dfl.structure.getRoot());
+					} else {
+						Log.e("KvtStatementAdminstrator", "acquiring dfl lock not successful!");
+					}
+					// }
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				} finally {
+					dfl.getLockObject().unlock();
+				}
 			}
 
 			public void teachviewDisconnected() {
@@ -430,7 +441,7 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 		// }
 		return "var" + type.getKey() + "_";
 	}
-	
+
 	private static String getPrefix(KStructVar variable) {
 		String key = variable.getKey();
 		int index = 0;
@@ -577,8 +588,9 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 		if (formalParamType.isAliasType()) {
 			return getDefaultActualParamType(formalParamType.getKStructType(), scope);
 		}
-		if ((formalParamType instanceof KStructTypeBool) || (formalParamType instanceof KStructTypeLInt) || (formalParamType instanceof KStructTypeReal) || (formalParamType instanceof KStructTypeString) || (formalParamType instanceof KStructTypeSubrange)
-				|| (formalParamType instanceof KStructTypeEnum)) {
+		if ((formalParamType instanceof KStructTypeBool) || (formalParamType instanceof KStructTypeLInt)
+				|| (formalParamType instanceof KStructTypeReal) || (formalParamType instanceof KStructTypeString)
+				|| (formalParamType instanceof KStructTypeSubrange) || (formalParamType instanceof KStructTypeEnum)) {
 			return formalParamType;
 		}
 		return null;
@@ -638,13 +650,15 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 				p.isOptional = ((KStructVar) param).isOptional();
 
 				if (!p.reuse && !p.isOptional && (t != null)) {
-					if ((t instanceof KStructTypeBool) || (t instanceof KStructTypeLInt) || (t instanceof KStructTypeReal) || (t instanceof KStructTypeString) || (t instanceof KStructTypeSubrange) || (t instanceof KStructTypeEnum)) {
+					if ((t instanceof KStructTypeBool) || (t instanceof KStructTypeLInt) || (t instanceof KStructTypeReal)
+							|| (t instanceof KStructTypeString) || (t instanceof KStructTypeSubrange) || (t instanceof KStructTypeEnum)) {
 						if (t instanceof KStructTypeBool) {
 							p.actualValue = Boolean.FALSE;
 							p.actualName = "FALSE";
 							try {
 								if (p.formalVar.containsAttribute(KvtCAttributeKey.D_INIT_VALUE)) {
-									p.actualValue = new Boolean(Boolean.parseBoolean((String) (p.formalVar.getAttribute(KvtCAttributeKey.D_INIT_VALUE))));
+									p.actualValue = new Boolean(Boolean.parseBoolean((String) (p.formalVar
+											.getAttribute(KvtCAttributeKey.D_INIT_VALUE))));
 									p.actualName = p.actualValue.toString();
 								}
 							} catch (Exception e) {
@@ -655,7 +669,8 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 							p.actualName = "0";
 							try {
 								if (p.formalVar.containsAttribute(KvtCAttributeKey.D_INIT_VALUE)) {
-									p.actualValue = new Integer(Integer.parseInt((String) (p.formalVar.getAttribute(KvtCAttributeKey.D_INIT_VALUE))));
+									p.actualValue = new Integer(Integer.parseInt((String) (p.formalVar
+											.getAttribute(KvtCAttributeKey.D_INIT_VALUE))));
 									p.actualName = p.actualValue.toString();
 								}
 							} catch (Exception e) {
@@ -689,7 +704,8 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 							p.actualName = p.actualValue.toString();
 							try {
 								if (p.formalVar.containsAttribute(KvtCAttributeKey.D_INIT_VALUE)) {
-									p.actualValue = new Integer(Integer.parseInt((String) (p.formalVar.getAttribute(KvtCAttributeKey.D_INIT_VALUE))));
+									p.actualValue = new Integer(Integer.parseInt((String) (p.formalVar
+											.getAttribute(KvtCAttributeKey.D_INIT_VALUE))));
 									p.actualName = p.actualValue.toString();
 								}
 							} catch (Exception e) {
@@ -705,7 +721,8 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 							String varPrefix = null;
 							if ((names != null) && (names.length > id)) {
 								varPrefix = names[id];
-								if ((varPrefix == null) || (0 == varPrefix.length()) || varPrefix.equalsIgnoreCase("*") || varPrefix.equalsIgnoreCase("?")) {
+								if ((varPrefix == null) || (0 == varPrefix.length()) || varPrefix.equalsIgnoreCase("*")
+										|| varPrefix.equalsIgnoreCase("?")) {
 									varPrefix = null;
 								}
 							}
@@ -718,7 +735,9 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 									p.actualValue = (var != null) ? d.variable.createKStructVarWrapper(var) : null;
 								}
 								if (var == null) {
-//									KvtErrMsgAdministrator.showError(KvtErrMsgAdministrator.ERR_TITLE, KvtErrMsgAdministrator.INS_ERR_MSG, null);
+									// KvtErrMsgAdministrator.showError(KvtErrMsgAdministrator.ERR_TITLE,
+									// KvtErrMsgAdministrator.INS_ERR_MSG,
+									// null);
 									Log.e("ERROR", "Could not insert!");
 								}
 							}
@@ -872,7 +891,8 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 					for (int j = 0; j < proj.getProgramCount(); j++) {
 						KvtProgram p = proj.getProgram(j);
 						if (checkName(p.getStructProgram(), text)/*
-																 * p.toString().equalsIgnoreCase
+																 * p.toString().
+																 * equalsIgnoreCase
 																 * (text)
 																 */) {
 							return true;
@@ -1278,7 +1298,8 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 				Integer value = Integer.valueOf(name);
 				Integer lowerBound = ((KStructTypeSubrange) formalType).getLowerBound();
 				Integer upperBound = ((KStructTypeSubrange) formalType).getUpperBound();
-				if ((lowerBound != null) && (upperBound != null) && (lowerBound.intValue() <= value.intValue()) && (value.intValue() <= upperBound.intValue())) {
+				if ((lowerBound != null) && (upperBound != null) && (lowerBound.intValue() <= value.intValue())
+						&& (value.intValue() <= upperBound.intValue())) {
 					return value;
 				}
 			} catch (Exception e) {
@@ -1512,14 +1533,14 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 	 * describes a routine parameter
 	 */
 	public static class Parameter {
-		public String formalName;
-		public KStructVar formalVar;
-		public KStructType formalType;
-		public String actualName;
-		public Object actualValue;
-		public KStructVar createdVar;
-		public boolean reuse;
-		public boolean isOptional;
+		public String		formalName;
+		public KStructVar	formalVar;
+		public KStructType	formalType;
+		public String		actualName;
+		public Object		actualValue;
+		public KStructVar	createdVar;
+		public boolean		reuse;
+		public boolean		isOptional;
 	}
 
 }

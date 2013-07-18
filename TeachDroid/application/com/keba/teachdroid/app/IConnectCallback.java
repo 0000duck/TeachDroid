@@ -11,7 +11,7 @@ import java.io.Serializable;
  */
 public interface IConnectCallback extends Serializable {
 
-	public void connect();
+	public void connect(String _ip);
 
 	public void disconnect();
 }

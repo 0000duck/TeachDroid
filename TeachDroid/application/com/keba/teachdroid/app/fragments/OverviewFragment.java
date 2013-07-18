@@ -21,6 +21,8 @@ import android.widget.TextView;
 
 import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor;
 import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener;
+import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
+import com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener;
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
 import com.keba.kemro.kvs.teach.util.KvtTeachviewConnectionListener;
 import com.keba.teachdroid.app.R;
@@ -30,7 +32,7 @@ import com.keba.teachdroid.data.RobotControlProxy;
  * @author ltz
  * 
  */
-public class OverviewFragment extends Fragment implements KvtDriveStateListener {
+public class OverviewFragment extends Fragment implements KvtDriveStateListener, KvtPositionMonitorListener {
 
 	private View	mRootView;
 
@@ -40,6 +42,7 @@ public class OverviewFragment extends Fragment implements KvtDriveStateListener 
 
 		// add listeners
 		KvtDriveStateMonitor.addListener(this);
+		KvtPositionMonitor.addListener(this);
 		KvtSystemCommunicator.addConnectionListener(new KvtTeachviewConnectionListener() {
 
 			public void teachviewDisconnected() {
@@ -162,6 +165,75 @@ public class OverviewFragment extends Fragment implements KvtDriveStateListener 
 	 * #driveIsReferencedChanged(java.lang.Boolean)
 	 */
 	public void driveIsReferencedChanged(Boolean _isRef) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
+	 * #cartesianPositionChanged(java.lang.String, java.lang.Number)
+	 */
+	public void cartesianPositionChanged(String _compName, Number _value) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
+	 * #pathVelocityChanged(float)
+	 */
+	public void pathVelocityChanged(float _velocityMms) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
+	 * #axisPositionChanged(int, java.lang.Number, java.lang.String)
+	 */
+	public void axisPositionChanged(int _axisNo, Number _value, String _axisName) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
+	 * #overrideChanged(java.lang.Number)
+	 */
+	public void overrideChanged(final Number _override) {
+		getActivity().runOnUiThread(new Runnable() {
+
+			public void run() {
+				// set override label'S text
+				TextView t = (TextView) mRootView.findViewById(R.id.overrideLabel);
+				t.setText("Override " + _override + "%");
+				((SeekBar) mRootView.findViewById(R.id.overrideBar)).setProgress(_override.intValue());
+			}
+		});
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
+	 * #chosenRefSysChanged(java.lang.String)
+	 */
+	public void chosenRefSysChanged(String _refsysName) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
+	 * #chosenToolChanged(java.lang.String)
+	 */
+	public void chosenToolChanged(String _toolName) {
 	}
 
 }
