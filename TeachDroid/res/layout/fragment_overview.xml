@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <TextView
+        android:id="@+id/overrideLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/overrideBar"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="23dp"
+        android:text="Override"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <SeekBar
+        android:id="@+id/overrideBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/overrideLabel"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginTop="35dp" />
+
+    <Switch
+        android:id="@+id/switch1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/overrideBar"
+        android:layout_below="@+id/overrideBar"
+        android:layout_marginTop="26dp"
+        android:layout_toLeftOf="@+id/powerStateIcon"
+        android:text="Drives Power State" />
+
+    <Button
+        android:id="@+id/button2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/powerStateIcon"
+        android:layout_below="@+id/switch1"
+        android:layout_marginTop="21dp"
+        android:text="Power" />
+
+    <ImageView
+        android:id="@+id/powerStateIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button2"
+        android:layout_alignRight="@+id/overrideBar"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/power_off" />
+
+    <ImageView
+        android:id="@+id/connStateIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/overrideLabel"
+        android:layout_toRightOf="@+id/switch1"
+        android:onClick="onConnStateClick"
+        android:src="@drawable/disconn" />
+
+</RelativeLayout>

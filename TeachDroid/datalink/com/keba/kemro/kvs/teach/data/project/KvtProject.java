@@ -7,6 +7,7 @@
  *------------------------------------------------------------------------*/
 package com.keba.kemro.kvs.teach.data.project;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Vector;
 
@@ -24,7 +25,11 @@ import com.keba.kemro.teach.dfl.structural.routine.KStructRoutine;
 /**
  * Representation eines Projektes
  */
-public class KvtProject {
+public class KvtProject implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long	serialVersionUID		= -3836759406451389133L;
 	public final static int NOT_BUILDED = 0;
 	public final static int BUILDED_WITH_ERROR = 1;
 	public final static int BUILDED_WITHOUT_ERROR = 2;
@@ -38,7 +43,7 @@ public class KvtProject {
 	private int state;
 
 	private Vector			programs;
-	private KTcDfl dfl;
+	private KTcDfl				dfl;
 
 	/**
 	 * Legt ein neues KProjekt an

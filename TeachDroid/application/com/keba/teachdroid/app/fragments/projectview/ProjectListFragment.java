@@ -1,8 +1,9 @@
-package com.keba.teachdroid.app.projectview;
+package com.keba.teachdroid.app.fragments.projectview;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -71,11 +72,10 @@ public class ProjectListFragment extends ListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-
-
-		// TODO: replace with a real list adapter.
-		setListAdapter(new ArrayAdapter<KvtProject>(getActivity(), android.R.layout.simple_list_item_activated_1, android.R.id.text1,
-				RobotControlProxy.getProjects()));
+		if (RobotControlProxy.isConnected())
+			// TODO: replace with a real list adapter.
+			setListAdapter(new ArrayAdapter<KvtProject>(getActivity(), android.R.layout.simple_list_item_activated_1, android.R.id.text1,
+					RobotControlProxy.getProjects()));
 	}
 
 	@Override
@@ -94,10 +94,12 @@ public class ProjectListFragment extends ListFragment {
 
 		// Activities containing this fragment must implement its callbacks.
 		if (!(activity instanceof Callbacks)) {
-			throw new IllegalStateException("Activity must implement fragment's callbacks.");
-		}
-
-		mCallbacks = (Callbacks) activity;
+			// throw new
+			// IllegalStateException("Activity must implement fragment's callbacks.");
+			Log.w("ProjectListFragment", "Activity must implement fragment's callbacks.");
+			mCallbacks = sDummyCallbacks;
+		} else
+			mCallbacks = (Callbacks) activity;
 	}
 
 	@Override

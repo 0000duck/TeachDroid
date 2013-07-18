@@ -3,45 +3,63 @@ package com.keba.teachdroid.app;
 import java.text.MessageFormat;
 import java.util.List;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.ImageView;
-import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.Spinner;
-import android.widget.Switch;
-import android.widget.TextView;
 
-import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor;
-import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener;
+import com.keba.kemro.kvs.teach.data.project.KvtProject;
+import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener;
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
-import com.keba.kemro.kvs.teach.util.KvtTeachviewConnectionListener;
-import com.keba.teachdroid.app.projectview.ProjectListActivity;
+import com.keba.teachdroid.app.fragments.ConnectFragment;
+import com.keba.teachdroid.app.fragments.OverviewFragment;
+import com.keba.teachdroid.app.fragments.projectview.ProjectDetailFragment;
+import com.keba.teachdroid.app.fragments.projectview.ProjectListActivity;
+import com.keba.teachdroid.app.fragments.projectview.ProjectListFragment;
+import com.keba.teachdroid.app.fragments.projectview.ProjectListFragment.Callbacks;
 import com.keba.teachdroid.data.InitializationTask;
 import com.keba.teachdroid.data.InitializationTask.InitializationListener;
 import com.keba.teachdroid.data.RobotControlProxy;
 import com.keba.teachdroid.util.PreferenceManager;
 
-public class MainActivity extends Activity implements InitializationListener, KvtDriveStateListener, KvtPositionMonitorListener {
+public class MainActivity extends FragmentActivity implements InitializationListener, KvtPositionMonitorListener, Callbacks, IConnectCallback {
 
+	/**
+	 * 
+	 */
+	private static final long			serialVersionUID		= 1L;
 	// private String m_host = "10.0.0.5";s
-	final String				m_connectFormatString	= "Connecting... ";
-	protected ProgressDialog	m_dlg;
+	final String						m_connectFormatString	= "Connecting... ";
+	protected volatile ProgressDialog	m_dlg;
+	/**
+	 * The {@link android.support.v4.view.PagerAdapter} that will provide
+	 * fragments for each of the sections. We use a
+	 * {@link android.support.v4.app.FragmentPagerAdapter} derivative, which
+	 * will keep every loaded fragment in memory. If this becomes too memory
+	 * intensive, it may be best to switch to a
+	 * {@link android.support.v4.app.FragmentStatePagerAdapter}.
+	 */
+	SectionsPagerAdapter				mSectionsPagerAdapter;
+
+	/**
+	 * The {@link ViewPager} that will host the section contents.
+	 */
+	ViewPager							mViewPager;
+	private long						mStartTime;
+	private String						mSelectedProject;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -49,76 +67,16 @@ public class MainActivity extends Activity implements InitializationListener, Kv
 
 		// add listeners for rc data
 		KvtPositionMonitor.addListener(this);
-		KvtDriveStateMonitor.addListener(this);
-		KvtSystemCommunicator.addConnectionListener(new KvtTeachviewConnectionListener() {
-			
-			public void teachviewDisconnected() {
-				runOnUiThread(new Runnable() {
 
-					public void run() {
-						ImageView v = (ImageView) findViewById(R.id.connStateIcon);
-						if (v != null) {
-							Resources res = getResources();
-							// v.setImageResource(R.drawable.conn);
-							v.setImageDrawable(res.getDrawable(R.drawable.disconn));
-							v.invalidate();
-						}
-					}
-				});
-
-			}
-			
-			public void teachviewConnected() {
-				runOnUiThread(new Runnable() {
-
-					public void run() {
-						ImageView v = (ImageView) findViewById(R.id.connStateIcon);
-						if (v != null) {
-							Resources res = getResources();
-							v.setImageDrawable(res.getDrawable(R.drawable.conn));
-							// v.setImageResource(R.drawable.disconn);
-							v.invalidate();
-						}
-					}
-				});
-			}
-		});
 		setContentView(R.layout.activity_main);
 
-		// setup override seekbar
-		SeekBar s = (SeekBar) findViewById(R.id.overrideBar);
-		s.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+		// Create the adapter that will return a fragment for each of the three
+		// primary sections of the app.
+		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-			public void onStopTrackingTouch(SeekBar _seekBar) {
-				int progress = _seekBar.getProgress();
-				if (progress >= 0 && progress <= 100)
-					RobotControlProxy.setOverride(progress);
-			}
-
-			public void onStartTrackingTouch(SeekBar _seekBar) {
-			}
-
-			public void onProgressChanged(SeekBar _seekBar, int _progress, boolean _fromUser) {
-				TextView t = (TextView) findViewById(R.id.overrideLabel);
-				t.setText("Override " + _progress + "%");
-			}
-		});
-
-		
-		// drives power switch
-		Switch sw = (Switch) findViewById(R.id.switch1);
-		sw.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-
-			public void onCheckedChanged(CompoundButton _buttonView, boolean _isChecked) {
-				// if (RobotControlProxy.isConnected()) {
-				// RobotControlProxy.toggleDrivesPower();
-				// }
-			}
-		});
-		sw.setClickable(false);
-
-		checkWifiAndConnect();
-
+		// Set up the ViewPager with the sections adapter.
+		mViewPager = (ViewPager) findViewById(R.id.pager);
+		mViewPager.setAdapter(mSectionsPagerAdapter);
 	}
 
 	/**
@@ -166,6 +124,7 @@ public class MainActivity extends Activity implements InitializationListener, Kv
 		// always read host from preferences, just in case someone has modified
 		// it in the meantime
 		String host = PreferenceManager.getInstance().getHostname();
+		mStartTime = System.currentTimeMillis();
 		InitializationTask itask = new InitializationTask(this);
 		itask.execute(host);
 
@@ -209,10 +168,6 @@ public class MainActivity extends Activity implements InitializationListener, Kv
 			checkWifiAndConnect();
 	}
 
-	public void onPowerToggle(View _v) {
-		RobotControlProxy.toggleDrivesPower();
-	}
-
 	public void onShowProjects(View _v) {
 		Intent projectsActivity = new Intent(this, ProjectListActivity.class);
 		// projectsActivity.putExtra("projects",
@@ -225,15 +180,17 @@ public class MainActivity extends Activity implements InitializationListener, Kv
 		List rs = KvtPositionMonitor.getAvailableRefsys();
 		List ts = KvtPositionMonitor.getAvailableTools();
 
-		ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, ts);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		Spinner toolSel = (Spinner) findViewById(R.id.toolSelectionCB);
-		toolSel.setAdapter(adapter);
-
-		ArrayAdapter adapter2 = new ArrayAdapter(this, android.R.layout.simple_spinner_item, rs);
-		adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		Spinner refsyssel = (Spinner) findViewById(R.id.refsysSelectionCB);
-		refsyssel.setAdapter(adapter2);
+		// ArrayAdapter adapter = new ArrayAdapter(this,
+		// android.R.layout.simple_spinner_item, ts);
+		// adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		// Spinner toolSel = (Spinner) findViewById(R.id.toolSelectionCB);
+		// toolSel.setAdapter(adapter);
+		//
+		// ArrayAdapter adapter2 = new ArrayAdapter(this,
+		// android.R.layout.simple_spinner_item, rs);
+		// adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		// Spinner refsyssel = (Spinner) findViewById(R.id.refsysSelectionCB);
+		// refsyssel.setAdapter(adapter2);
 	}
 
 	/*
@@ -281,8 +238,10 @@ public class MainActivity extends Activity implements InitializationListener, Kv
 
 		runOnUiThread(new Runnable() {
 			public void run() {
-
+				long duration = System.currentTimeMillis() - mStartTime;
+				System.out.println("Connecting took me " + duration / 1000 + " ms");
 				m_dlg.dismiss();
+				mViewPager.setCurrentItem(1, true);
 			}
 		});
 
@@ -301,8 +260,7 @@ public class MainActivity extends Activity implements InitializationListener, Kv
 				if (_progress instanceof Integer)
 					m_dlg.setProgress((Integer) _progress);
 				else
-					m_dlg.setTitle(MessageFormat.format(m_connectFormatString
- + "{0}"/*
+					m_dlg.setTitle(MessageFormat.format(m_connectFormatString + "{0}"/*
 																					 * %
 																					 * complete
 																					 * "
@@ -310,52 +268,6 @@ public class MainActivity extends Activity implements InitializationListener, Kv
 
 			}
 		});
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener
-	 * #drivePowerChanged(boolean)
-	 */
-	public void drivePowerChanged(final boolean _hasPower) {
-		// power state
-		runOnUiThread(new Runnable() {
-
-			public void run() {
-				Switch sw = (Switch) findViewById(R.id.switch1);
-				sw.setChecked(_hasPower);
-
-				ImageView iv = (ImageView) findViewById(R.id.powerStateIcon);
-				if (iv != null) {
-					Resources res = getResources();
-					iv.setImageDrawable(_hasPower ? res.getDrawable(R.drawable.power_on) : res.getDrawable(R.drawable.power_off));
-					iv.invalidate();
-				}
-			}
-		});
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener
-	 * #driveIsReadyChanged(java.lang.Boolean)
-	 */
-	public void driveIsReadyChanged(Boolean _isReady) {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener
-	 * #driveIsReferencedChanged(java.lang.Boolean)
-	 */
-	public void driveIsReferencedChanged(Boolean _isRef) {
 	}
 
 	/*
@@ -390,9 +302,10 @@ public class MainActivity extends Activity implements InitializationListener, Kv
 
 			public void run() {
 				// set override label'S text
-				TextView t = (TextView) findViewById(R.id.overrideLabel);
-				t.setText("Override " + _override + "%");
-				((SeekBar) findViewById(R.id.overrideBar)).setProgress(_override.intValue());
+				// TextView t = (TextView) findViewById(R.id.overrideLabel);
+				// t.setText("Override " + _override + "%");
+				// ((SeekBar)
+				// findViewById(R.id.overrideBar)).setProgress(_override.intValue());
 			}
 		});
 	}
@@ -425,5 +338,116 @@ public class MainActivity extends Activity implements InitializationListener, Kv
 	 * #chosenToolChanged(java.lang.String)
 	 */
 	public void chosenToolChanged(String _toolName) {
+	}
+
+	/**
+	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
+	 * one of the sections/tabs/pages.
+	 */
+	public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+		public SectionsPagerAdapter(FragmentManager fm) {
+			super(fm);
+		}
+
+		@Override
+		public Fragment getItem(int position) {
+			// getItem is called to instantiate the fragment for the given page.
+			// Return a DummySectionFragment (defined as a static inner class
+			// below) with the page number as its lone argument.
+
+			Fragment fragment;
+			Bundle args = new Bundle();
+
+			switch (position) {
+			case 0:
+				fragment = new ConnectFragment();
+
+				args.putSerializable("connector", MainActivity.this);
+				fragment.setArguments(args);
+				break;
+			case 1:
+				fragment = new OverviewFragment();
+				break;
+			case 2:
+				fragment = new ProjectListFragment();
+				break;
+			case 3:
+				KvtProject p = KvtProjectAdministrator.getProject(mSelectedProject);
+				if (p != null) {
+					fragment = new ProjectDetailFragment();
+					args = new Bundle();
+					args.putSerializable("project", p);
+					fragment.setArguments(args);
+				} else
+					fragment = new Fragment();// show empty screen
+				break;
+
+			default:
+				fragment = new Fragment();
+				break;
+			}
+			return fragment;
+		}
+
+		@Override
+		public int getCount() {
+			// if (RobotControlProxy.isConnected())
+			return 4; // if projects AND programs are available
+			// return 3; // if not connected
+		}
+
+		@Override
+		public CharSequence getPageTitle(int position) {
+			switch (position) {
+			case 0:
+				return getString(R.string.title_section_connect);
+			case 1:
+				return getString(R.string.title_section_overview);
+			case 2:
+				return getString(R.string.title_section_programs);
+			default:
+				return "section_" + position;
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.keba.teachdroid.app.ConnectCallback#connect()
+	 */
+	public void connect() {
+		mSelectedProject = null;
+		checkWifiAndConnect();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.keba.teachdroid.app.IConnectCallback#disconnect()
+	 */
+	public void disconnect() {
+		mSelectedProject = null;
+		disconnectFromPLC();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.teachdroid.app.fragments.projectview.ProjectListFragment.Callbacks
+	 * #onItemSelected(java.lang.String)
+	 */
+	public void onItemSelected(String _id) {
+		mSelectedProject = _id;
+		KvtProject p = KvtProjectAdministrator.getProject(mSelectedProject);
+		if (p != null) {
+			Fragment f = mSectionsPagerAdapter.getItem(3);
+			if (f instanceof ProjectDetailFragment) {
+				((ProjectDetailFragment) f).setProject(p);
+			}
+			mViewPager.setCurrentItem(3);
+		}
 	}
 }

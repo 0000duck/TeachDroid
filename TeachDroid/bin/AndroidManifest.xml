@@ -20,7 +20,9 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name="com.keba.teachdroid.app.MainActivity"
-            android:label="@string/title_activity_main" >
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/title_activity_main"
+            android:screenOrientation="landscape" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -36,15 +38,17 @@
                 android:value="com.keba.teachdroid.app.MainActivity" />
         </activity>
         <activity
-            android:name="com.keba.teachdroid.app.projectview.ProjectListActivity"
+            android:name="com.keba.teachdroid.app.fragments.projectview.ProjectListActivity"
+            android:configChanges="orientation|keyboardHidden"
             android:label="@string/title_project_list"
-            android:parentActivityName="com.keba.teachdroid.app.MainActivity" >
+            android:parentActivityName="com.keba.teachdroid.app.MainActivity"
+            android:screenOrientation="landscape" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.keba.teachdroid.app.MainActivity" />
         </activity>
         <activity
-            android:name="com.keba.teachdroid.app.projectview.ProjectDetailActivity"
+            android:name="com.keba.teachdroid.app.fragments.projectview.ProjectDetailActivity"
             android:label="@string/title_project_detail"
             android:parentActivityName=".ProjectListActivity" >
             <meta-data

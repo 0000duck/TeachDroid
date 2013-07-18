@@ -85,7 +85,7 @@ public class InitializationTask extends AsyncTask<String, Object, Boolean> {
 		// }).start();
 
 		publishProgress("teachcontrol");
-		KvtSystemCommunicator.connectOnce(host, 5000, "_global");
+		KvtSystemCommunicator.connectOnce(host, 20000, "_global");
 		publishProgress(100);
 
 		return KvtSystemCommunicator.isConnected();

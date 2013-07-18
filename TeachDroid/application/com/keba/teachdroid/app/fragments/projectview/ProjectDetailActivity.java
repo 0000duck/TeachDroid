@@ -1,4 +1,4 @@
-package com.keba.teachdroid.app.projectview;
+package com.keba.teachdroid.app.fragments.projectview;
 
 import android.content.Intent;
 import android.os.Bundle;

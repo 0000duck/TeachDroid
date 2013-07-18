@@ -23,7 +23,7 @@
 
     <fragment
         android:id="@+id/project_list"
-        android:name="com.keba.teachdroid.app.projectview.ProjectListFragment"
+        android:name="com.keba.teachdroid.app.fragments.projectview.ProjectListFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
