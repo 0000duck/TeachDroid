@@ -5,10 +5,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.keba.kemro.kvs.teach.data.project.KvtProgram;
 import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.teachdroid.app.R;
 
@@ -87,8 +85,11 @@ public class ProjectDetailFragment extends Fragment {
 			// ((TextView)
 			// rootView.findViewById(R.id.project_detail_list)).setText(mItem.getName());
 			ListView lv = ((ListView) mRootView.findViewById(R.id.project_detail_list));
-			lv.setAdapter(new ArrayAdapter<KvtProgram>(getActivity(), android.R.layout.simple_list_item_activated_1, android.R.id.text1, mItem
-					.getPrograms()));
+			// lv.setAdapter(new ArrayAdapter<KvtProgram>(getActivity(),
+			// android.R.layout.simple_list_item_activated_1,
+			// android.R.id.text1, mItem
+			// .getPrograms()));
+			lv.setAdapter(new ProgramListRowAdapter(getActivity(), mItem));
 
 		}
 	}
