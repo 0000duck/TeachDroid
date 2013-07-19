@@ -39,7 +39,6 @@ public class MainActivity extends FragmentActivity implements InitializationList
 	 * 
 	 */
 	private static final long			serialVersionUID		= 1L;
-	// private String m_host = "10.0.0.5";s
 	final String						m_connectFormatString	= "Connecting... ";
 	protected volatile ProgressDialog	m_dlg;
 	/**
