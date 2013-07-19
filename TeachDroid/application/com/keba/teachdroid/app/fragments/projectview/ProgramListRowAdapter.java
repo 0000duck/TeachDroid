@@ -39,11 +39,15 @@ public class ProgramListRowAdapter extends BaseAdapter {
 	}
 
 	public Object getItem(int position) {
-		return position;
+		return mParent.getProgram(position);
 	}
 
 	public long getItemId(int position) {
 		return position;
+	}
+
+	public void setParent(KvtProject _p) {
+		mParent = _p;
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {

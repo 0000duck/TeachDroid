@@ -18,7 +18,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
 import java.util.Vector;
-import java.util.concurrent.TimeUnit;
 
 import android.util.Log;
 
@@ -128,20 +127,13 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 		KvtSystemCommunicator.addConnectionListener(new KvtTeachviewConnectionListener() {
 			public void teachviewConnected() {
 				dfl = KvtSystemCommunicator.getTcDfl();
-				// synchronized (dfl.getLockObject()) {
-				try {
-					if (dfl.getLockObject().tryLock(10, TimeUnit.SECONDS)) {
-						dfl.structure.addStructAdministratorListener(m_admin);
-						m_admin.treeChanged(dfl.structure.getRoot());
-					} else {
-						Log.e("KvtStatementAdminstrator", "acquiring dfl lock not successful!");
-					}
-					// }
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} finally {
-					dfl.getLockObject().unlock();
+				synchronized (dfl.getLockObject()) {
+
+					dfl.structure.addStructAdministratorListener(m_admin);
+					m_admin.treeChanged(dfl.structure.getRoot());
+
 				}
+
 			}
 
 			public void teachviewDisconnected() {

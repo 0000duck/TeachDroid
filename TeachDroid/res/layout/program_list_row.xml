@@ -12,8 +12,6 @@
         android:orientation="horizontal"
         android:padding="3dip" >
 
-
-
         <!-- state image -->
 
         <ImageView

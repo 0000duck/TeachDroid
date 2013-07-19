@@ -15,7 +15,6 @@
 package com.keba.kemro.kvs.teach.data.project;
 
 import java.util.Vector;
-import java.util.concurrent.TimeUnit;
 
 import android.util.Log;
 
@@ -59,28 +58,17 @@ public class KvtProjectAdministrator {
 		KvtSystemCommunicator.addConnectionListener(new KvtTeachviewConnectionListener() {
 			public void teachviewConnected() {
 				dfl = KvtSystemCommunicator.getTcDfl();
-				// synchronized (dfl.getLockObject()) {
-				try {
-					if (dfl.getLockObject().tryLock(10L, TimeUnit.SECONDS)) {
-						Log.i("TC connection", "Project administrator connecting...");
-						dfl.directory.addDirectoryAdminListener(listener);
-						dfl.structure.addStructAdministratorListener(listener);
-						dfl.execution.addListener(listener);
+				synchronized (dfl.getLockObject()) {
 
+					Log.i("TC connection", "Project administrator connecting...");
+					dfl.directory.addDirectoryAdminListener(listener);
+					dfl.structure.addStructAdministratorListener(listener);
+					dfl.execution.addListener(listener);
+					listener.directoryProjectsChanged();
 
+					Log.i("TC connection", "Project administrator connected!");
 
-						// dfl.getLockObject().unlock();
-						Log.i("TC connection", "Project administrator connected!");
-					} else
-						Log.e("KvtProjectAdministrator", "acquiring dfl lock not successful!");
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				} finally {
-					dfl.getLockObject().unlock();
 				}
-				// placed outside dfl lock
-				listener.directoryProjectsChanged();
-				// }
 			}
 
 			public void teachviewDisconnected() {
@@ -429,24 +417,24 @@ public class KvtProjectAdministrator {
 			KTcDfl d = dfl;
 			Vector<KvtProject> tmp = new Vector<KvtProject>();
 			if (d != null) {
-				// synchronized (d.getLockObject()) {
-				m_projects.clear();
-				Vector entryList = d.directory.getAllProjects();
-				for (int i = 0; i < entryList.size(); i++) {
-					KDirEntry entry = (KDirEntry) entryList.elementAt(i);
-					KStructProject project = (KStructProject) d.structure.getKStructNode(entry);
-					KExecUnitProject execUnit = null;
-					if (project != null) {
-						execUnit = checkExecUnitProject(project, d.execution.getRoot());
+				synchronized (d.getLockObject()) {
+					m_projects.clear();
+					Vector entryList = d.directory.getAllProjects();
+					for (int i = 0; i < entryList.size(); i++) {
+						KDirEntry entry = (KDirEntry) entryList.elementAt(i);
+						KStructProject project = (KStructProject) d.structure.getKStructNode(entry);
+						KExecUnitProject execUnit = null;
+						if (project != null) {
+							execUnit = checkExecUnitProject(project, d.execution.getRoot());
+						}
+						KvtProject prj = new KvtProject(entry, project, execUnit, d);
+						m_projects.add(prj);
+						Log.i("TC Connection", "project added: " + prj.getName());
+						tmp.add(prj);
 					}
-					KvtProject prj = new KvtProject(entry, project, execUnit, d);
-					m_projects.add(prj);
-					Log.i("TC Connection", "project added: " + prj.getName());
-					tmp.add(prj);
+					m_projects = tmp;
+					fireProjectListChanged();
 				}
-				m_projects = tmp;
-				fireProjectListChanged();
-				// }
 			}
 
 			return tmp;

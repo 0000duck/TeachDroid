@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
+import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.teachdroid.app.R;
 
 /**
@@ -21,10 +22,10 @@ import com.keba.teachdroid.app.R;
  * {@link ProjectDetailFragment}.
  * <p>
  * This activity also implements the required
- * {@link ProjectListFragment.Callbacks} interface to listen for item
+ * {@link ProjectListFragment.SelectionCallback} interface to listen for item
  * selections.
  */
-public class ProjectListActivity extends FragmentActivity implements ProjectListFragment.Callbacks {
+public class ProjectListActivity extends FragmentActivity implements ProjectListFragment.SelectionCallback {
 
 	/**
 	 * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -72,16 +73,16 @@ public class ProjectListActivity extends FragmentActivity implements ProjectList
 	}
 
 	/**
-	 * Callback method from {@link ProjectListFragment.Callbacks} indicating
+	 * Callback method from {@link ProjectListFragment.SelectionCallback} indicating
 	 * that the item with the given ID was selected.
 	 */
-	public void onItemSelected(String id) {
+	public void onItemSelected(KvtProject id) {
 		if (mTwoPane) {
 			// In two-pane mode, show the detail view in this activity by
 			// adding or replacing the detail fragment using a
 			// fragment transaction.
 			Bundle arguments = new Bundle();
-			arguments.putString(ProjectDetailFragment.ARG_ITEM_ID, id);
+			arguments.putSerializable(ProjectDetailFragment.ARG_ITEM_ID, id);
 			ProjectDetailFragment fragment = new ProjectDetailFragment();
 			fragment.setArguments(arguments);
 			getSupportFragmentManager().beginTransaction().replace(R.id.project_detail_container, fragment).commit();

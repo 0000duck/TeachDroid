@@ -20,7 +20,6 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.keba.kemro.kvs.teach.data.project.KvtProject;
-import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
 import com.keba.teachdroid.app.fragments.ConnectFragment;
@@ -28,13 +27,13 @@ import com.keba.teachdroid.app.fragments.OverviewFragment;
 import com.keba.teachdroid.app.fragments.projectview.ProjectDetailFragment;
 import com.keba.teachdroid.app.fragments.projectview.ProjectListActivity;
 import com.keba.teachdroid.app.fragments.projectview.ProjectListFragment;
-import com.keba.teachdroid.app.fragments.projectview.ProjectListFragment.Callbacks;
+import com.keba.teachdroid.app.fragments.projectview.ProjectListFragment.SelectionCallback;
 import com.keba.teachdroid.data.InitializationTask;
 import com.keba.teachdroid.data.InitializationTask.InitializationListener;
 import com.keba.teachdroid.data.RobotControlProxy;
 import com.keba.teachdroid.util.PreferenceManager;
 
-public class MainActivity extends FragmentActivity implements InitializationListener, Callbacks, IConnectCallback {
+public class MainActivity extends FragmentActivity implements InitializationListener, SelectionCallback, IConnectCallback {
 
 	/**
 	 * 
@@ -58,7 +57,7 @@ public class MainActivity extends FragmentActivity implements InitializationList
 	 */
 	ViewPager							mViewPager;
 	private long						mStartTime;
-	private String						mSelectedProject;
+	private KvtProject					mSelectedProject;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -404,13 +403,13 @@ public class MainActivity extends FragmentActivity implements InitializationList
 	 * com.keba.teachdroid.app.fragments.projectview.ProjectListFragment.Callbacks
 	 * #onItemSelected(java.lang.String)
 	 */
-	public void onItemSelected(String _id) {
-		mSelectedProject = _id;
-		KvtProject p = KvtProjectAdministrator.getProject(mSelectedProject);
-		if (p != null) {
+	public void onItemSelected(KvtProject _entry) {
+		mSelectedProject = _entry;
+
+		if (mSelectedProject != null) {
 			Fragment f = mSectionsPagerAdapter.getItem(3);
 			if (f instanceof ProjectDetailFragment) {
-				((ProjectDetailFragment) f).setProject(p);
+				((ProjectDetailFragment) f).setProject(mSelectedProject);
 			}
 			mViewPager.setCurrentItem(3);
 		}

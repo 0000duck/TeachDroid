@@ -4,6 +4,7 @@
 package com.keba.teachdroid.app.fragments;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -27,14 +28,24 @@ import com.keba.teachdroid.util.PreferenceManager;
  */
 public class ConnectFragment extends Fragment {
 
+	@Override
+	public void onSaveInstanceState(Bundle _outState) {
+		_outState.putString("date", new Date().toString());
+	}
+
 	private IConnectCallback	mCallback;
 	private View				mRootView;
+	private boolean				mConnected;
 
 	public ConnectFragment() {
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		if (savedInstanceState != null) {
+			String test = savedInstanceState.getString("date");
+		}
+
 		mRootView = inflater.inflate(R.layout.fragment_connect, container, false);
 
 		KvtSystemCommunicator.addConnectionListener(new KvtTeachviewConnectionListener() {
@@ -46,6 +57,7 @@ public class ConnectFragment extends Fragment {
 						Button connect = (Button) mRootView.findViewById(R.id.connectButton);
 						connect.setText(getActivity().getString(R.string.action_connect));
 						connect.invalidate();
+						mConnected = false;
 					}
 				});
 
@@ -54,10 +66,12 @@ public class ConnectFragment extends Fragment {
 			public void teachviewConnected() {
 				getActivity().runOnUiThread(new Runnable() {
 
+
 					public void run() {
 						Button connect = (Button) mRootView.findViewById(R.id.connectButton);
 						connect.setText(getActivity().getString(R.string.action_disconnect));
 						connect.invalidate();
+						mConnected = true;
 					}
 				});
 
@@ -91,6 +105,8 @@ public class ConnectFragment extends Fragment {
 				// switch to next section
 			}
 		});
+		int id = mConnected ? R.string.action_disconnect : R.string.action_connect;
+		connect.setText(getString(id));
 
 		return mRootView;
 	}

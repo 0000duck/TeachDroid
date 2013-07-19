@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.teachdroid.app.R;
@@ -20,14 +21,16 @@ public class ProjectDetailFragment extends Fragment {
 	 * The fragment argument representing the item ID that this fragment
 	 * represents.
 	 */
-	public static final String	ARG_ITEM_ID	= "item_id";
+	public static final String		ARG_ITEM_ID	= "item_id";
 
 	/**
 	 * The dummy content this fragment is presenting.
 	 */
-	private KvtProject			mItem;
+	private KvtProject				mItem;
 
-	private View				mRootView;
+	private View					mRootView;
+
+	private ProgramListRowAdapter	mAdapter;
 
 	/**
 	 * Mandatory empty constructor for the fragment manager to instantiate the
@@ -36,39 +39,17 @@ public class ProjectDetailFragment extends Fragment {
 	public ProjectDetailFragment() {
 	}
 
-	// @Override
-	// public void onCreate(Bundle savedInstanceState) {
-	// super.onCreate(savedInstanceState);
-	//
-	//
-	//
-	// if (getArguments() != null && getArguments().containsKey(ARG_ITEM_ID)) {
-	// // Load the dummy content specified by the fragment
-	// // arguments. In a real-world scenario, use a Loader
-	// // to load content from a content provider.
-	// // mItem =
-	// // DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
-	// String name = getArguments().getString(ARG_ITEM_ID);
-	// for (KvtProject proj : RobotControlProxy.getProjects()) {
-	// if (proj.getName().equals(name)) {
-	// mItem = proj;
-	// break;
-	// }
-	//
-	// }
-	// }
-	//
-	// }
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		mRootView = inflater.inflate(R.layout.fragment_project_detail, container, false);
 
-		if (getArguments() != null && getArguments().containsKey("project")) {
-			KvtProject p = (KvtProject) getArguments().getSerializable("project");
-			if (p != null)
-				mItem = p;
-		}
+		// if (getArguments() != null && getArguments().containsKey("project"))
+		// {
+		// KvtProject p = (KvtProject)
+		// getArguments().getSerializable("project");
+		// if (p != null)
+		// mItem = p;
+		// }
 		updateUI();
 
 		return mRootView;
@@ -78,18 +59,19 @@ public class ProjectDetailFragment extends Fragment {
 	 * @param rootView
 	 */
 	private void updateUI() {
-		// Show the dummy content as text in a TextView.
 		if (mItem != null && mRootView != null) {
-			// ((TextView)
-			// rootView.findViewById(R.id.project_detail)).setText(mItem.content);
-			// ((TextView)
-			// rootView.findViewById(R.id.project_detail_list)).setText(mItem.getName());
+
 			ListView lv = ((ListView) mRootView.findViewById(R.id.project_detail_list));
-			// lv.setAdapter(new ArrayAdapter<KvtProgram>(getActivity(),
-			// android.R.layout.simple_list_item_activated_1,
-			// android.R.id.text1, mItem
-			// .getPrograms()));
-			lv.setAdapter(new ProgramListRowAdapter(getActivity(), mItem));
+
+			if (mAdapter == null) {
+				mAdapter = new ProgramListRowAdapter(getActivity(), mItem);
+				lv.setAdapter(mAdapter);
+			} else {
+				mAdapter.setParent(mItem);
+				mAdapter.notifyDataSetChanged();
+			}
+			TextView tv = (TextView) mRootView.findViewById(R.id.projectNameTV);
+			tv.setText(mItem.getName());
 
 		}
 	}

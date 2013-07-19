@@ -35,6 +35,7 @@ import com.keba.teachdroid.data.RobotControlProxy;
 public class OverviewFragment extends Fragment implements KvtDriveStateListener, KvtPositionMonitorListener {
 
 	private View	mRootView;
+	private boolean	mConnected;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,6 +57,7 @@ public class OverviewFragment extends Fragment implements KvtDriveStateListener,
 							v.setImageDrawable(res.getDrawable(R.drawable.disconn));
 							v.invalidate();
 						}
+						mConnected = false;
 					}
 				});
 
@@ -72,6 +74,7 @@ public class OverviewFragment extends Fragment implements KvtDriveStateListener,
 							// v.setImageResource(R.drawable.disconn);
 							v.invalidate();
 						}
+						mConnected = false;
 					}
 				});
 			}
@@ -117,7 +120,13 @@ public class OverviewFragment extends Fragment implements KvtDriveStateListener,
 				}
 			});
 
-		// drive power toggle
+		ImageView v = (ImageView) mRootView.findViewById(R.id.connStateIcon);
+		if (v != null) {
+			Resources res = getResources();
+			int id = mConnected ? R.drawable.conn : R.drawable.disconn;
+			v.setImageDrawable(res.getDrawable(id));
+			v.invalidate();
+		}
 
 		return mRootView;
 	}
