@@ -34,7 +34,7 @@ import com.keba.teachdroid.data.RobotControlProxy;
 import com.keba.teachdroid.util.PreferenceManager;
 
 public class MainActivity extends FragmentActivity implements InitializationListener, SelectionCallback, IConnectCallback {
-
+String xyz = "geht das?";
 	/**
 	 * 
 	 */
