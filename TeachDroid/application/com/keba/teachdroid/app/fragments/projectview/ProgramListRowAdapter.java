@@ -46,8 +46,10 @@ public class ProgramListRowAdapter extends BaseAdapter {
 		return position;
 	}
 
+
 	public void setParent(KvtProject _p) {
 		mParent = _p;
+		
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
@@ -55,9 +57,19 @@ public class ProgramListRowAdapter extends BaseAdapter {
 		if (convertView == null)
 			vi = inflater.inflate(R.layout.program_list_row, null);
 
-		TextView name = (TextView) vi.findViewById(R.id.list_program_name); // title
+		return updateList(position, vi);
 
-		ImageView state_image = (ImageView) vi.findViewById(R.id.list_state_icon); // thumb
+	}
+
+	/**
+	 * @param position
+	 * @param vi
+	 * @return
+	 */
+	private View updateList(int position, View _vi) {
+		TextView name = (TextView) _vi.findViewById(R.id.list_program_name); // title
+
+		ImageView state_image = (ImageView) _vi.findViewById(R.id.list_state_icon); // thumb
 																					// image
 
 		int id = R.drawable.program_state_stop;
@@ -71,9 +83,10 @@ public class ProgramListRowAdapter extends BaseAdapter {
 		case KvtProgram.LOADED:
 		case KvtProgram.OPEN:
 		case KvtProgram.STOPPED:
-		case KvtProgram.FINISHED:
+
 			id = R.drawable.program_state_stop;
 		case KvtProgram.STEPPING:
+		case KvtProgram.FINISHED:
 		case KvtProgram.WAITING:
 			id = R.drawable.program_state_pause;
 
@@ -82,6 +95,6 @@ public class ProgramListRowAdapter extends BaseAdapter {
 		Drawable drw = activity.getResources().getDrawable(id);
 		state_image.setImageDrawable(drw);
 
-		return vi;
+		return _vi;
 	}
 }

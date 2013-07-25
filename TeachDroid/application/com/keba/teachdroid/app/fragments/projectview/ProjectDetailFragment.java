@@ -8,7 +8,10 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.keba.kemro.kvs.teach.data.project.KvtProgram;
 import com.keba.kemro.kvs.teach.data.project.KvtProject;
+import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
+import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministratorListener;
 import com.keba.teachdroid.app.R;
 
 /**
@@ -16,7 +19,7 @@ import com.keba.teachdroid.app.R;
  * either contained in a {@link ProjectListActivity} in two-pane mode (on
  * tablets) or a {@link ProjectDetailActivity} on handsets.
  */
-public class ProjectDetailFragment extends Fragment {
+public class ProjectDetailFragment extends Fragment implements KvtProjectAdministratorListener {
 	/**
 	 * The fragment argument representing the item ID that this fragment
 	 * represents.
@@ -26,7 +29,7 @@ public class ProjectDetailFragment extends Fragment {
 	/**
 	 * The dummy content this fragment is presenting.
 	 */
-	private KvtProject				mItem;
+	private KvtProject				mProject;
 
 	private View					mRootView;
 
@@ -43,6 +46,8 @@ public class ProjectDetailFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		mRootView = inflater.inflate(R.layout.fragment_project_detail, container, false);
 
+		KvtProjectAdministrator.addProjectListener(this);
+
 		// if (getArguments() != null && getArguments().containsKey("project"))
 		// {
 		// KvtProject p = (KvtProject)
@@ -58,21 +63,25 @@ public class ProjectDetailFragment extends Fragment {
 	/**
 	 * @param rootView
 	 */
-	private void updateUI() {
-		if (mItem != null && mRootView != null) {
+	private synchronized void updateUI() {
+		if (mProject != null && mRootView != null) {
+			getActivity().runOnUiThread(new Runnable() {
 
-			ListView lv = ((ListView) mRootView.findViewById(R.id.project_detail_list));
+				public void run() {
+					final ListView lv = ((ListView) mRootView.findViewById(R.id.project_detail_list));
 
-			if (mAdapter == null) {
-				mAdapter = new ProgramListRowAdapter(getActivity(), mItem);
-				lv.setAdapter(mAdapter);
-			} else {
-				mAdapter.setParent(mItem);
-				mAdapter.notifyDataSetChanged();
-			}
-			TextView tv = (TextView) mRootView.findViewById(R.id.projectNameTV);
-			tv.setText(mItem.getName());
+					if (mAdapter == null) {
 
+						mAdapter = new ProgramListRowAdapter(getActivity(), mProject);
+						lv.setAdapter(mAdapter);
+
+					} else {
+						mAdapter.setParent(mProject);
+					}
+					TextView tv = (TextView) mRootView.findViewById(R.id.projectNameTV);
+					tv.setText(mProject.getName());
+				}
+			});
 		}
 	}
 
@@ -81,7 +90,59 @@ public class ProjectDetailFragment extends Fragment {
 	 */
 	public void setProject(KvtProject _p) {
 
-		mItem = _p;
+		mProject = _p;
 		updateUI();
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		KvtProjectAdministrator.removeProjectListener(this);
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.kemro.kvs.teach.data.project.KvtProjectAdministratorListener
+	 * #projectStateChanged(com.keba.kemro.kvs.teach.data.project.KvtProject)
+	 */
+	public void projectStateChanged(KvtProject _prj) {
+		if (_prj.getName().equals(mProject.getName())) {
+			setProject(_prj);
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.kemro.kvs.teach.data.project.KvtProjectAdministratorListener
+	 * #programStateChanged(com.keba.kemro.kvs.teach.data.project.KvtProgram)
+	 */
+	public void programStateChanged(KvtProgram _prg) {
+
+		KvtProgram prg = mProject.getProgram(_prg.getName());
+		if (prg != null) {
+			KvtProject prj = prg.getParent();
+			if (prj != null) {
+				mAdapter = null;
+				setProject(prj);
+			}
+
+		}
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.kemro.kvs.teach.data.project.KvtProjectAdministratorListener
+	 * #projectListChanged()
+	 */
+	public void projectListChanged() {
+
 	}
 }
