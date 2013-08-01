@@ -36,7 +36,7 @@ import com.keba.teachdroid.util.PreferenceManager;
 public class MainActivity extends FragmentActivity implements InitializationListener, SelectionCallback, IConnectCallback {
 
 	/**
-	 * 
+	 * bla
 	 */
 	private static final long			serialVersionUID		= 1L;
 	final String						m_connectFormatString	= "Connecting... ";
