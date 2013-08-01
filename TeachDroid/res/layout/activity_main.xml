@@ -1,127 +1,93 @@
-<!-- <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" -->
-<!--     xmlns:tools="http://schemas.android.com/tools" -->
-<!--     android:layout_width="match_parent" -->
-<!--     android:layout_height="match_parent" -->
-<!--     android:paddingBottom="@dimen/activity_vertical_margin" -->
-<!--     android:paddingLeft="@dimen/activity_horizontal_margin" -->
-<!--     android:paddingRight="@dimen/activity_horizontal_margin" -->
-<!--     android:paddingTop="@dimen/activity_vertical_margin" -->
-<!--     tools:context=".MainActivity" > -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
 
-<!--     <TextView -->
-<!--         android:id="@+id/overrideLabel" -->
-<!--         android:layout_width="wrap_content" -->
-<!--         android:layout_height="wrap_content" -->
-<!--         android:layout_alignLeft="@+id/overrideBar" -->
-<!--         android:layout_alignParentTop="true" -->
-<!--         android:layout_marginTop="23dp" -->
-<!--         android:text="Override" -->
-<!--         android:textAppearance="?android:attr/textAppearanceLarge" /> -->
-
-<!--     <SeekBar -->
-<!--         android:id="@+id/overrideBar" -->
-<!--         android:layout_width="match_parent" -->
-<!--         android:layout_height="wrap_content" -->
-<!--         android:layout_below="@+id/overrideLabel" -->
-<!--         android:layout_centerHorizontal="true" -->
-<!--         android:layout_marginTop="15dp" /> -->
-
-<!--     <ImageView -->
-<!--         android:id="@+id/connStateIcon" -->
-<!--         android:layout_width="wrap_content" -->
-<!--         android:layout_height="wrap_content" -->
-<!--         android:layout_alignParentRight="true" -->
-<!--         android:layout_alignParentTop="true" -->
-<!--         android:onClick="onConnStateClick" -->
-<!--         android:src="@drawable/disconn" /> -->
-
-<!--     <Switch -->
-<!--         android:id="@+id/switch1" -->
-<!--         android:layout_width="wrap_content" -->
-<!--         android:layout_height="wrap_content" -->
-<!--         android:layout_alignLeft="@+id/overrideBar" -->
-<!--         android:layout_below="@+id/overrideBar" -->
-<!--         android:layout_marginTop="26dp" -->
-<!--         android:layout_toLeftOf="@+id/powerStateIcon" -->
-<!--         android:text="Drives Power State" /> -->
-
-<!--     <ImageView -->
-<!--         android:id="@+id/powerStateIcon" -->
-<!--         android:layout_width="wrap_content" -->
-<!--         android:layout_height="wrap_content" -->
-<!--         android:layout_above="@+id/button1" -->
-<!--         android:layout_alignRight="@+id/overrideBar" -->
-<!--         android:layout_marginRight="12dp" -->
-<!--         android:src="@drawable/power_off" /> -->
-
-<!--     <Spinner -->
-<!--         android:id="@+id/refsysSelectionCB" -->
-<!--         android:layout_width="wrap_content" -->
-<!--         android:layout_height="wrap_content" -->
-<!--         android:layout_alignLeft="@+id/switch1" -->
-<!--         android:layout_below="@+id/button1"  -->
-<!--         android:prompt="@string/toolname_prompt"/> -->
-        
-
-<!--     <Spinner -->
-<!--         android:id="@+id/toolSelectionCB" -->
-<!--         android:layout_width="wrap_content" -->
-<!--         android:layout_height="wrap_content" -->
-<!--         android:layout_alignLeft="@+id/switch1" -->
-<!--         android:layout_below="@+id/refsysSelectionCB" -->
-<!--         android:prompt="@string/refsysname_prompt" /> -->
-
-<!--     <Button -->
-<!--         android:id="@+id/button2" -->
-<!--         android:layout_width="wrap_content" -->
-<!--         android:layout_height="wrap_content" -->
-<!--         android:layout_alignRight="@+id/powerStateIcon" -->
-<!--         android:layout_below="@+id/switch1" -->
-<!--         android:layout_marginTop="21dp" -->
-<!--         android:onClick="onPowerToggle" -->
-<!--         android:text="Power" /> -->
-
-<!--     <Button -->
-<!--         android:id="@+id/button3" -->
-<!--         android:layout_width="wrap_content" -->
-<!--         android:layout_height="wrap_content" -->
-<!--         android:layout_alignParentBottom="true" -->
-<!--         android:layout_alignRight="@+id/overrideBar" -->
-<!--         android:onClick="onShowProjects" -->
-<!--         android:text="projects" /> -->
-
-<!--     <Button -->
-<!--         android:id="@+id/button1" -->
-<!--         android:layout_width="wrap_content" -->
-<!--         android:layout_height="wrap_content" -->
-<!--         android:layout_alignLeft="@+id/switch1" -->
-<!--         android:layout_below="@+id/switch1" -->
-<!--         android:onClick="onGenericButtonClick" -->
-<!--         android:text="Button" /> -->
-
-
-<!-- </RelativeLayout> -->
-
-<android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/pager"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity" >
-
-    <!--
-    This title strip will display the currently visible page title, as well as the page
-    titles for adjacent pages.
-    -->
-
-    <android.support.v4.view.PagerTitleStrip
-        android:id="@+id/pager_title_strip"
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
-        android:background="#57a639"
-        android:paddingBottom="4dp"
-        android:paddingTop="4dp"
-        android:textColor="#fff" />
+        android:layout_alignLeft="@+id/progressBar1"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="8dp"
+        android:src="@drawable/robot_small" />
 
-</android.support.v4.view.ViewPager>
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/textView1"
+        android:layout_below="@+id/textView1"
+        android:layout_marginTop="16dp"
+        android:text="Medium Text"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/imageView1"
+        android:layout_alignTop="@+id/imageView1"
+        android:layout_marginLeft="69dp"
+        android:layout_marginTop="42dp"
+        android:text="Large Text"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/imageView1"
+        android:layout_below="@+id/imageView1"
+        android:layout_marginTop="14dp"
+        android:text="Large Text"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <fragment
+        android:id="@+id/fragment_load_info"
+        android:name="android.app.ListFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textView3"
+        android:layout_alignTop="@+id/imageView1"
+        android:layout_toRightOf="@+id/progressBar1"
+        android:layout_marginLeft="100dp"
+        android:layout_marginRight="8dp" />
+
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/textView3"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/progressBar1"
+        android:layout_toLeftOf="@+id/textView2"
+        android:text="Small Text"
+        android:layout_marginTop="8dp"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/imageView2"
+        android:layout_toRightOf="@+id/progressBar1"
+        android:layout_marginLeft="8dp"
+        android:src="@drawable/program_state_run_small" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textView4"
+        android:layout_alignRight="@+id/fragment_load_info"
+        android:src="@drawable/logo" />
+		
+</RelativeLayout>

@@ -61,7 +61,7 @@ public class MainActivity extends FragmentActivity implements InitializationList
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		setContentView(R.layout.activity_main);
 
 		// Create the adapter that will return a fragment for each of the three
