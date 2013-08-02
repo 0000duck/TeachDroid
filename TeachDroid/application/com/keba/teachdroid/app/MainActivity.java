@@ -18,6 +18,7 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 
 import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
@@ -36,7 +37,7 @@ import com.keba.teachdroid.util.PreferenceManager;
 public class MainActivity extends FragmentActivity implements InitializationListener, SelectionCallback, IConnectCallback {
 
 	/**
-	 * bla
+	 * 
 	 */
 	private static final long			serialVersionUID		= 1L;
 	final String						m_connectFormatString	= "Connecting... ";
@@ -66,11 +67,28 @@ public class MainActivity extends FragmentActivity implements InitializationList
 
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
-		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+//		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
 		// Set up the ViewPager with the sections adapter.
-		mViewPager = (ViewPager) findViewById(R.id.pager);
-		mViewPager.setAdapter(mSectionsPagerAdapter);
+//		mViewPager = (ViewPager) findViewById(R.id.pager);
+//		mViewPager.setAdapter(mSectionsPagerAdapter);
+findViewById(R.id.fragment_prog_code_main).setOnClickListener(new View.OnClickListener() {
+			
+			public void onClick(View v) {
+				
+				onShowProjects(v);
+				
+			}
+		});
+
+findViewById(R.id.fragment_robot_main).setOnClickListener(new View.OnClickListener() {
+	
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		
+	}
+});
+		
 	}
 
 	/**
@@ -131,9 +149,12 @@ public class MainActivity extends FragmentActivity implements InitializationList
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
+		
 		return true;
 	}
 
+	
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem _item) {
 
