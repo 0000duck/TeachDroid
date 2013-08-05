@@ -10,38 +10,29 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
-
 import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
-import com.keba.teachdroid.app.fragments.ConnectFragment;
-import com.keba.teachdroid.app.fragments.OverviewFragment;
-import com.keba.teachdroid.app.fragments.projectview.ProjectDetailFragment;
 import com.keba.teachdroid.app.fragments.projectview.ProjectListActivity;
-import com.keba.teachdroid.app.fragments.projectview.ProjectListFragment;
-import com.keba.teachdroid.app.fragments.projectview.ProjectListFragment.SelectionCallback;
 import com.keba.teachdroid.data.InitializationTask;
 import com.keba.teachdroid.data.InitializationTask.InitializationListener;
 import com.keba.teachdroid.data.RobotControlProxy;
 import com.keba.teachdroid.util.PreferenceManager;
 
-public class MainActivity extends FragmentActivity implements InitializationListener, SelectionCallback, IConnectCallback {
+public class MainActivity extends FragmentActivity implements
+		InitializationListener, IConnectCallback {
 
 	/**
 	 * 
 	 */
-	private static final long			serialVersionUID		= 1L;
-	final String						m_connectFormatString	= "Connecting... ";
-	protected volatile ProgressDialog	m_dlg;
+	private static final long serialVersionUID = 1L;
+	final String m_connectFormatString = "Connecting... ";
+	protected volatile ProgressDialog m_dlg;
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
 	 * fragments for each of the sections. We use a
@@ -50,45 +41,48 @@ public class MainActivity extends FragmentActivity implements InitializationList
 	 * intensive, it may be best to switch to a
 	 * {@link android.support.v4.app.FragmentStatePagerAdapter}.
 	 */
-	SectionsPagerAdapter				mSectionsPagerAdapter;
+//	SectionsPagerAdapter mSectionsPagerAdapter;
 
 	/**
 	 * The {@link ViewPager} that will host the section contents.
 	 */
-	ViewPager							mViewPager;
-	private long						mStartTime;
-	private KvtProject					mSelectedProject;
+	ViewPager mViewPager;
+	private long mStartTime;
+	private KvtProject mSelectedProject;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		setContentView(R.layout.activity_main);
 
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
-//		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+		// mSectionsPagerAdapter = new
+		// SectionsPagerAdapter(getSupportFragmentManager());
 
 		// Set up the ViewPager with the sections adapter.
-//		mViewPager = (ViewPager) findViewById(R.id.pager);
-//		mViewPager.setAdapter(mSectionsPagerAdapter);
-findViewById(R.id.fragment_prog_code_main).setOnClickListener(new View.OnClickListener() {
-			
-			public void onClick(View v) {
-				
-				onShowProjects(v);
-				
-			}
-		});
+		// mViewPager = (ViewPager) findViewById(R.id.pager);
+		// mViewPager.setAdapter(mSectionsPagerAdapter);
+		findViewById(R.id.fragment_prog_code_main).setOnClickListener(
+				new View.OnClickListener() {
 
-findViewById(R.id.fragment_robot_main).setOnClickListener(new View.OnClickListener() {
-	
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-		
-	}
-});
-		
+					public void onClick(View v) {
+
+						onShowProjects(v);
+
+					}
+				});
+
+		findViewById(R.id.fragment_robot_main).setOnClickListener(
+				new View.OnClickListener() {
+
+					public void onClick(View v) {
+						// TODO Auto-generated method stub
+
+					}
+				});
+
 	}
 
 	/**
@@ -105,13 +99,15 @@ findViewById(R.id.fragment_robot_main).setOnClickListener(new View.OnClickListen
 				dlgAlert.setMessage("Click OK to enable WiFi, Cancel to dismiss!");
 
 				dlgAlert.setTitle("Info");
-				dlgAlert.setPositiveButton("OK", new android.content.DialogInterface.OnClickListener() {
+				dlgAlert.setPositiveButton("OK",
+						new android.content.DialogInterface.OnClickListener() {
 
-					public void onClick(DialogInterface _dialog, int _which) {
-						wifi.setWifiEnabled(true);
-						connectToPlc(_host);
-					}
-				});
+							public void onClick(DialogInterface _dialog,
+									int _which) {
+								wifi.setWifiEnabled(true);
+								connectToPlc(_host);
+							}
+						});
 				dlgAlert.setNegativeButton("Cancel", /*
 													 * new android.content.
 													 * DialogInterface
@@ -149,17 +145,16 @@ findViewById(R.id.fragment_robot_main).setOnClickListener(new View.OnClickListen
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
-		
+
 		return true;
 	}
 
-	
-	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem _item) {
 
 		if (_item.getTitle().equals(getString(R.string.menu_settings))) {
-			Intent settingsActivity = new Intent(getBaseContext(), SettingsActivity.class);
+			Intent settingsActivity = new Intent(getBaseContext(),
+					SettingsActivity.class);
 			startActivity(settingsActivity);
 
 		} else if (_item.getTitle().equals(getString(R.string.action_connect))) {
@@ -191,7 +186,7 @@ findViewById(R.id.fragment_robot_main).setOnClickListener(new View.OnClickListen
 	}
 
 	public void onShowProjects(View _v) {
-		Intent projectsActivity = new Intent(this, ProjectListActivity.class);
+		Intent projectsActivity = new Intent(this, ProjectActivity.class);
 		// projectsActivity.putExtra("projects",
 		// RobotControlProxy.getProjects());
 		startActivity(projectsActivity);
@@ -230,13 +225,15 @@ findViewById(R.id.fragment_robot_main).setOnClickListener(new View.OnClickListen
 
 				// m_dlg = ProgressDialog.show(MainActivity.this,
 				// "Connecting...", "Connecting to " + m_host, true, true);
-				m_dlg = new ProgressDialog(MainActivity.this, ProgressDialog.STYLE_SPINNER);
+				m_dlg = new ProgressDialog(MainActivity.this,
+						ProgressDialog.STYLE_SPINNER);
 				m_dlg.setTitle("Connecting...");
 				// m_dlg.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 
 				m_dlg.setCancelable(true);
 				m_dlg.setCanceledOnTouchOutside(false);
-				m_dlg.setMessage("Connecting to " + PreferenceManager.getInstance().getHostname());
+				m_dlg.setMessage("Connecting to "
+						+ PreferenceManager.getInstance().getHostname());
 
 				m_dlg.setIndeterminate(true);
 				m_dlg.show();
@@ -261,9 +258,10 @@ findViewById(R.id.fragment_robot_main).setOnClickListener(new View.OnClickListen
 		runOnUiThread(new Runnable() {
 			public void run() {
 				long duration = System.currentTimeMillis() - mStartTime;
-				System.out.println("Connecting took me " + duration / 1000 + " ms");
+				System.out.println("Connecting took me " + duration / 1000
+						+ " ms");
 				m_dlg.dismiss();
-				mViewPager.setCurrentItem(1, true);
+//				mViewPager.setCurrentItem(1, true);
 			}
 		});
 
@@ -282,119 +280,16 @@ findViewById(R.id.fragment_robot_main).setOnClickListener(new View.OnClickListen
 				if (_progress instanceof Integer)
 					m_dlg.setProgress((Integer) _progress);
 				else
-					m_dlg.setTitle(MessageFormat.format(m_connectFormatString + "{0}"/*
-																					 * %
-																					 * complete
-																					 * "
-																					 */, _progress));
+					m_dlg.setTitle(MessageFormat.format(m_connectFormatString
+							+ "{0}"/*
+									 * % complete "
+									 */, _progress));
 
 			}
 		});
 	}
 
-	/**
-	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-	 * one of the sections/tabs/pages.
-	 */
-	public class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-		private Fragment[]	mFragments;
-
-		public SectionsPagerAdapter(FragmentManager fm) {
-			super(fm);
-
-		}
-
-		@Override
-		public Fragment getItem(int position) {
-			// getItem is called to instantiate the fragment for the given page.
-			// Return a DummySectionFragment (defined as a static inner class
-			// below) with the page number as its lone argument.
-
-			// Fragment fragment;
-			// Bundle args = new Bundle();
-			//
-			// switch (position) {
-			// case 0:
-			// fragment = new ConnectFragment();
-			//
-			// args.putSerializable("connector", MainActivity.this);
-			// fragment.setArguments(args);
-			// break;
-			// case 1:
-			// fragment = new OverviewFragment();
-			// break;
-			// case 2:
-			// fragment = new ProjectListFragment();
-			// break;
-			// case 3:
-			// fragment = new ProjectDetailFragment();
-			// KvtProject p =
-			// KvtProjectAdministrator.getProject(mSelectedProject);
-			// if (p != null) {
-			//
-			// args = new Bundle();
-			// args.putSerializable("project", p);
-			// fragment.setArguments(args);
-			// }
-			// break;
-			//
-			// default:
-			// fragment = new Fragment();
-			// break;
-			// }
-			// return fragment;
-
-			if (position > getCount() - 1)
-				return null;
-
-			if (mFragments == null) {
-				Bundle args = new Bundle();
-
-				mFragments = new Fragment[] { new ConnectFragment(), new OverviewFragment(), new ProjectListFragment(),
-						new ProjectDetailFragment() };
-
-				args.putSerializable("connector", MainActivity.this);
-				mFragments[0].setArguments(args);
-			}
-
-			// if (position == 3 && mSelectedProject != null) {
-			// KvtProject p =
-			// KvtProjectAdministrator.getProject(mSelectedProject);
-			// if (p != null) {
-			//
-			// Bundle args = new Bundle();
-			// args.putSerializable("project", p);
-			// mFragments[3].setArguments(args);
-			// }
-			// }
-
-			return mFragments[position];
-		}
-
-		@Override
-		public int getCount() {
-			// if (RobotControlProxy.isConnected())
-			return 4; // if projects AND programs are available
-			// return 3; // if not connected
-		}
-
-		@Override
-		public CharSequence getPageTitle(int position) {
-			switch (position) {
-			case 0:
-				return getString(R.string.title_section_connect);
-			case 1:
-				return getString(R.string.title_section_overview);
-			case 2:
-				return getString(R.string.title_section_projects);
-			case 3:
-				return getString(R.string.title_section_programs);
-			default:
-				return "NOT_DEFINED_" + position;
-			}
-		}
-	}
+	
 
 	/*
 	 * (non-Javadoc)
@@ -423,15 +318,15 @@ findViewById(R.id.fragment_robot_main).setOnClickListener(new View.OnClickListen
 	 * com.keba.teachdroid.app.fragments.projectview.ProjectListFragment.Callbacks
 	 * #onItemSelected(java.lang.String)
 	 */
-	public void onItemSelected(KvtProject _entry) {
-		mSelectedProject = _entry;
-
-		if (mSelectedProject != null) {
-			Fragment f = mSectionsPagerAdapter.getItem(3);
-			if (f instanceof ProjectDetailFragment) {
-				((ProjectDetailFragment) f).setProject(mSelectedProject);
-			}
-			mViewPager.setCurrentItem(3);
-		}
-	}
+//	public void onItemSelected(KvtProject _entry) {
+//		mSelectedProject = _entry;
+//
+//		if (mSelectedProject != null) {
+//			Fragment f = mSectionsPagerAdapter.getItem(3);
+//			if (f instanceof ProjectDetailFragment) {
+//				((ProjectDetailFragment) f).setProject(mSelectedProject);
+//			}
+//			mViewPager.setCurrentItem(3);
+//		}
+//	}
 }

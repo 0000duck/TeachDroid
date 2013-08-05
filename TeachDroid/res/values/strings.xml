@@ -24,5 +24,6 @@
     <string name="title_section_programs">Programs</string>
     <string name="title_section_projects">Projects</string>
     <string name="action_disconnect">Disconnect</string>
+    <string name="program_code_dummy">LIN(cp0)\nDyn(d0)\n</string>
 
 </resources>
