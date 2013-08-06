@@ -68,7 +68,7 @@ public class ProjectDetailFragment extends Fragment implements KvtProjectAdminis
 			getActivity().runOnUiThread(new Runnable() {
 
 				public void run() {
-					final ListView lv = ((ListView) mRootView.findViewById(R.id.project_detail_list));
+					final ListView lv = ((ListView) mRootView.findViewById(R.id.projectDetailList));
 
 					if (mAdapter == null) {
 

@@ -1,15 +1,15 @@
 package com.keba.teachdroid.app;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
 
-import com.keba.kemro.kvs.teach.data.project.KvtProject;
-import com.keba.teachdroid.app.fragments.ConnectFragment;
-import com.keba.teachdroid.app.fragments.OverviewFragment;
 import com.keba.teachdroid.app.fragments.ProgramCodeFragment;
-import com.keba.teachdroid.app.fragments.ProgrammCodeFragmentMain;
-import com.keba.teachdroid.app.fragments.projectview.ProjectDetailFragment;
-import com.keba.teachdroid.app.fragments.projectview.ProjectListFragment;
-import com.keba.teachdroid.app.fragments.projectview.ProjectListFragment.SelectionCallback;
+import com.keba.teachdroid.app.fragments.ProgramInfoFragment;
+import com.keba.teachdroid.app.fragments.ProjectDetailFragment;
+import com.keba.teachdroid.app.fragments.ProjectListFragment;
+import com.keba.teachdroid.app.fragments.ProjectNestingFragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,13 +17,20 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
 
-public class ProjectActivity extends FragmentActivity implements Serializable, SelectionCallback {
+public class ProjectActivity extends FragmentActivity implements Serializable {
 
 	ViewPager mViewPager;
 	SectionsPagerAdapter mSectionsPagerAdapter;
+
+	// dummy contents for the Pages!
+	String[] projects = { "Project1", "Project2", "Project3" };
+	Vector<String[]> programs = new Vector<String[]>();
+	Map<Integer, String> programCodes = new HashMap<Integer, String>();
+	Map<Integer, String> programInfos = new HashMap<Integer, String>();
+
+	int selectedProject = 0;
+	int selectedProgram = 0;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -31,12 +38,70 @@ public class ProjectActivity extends FragmentActivity implements Serializable, S
 		setContentView(R.layout.activity_project_swipe);
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
-		mSectionsPagerAdapter = new SectionsPagerAdapter(
-				getSupportFragmentManager());
+		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
+
+		// dummy content building
+		String[] programs1 = { "Prog1", "Prog2", "Prog3" };
+		String[] programs2 = { "Prog44", "Prog45", "Prog46" };
+		String[] programs3 = { "Prog7", "Prog8", "Prog9" };
+		programs.add(programs1);
+		programs.add(programs2);
+		programs.add(programs3);
+	}
+
+	public String[] getProjects() {
+		return projects;
+	}
+
+	public String[] getPrograms() {
+		return programs.get(selectedProject);
+	}
+
+	public String getProgramCode() {
+		if (programCodes != null) {
+			return programCodes.get(Integer.valueOf(selectedProgram));
+		} else {
+			return "No Program selected";
+		}
+	}
+
+	public String getProgramInfo() {
+		return null;
+	}
+
+	public int getSelectedProject() {
+		return selectedProject;
+	}
+
+	public void setSelectedProject(int selectedProject) {
+		this.selectedProject = selectedProject;
+		((ProjectNestingFragment) mSectionsPagerAdapter.getItem(0)).setProgramListContent();
+		mViewPager.invalidate();
+	}
+
+	public int getSelectedProgram() {
+		return selectedProgram;
+	}
+
+	public void setSelectedProgram(int selectedProgram) {
+		this.selectedProgram = selectedProgram;
+		programCodes.clear();
+		programCodes.put(Integer.valueOf(0), "Project:" + projects[selectedProject] + "\nProgram:" + getPrograms()[selectedProgram] + "\nLIN(cp0)\nPTP(ap0)");
+		programCodes.put(Integer.valueOf(1), "Project:" + projects[selectedProject] + "\nProgram:" + getPrograms()[selectedProgram] + "\nLIN(cp0)\nPTP(ap0)");
+		programCodes.put(Integer.valueOf(2), "Project:" + projects[selectedProject] + "\nProgram:" + getPrograms()[selectedProgram] + "\nLIN(cp0)\nPTP(ap0)");
+		((ProgramCodeFragment) mSectionsPagerAdapter.getItem(1)).setProgramCode();
+
+		programInfos.clear();
+		programInfos.put(Integer.valueOf(0), "Project:" + projects[selectedProject] + "\nProgram:" + getPrograms()[selectedProgram] + "\nrunning..");
+		programInfos.put(Integer.valueOf(1), "Project:" + projects[selectedProject] + "\nProgram:" + getPrograms()[selectedProgram] + "\nrunning..");
+		programInfos.put(Integer.valueOf(2), "Project:" + projects[selectedProject] + "\nProgram:" + getPrograms()[selectedProgram] + "\nrunning..");
+		((ProgramInfoFragment) mSectionsPagerAdapter.getItem(2)).setProgramInfo();
+
+		mViewPager.setCurrentItem(1);
 
 	}
 
@@ -55,70 +120,51 @@ public class ProjectActivity extends FragmentActivity implements Serializable, S
 
 		@Override
 		public Fragment getItem(int position) {
-			
+
 			if (position > getCount() - 1)
 				return null;
 
 			if (mFragments == null) {
 				Bundle args = new Bundle();
-
-//				mFragments = new Fragment[] { new ConnectFragment(),
-//						new OverviewFragment(), new ProjectListFragment(),
-//						new ProjectDetailFragment() };
-				mFragments= new Fragment[]{new ProgramCodeFragment(), new OverviewFragment()};
+				mFragments = new Fragment[] { new ProjectNestingFragment(), new ProgramCodeFragment(), new ProgramInfoFragment() }; /*
+																																	 * new
+																																	 * ProjectListFragment
+																																	 * (
+																																	 * )
+																																	 * ,
+																																	 * new
+																																	 * ProjectDetailFragment
+																																	 * (
+																																	 * )
+																																	 */
 
 				args.putSerializable("connector", ProjectActivity.this);
 				mFragments[0].setArguments(args);
+				mFragments[1].setArguments(args);
+				mFragments[2].setArguments(args);
 			}
-
-			// if (position == 3 && mSelectedProject != null) {
-			// KvtProject p =
-			// KvtProjectAdministrator.getProject(mSelectedProject);
-			// if (p != null) {
-			//
-			// Bundle args = new Bundle();
-			// args.putSerializable("project", p);
-			// mFragments[3].setArguments(args);
-			// }
-			// }
 
 			return mFragments[position];
 		}
 
 		@Override
 		public int getCount() {
-			// if (RobotControlProxy.isConnected())
-			return mFragments != null?mFragments.length:2; // if projects AND programs are available
-			// return 3; // if not connected
+			return 2;
 		}
 
 		@Override
 		public CharSequence getPageTitle(int position) {
 			switch (position) {
 			case 0:
-				return getString(R.string.title_section_connect);
+				return getString(R.string.title_project_list);
 			case 1:
-				return getString(R.string.title_section_overview);
-			case 2:
-				return getString(R.string.title_section_projects);
-			case 3:
-				return getString(R.string.title_section_programs);
+				return getString(R.string.title_section_program_code);
+				// case 2:
+				// return getString(R.string.title_project_detail);
 			default:
 				return "NOT_DEFINED_" + position;
 			}
 		}
 	}
 
-	public void onItemSelected(KvtProject _entry) {
-//		mSelectedProject = _entry;
-//
-//		if (mSelectedProject != null) {
-//			Fragment f = mSectionsPagerAdapter.getItem(3);
-//			if (f instanceof ProjectDetailFragment) {
-//				((ProjectDetailFragment) f).setProject(mSelectedProject);
-//			}
-//			mViewPager.setCurrentItem(3);
-//		}
-		
-	}
 }

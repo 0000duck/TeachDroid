@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:id="@+id/projectNestingLayout" >
+
+    <TextView
+        android:id="@+id/textViewProjects"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/title_project_list"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/textViewPrograms"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="46dp"
+        android:layout_toRightOf="@+id/textViewProjects"
+        android:text="@string/title_project_detail"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+	
+	<ListView
+        android:id="@+id/listViewProjects"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textViewProjects"
+        android:layout_toLeftOf="@+id/listViewPrograms" >
+
+    </ListView>
+    
+    <ListView
+        android:id="@+id/listViewPrograms"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/textViewPrograms"
+        android:layout_below="@+id/textViewProjects"
+        android:layout_marginLeft="41dp" >
+
+    </ListView>
+
+    
+
+</RelativeLayout>
