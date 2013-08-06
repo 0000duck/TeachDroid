@@ -19,13 +19,13 @@ public class ProgramInfoFragment extends Fragment {
 		View mRootView = inflater.inflate(R.layout.fragment_program_info, container, false);
 		t = (TextView) mRootView.findViewById(R.id.programInfo);
 		callback = (ProjectActivity) getArguments().getSerializable("connector");
-		
-		
+		t.setText(callback.getProgramInfo());
 		return mRootView;
 	}
-	
-	public void setProgramInfo(){
-		t.setText(callback.getProgramInfo());
+
+	public void setProgramInfo() {
+		if (t != null)
+			t.setText(callback.getProgramInfo());
 	}
 
 }

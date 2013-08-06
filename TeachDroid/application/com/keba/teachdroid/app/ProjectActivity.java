@@ -7,8 +7,6 @@ import java.util.Vector;
 
 import com.keba.teachdroid.app.fragments.ProgramCodeFragment;
 import com.keba.teachdroid.app.fragments.ProgramInfoFragment;
-import com.keba.teachdroid.app.fragments.ProjectDetailFragment;
-import com.keba.teachdroid.app.fragments.ProjectListFragment;
 import com.keba.teachdroid.app.fragments.ProjectNestingFragment;
 
 import android.os.Bundle;
@@ -70,7 +68,11 @@ public class ProjectActivity extends FragmentActivity implements Serializable {
 	}
 
 	public String getProgramInfo() {
-		return null;
+		if (programInfos != null) {
+			return programInfos.get(Integer.valueOf(selectedProgram));
+		} else {
+			return "No Program selected";
+		}
 	}
 
 	public int getSelectedProject() {
@@ -126,18 +128,7 @@ public class ProjectActivity extends FragmentActivity implements Serializable {
 
 			if (mFragments == null) {
 				Bundle args = new Bundle();
-				mFragments = new Fragment[] { new ProjectNestingFragment(), new ProgramCodeFragment(), new ProgramInfoFragment() }; /*
-																																	 * new
-																																	 * ProjectListFragment
-																																	 * (
-																																	 * )
-																																	 * ,
-																																	 * new
-																																	 * ProjectDetailFragment
-																																	 * (
-																																	 * )
-																																	 */
-
+				mFragments = new Fragment[] { new ProjectNestingFragment(), new ProgramCodeFragment(), new ProgramInfoFragment() };
 				args.putSerializable("connector", ProjectActivity.this);
 				mFragments[0].setArguments(args);
 				mFragments[1].setArguments(args);
@@ -149,7 +140,7 @@ public class ProjectActivity extends FragmentActivity implements Serializable {
 
 		@Override
 		public int getCount() {
-			return 2;
+			return 3;
 		}
 
 		@Override
@@ -159,8 +150,8 @@ public class ProjectActivity extends FragmentActivity implements Serializable {
 				return getString(R.string.title_project_list);
 			case 1:
 				return getString(R.string.title_section_program_code);
-				// case 2:
-				// return getString(R.string.title_project_detail);
+			case 2:
+				return getString(R.string.title_program_info);
 			default:
 				return "NOT_DEFINED_" + position;
 			}
