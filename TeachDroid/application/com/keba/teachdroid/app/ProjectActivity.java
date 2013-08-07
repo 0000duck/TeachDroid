@@ -5,9 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
+import com.keba.teachdroid.app.fragments.BaseActivity;
+import com.keba.teachdroid.app.fragments.MasterFragment;
 import com.keba.teachdroid.app.fragments.ProgramCodeFragment;
 import com.keba.teachdroid.app.fragments.ProgramInfoFragment;
 import com.keba.teachdroid.app.fragments.ProjectNestingFragment;
+import com.keba.teachdroid.app.fragments.InnerListFragment;
+import com.keba.teachdroid.app.fragments.InnerDetailFragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,8 +19,11 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
-public class ProjectActivity extends FragmentActivity implements Serializable {
+public class ProjectActivity extends BaseActivity implements Serializable, InnerListFragment.SelectionCallback, InnerDetailFragment.SelectionCallback {
 
 	ViewPager mViewPager;
 	SectionsPagerAdapter mSectionsPagerAdapter;
@@ -34,12 +41,38 @@ public class ProjectActivity extends FragmentActivity implements Serializable {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_project_swipe);
+
+		mTitle = mDrawerTitle = getTitle();
+
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		mDrawerList = (ListView) findViewById(R.id.left_drawer);
+		mNavigationStrings = getResources().getStringArray(R.array.navigation_array);
+
+		// set up the drawer's list view with items and click listener
+		mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mNavigationStrings));
+		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+		// // enable ActionBar app icon to behave as action to toggle nav drawer
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setHomeButtonEnabled(true);
+
+		// ActionBarDrawerToggle ties together the the proper interactions
+		// between the sliding drawer and the action bar app icon
+		mDrawerToggle = new MyActionBarDrawerToggle(this, /* host Activity */
+		mDrawerLayout, /* DrawerLayout object */
+		R.drawable.ic_drawer, /* nav drawer image to replace 'Up' caret */
+		R.string.drawer_open, /* "open drawer" description for accessibility */
+		R.string.drawer_close /* "close drawer" description for accessibility */
+		);
+		mDrawerLayout.setDrawerListener(mDrawerToggle);
+
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the app.
 		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
+		mViewPager.setOffscreenPageLimit(3);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
 		// dummy content building
@@ -81,7 +114,7 @@ public class ProjectActivity extends FragmentActivity implements Serializable {
 
 	public void setSelectedProject(int selectedProject) {
 		this.selectedProject = selectedProject;
-		((ProjectNestingFragment) mSectionsPagerAdapter.getItem(0)).setProgramListContent();
+//		((ProjectNestingFragment) mSectionsPagerAdapter.getItem(0)).setProgramListContent();
 		mViewPager.invalidate();
 	}
 
@@ -107,6 +140,17 @@ public class ProjectActivity extends FragmentActivity implements Serializable {
 
 	}
 
+	
+	public void onProjectSelected(int id) {
+		setSelectedProject(id);
+		((MasterFragment) mSectionsPagerAdapter.getItem(0)).detailSelected(id);
+	}
+	
+	public void onProgramSelected(int id) {
+		setSelectedProgram(id);
+//		((MasterFragment) mSectionsPagerAdapter.getItem(0)).detailSelected(id);
+	}
+
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
 	 * one of the sections/tabs/pages.
@@ -128,7 +172,7 @@ public class ProjectActivity extends FragmentActivity implements Serializable {
 
 			if (mFragments == null) {
 				Bundle args = new Bundle();
-				mFragments = new Fragment[] { new ProjectNestingFragment(), new ProgramCodeFragment(), new ProgramInfoFragment() };
+				mFragments = new Fragment[] { new MasterFragment(), new ProgramCodeFragment(), new ProgramInfoFragment() };
 				args.putSerializable("connector", ProjectActivity.this);
 				mFragments[0].setArguments(args);
 				mFragments[1].setArguments(args);

@@ -10,22 +10,24 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
 import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
-import com.keba.teachdroid.app.fragments.projectview.ProjectListActivity;
+import com.keba.teachdroid.app.fragments.BaseActivity;
 import com.keba.teachdroid.data.InitializationTask;
 import com.keba.teachdroid.data.InitializationTask.InitializationListener;
 import com.keba.teachdroid.data.RobotControlProxy;
 import com.keba.teachdroid.util.PreferenceManager;
 
-public class MainActivity extends FragmentActivity implements
-		InitializationListener, IConnectCallback {
+public class MainActivity extends BaseActivity implements InitializationListener, IConnectCallback {
 
 	/**
 	 * 
@@ -41,7 +43,7 @@ public class MainActivity extends FragmentActivity implements
 	 * intensive, it may be best to switch to a
 	 * {@link android.support.v4.app.FragmentStatePagerAdapter}.
 	 */
-//	SectionsPagerAdapter mSectionsPagerAdapter;
+	// SectionsPagerAdapter mSectionsPagerAdapter;
 
 	/**
 	 * The {@link ViewPager} that will host the section contents.
@@ -53,35 +55,48 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		setContentView(R.layout.activity_main);
 
-		// Create the adapter that will return a fragment for each of the three
-		// primary sections of the app.
-		// mSectionsPagerAdapter = new
-		// SectionsPagerAdapter(getSupportFragmentManager());
+		mTitle = mDrawerTitle = getTitle();
 
-		// Set up the ViewPager with the sections adapter.
-		// mViewPager = (ViewPager) findViewById(R.id.pager);
-		// mViewPager.setAdapter(mSectionsPagerAdapter);
-		findViewById(R.id.fragment_prog_code_main).setOnClickListener(
-				new View.OnClickListener() {
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		mDrawerList = (ListView) findViewById(R.id.left_drawer);
+		mNavigationStrings = getResources().getStringArray(R.array.navigation_array);
 
-					public void onClick(View v) {
+		// set up the drawer's list view with items and click listener
+		mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mNavigationStrings));
+		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
-						onShowProjects(v);
+		// // enable ActionBar app icon to behave as action to toggle nav drawer
+		getActionBar().setHomeButtonEnabled(true);
 
-					}
-				});
+		// ActionBarDrawerToggle ties together the the proper interactions
+		// between the sliding drawer and the action bar app icon
+		mDrawerToggle = new MyActionBarDrawerToggle(this, /* host Activity */
+		mDrawerLayout, /* DrawerLayout object */
+		R.drawable.ic_drawer, /* nav drawer image to replace 'Up' caret */
+		R.string.drawer_open, /* "open drawer" description for accessibility */
+		R.string.drawer_close /* "close drawer" description for accessibility */
+		);
+		mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-		findViewById(R.id.fragment_robot_main).setOnClickListener(
-				new View.OnClickListener() {
+		
+		findViewById(R.id.fragment_prog_code_main).setOnClickListener(new View.OnClickListener() {
 
-					public void onClick(View v) {
-						// TODO Auto-generated method stub
+			public void onClick(View v) {
 
-					}
-				});
+				onShowProjects(v);
+
+			}
+		});
+
+		findViewById(R.id.fragment_robot_main).setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+
+			}
+		});
 
 	}
 
@@ -99,15 +114,13 @@ public class MainActivity extends FragmentActivity implements
 				dlgAlert.setMessage("Click OK to enable WiFi, Cancel to dismiss!");
 
 				dlgAlert.setTitle("Info");
-				dlgAlert.setPositiveButton("OK",
-						new android.content.DialogInterface.OnClickListener() {
+				dlgAlert.setPositiveButton("OK", new android.content.DialogInterface.OnClickListener() {
 
-							public void onClick(DialogInterface _dialog,
-									int _which) {
-								wifi.setWifiEnabled(true);
-								connectToPlc(_host);
-							}
-						});
+					public void onClick(DialogInterface _dialog, int _which) {
+						wifi.setWifiEnabled(true);
+						connectToPlc(_host);
+					}
+				});
 				dlgAlert.setNegativeButton("Cancel", /*
 													 * new android.content.
 													 * DialogInterface
@@ -151,10 +164,14 @@ public class MainActivity extends FragmentActivity implements
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem _item) {
-
+		 // The action bar home/up action should open or close the drawer.
+        // ActionBarDrawerToggle will take care of this.
+       if (mDrawerToggle.onOptionsItemSelected(_item)) {
+           return true;
+       }
+       
 		if (_item.getTitle().equals(getString(R.string.menu_settings))) {
-			Intent settingsActivity = new Intent(getBaseContext(),
-					SettingsActivity.class);
+			Intent settingsActivity = new Intent(getBaseContext(), SettingsActivity.class);
 			startActivity(settingsActivity);
 
 		} else if (_item.getTitle().equals(getString(R.string.action_connect))) {
@@ -225,15 +242,13 @@ public class MainActivity extends FragmentActivity implements
 
 				// m_dlg = ProgressDialog.show(MainActivity.this,
 				// "Connecting...", "Connecting to " + m_host, true, true);
-				m_dlg = new ProgressDialog(MainActivity.this,
-						ProgressDialog.STYLE_SPINNER);
+				m_dlg = new ProgressDialog(MainActivity.this, ProgressDialog.STYLE_SPINNER);
 				m_dlg.setTitle("Connecting...");
 				// m_dlg.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
 
 				m_dlg.setCancelable(true);
 				m_dlg.setCanceledOnTouchOutside(false);
-				m_dlg.setMessage("Connecting to "
-						+ PreferenceManager.getInstance().getHostname());
+				m_dlg.setMessage("Connecting to " + PreferenceManager.getInstance().getHostname());
 
 				m_dlg.setIndeterminate(true);
 				m_dlg.show();
@@ -258,10 +273,9 @@ public class MainActivity extends FragmentActivity implements
 		runOnUiThread(new Runnable() {
 			public void run() {
 				long duration = System.currentTimeMillis() - mStartTime;
-				System.out.println("Connecting took me " + duration / 1000
-						+ " ms");
+				System.out.println("Connecting took me " + duration / 1000 + " ms");
 				m_dlg.dismiss();
-//				mViewPager.setCurrentItem(1, true);
+				// mViewPager.setCurrentItem(1, true);
 			}
 		});
 
@@ -280,16 +294,15 @@ public class MainActivity extends FragmentActivity implements
 				if (_progress instanceof Integer)
 					m_dlg.setProgress((Integer) _progress);
 				else
-					m_dlg.setTitle(MessageFormat.format(m_connectFormatString
-							+ "{0}"/*
-									 * % complete "
-									 */, _progress));
+					m_dlg.setTitle(MessageFormat.format(m_connectFormatString + "{0}"/*
+																					 * %
+																					 * complete
+																					 * "
+																					 */, _progress));
 
 			}
 		});
 	}
-
-	
 
 	/*
 	 * (non-Javadoc)
@@ -318,15 +331,15 @@ public class MainActivity extends FragmentActivity implements
 	 * com.keba.teachdroid.app.fragments.projectview.ProjectListFragment.Callbacks
 	 * #onItemSelected(java.lang.String)
 	 */
-//	public void onItemSelected(KvtProject _entry) {
-//		mSelectedProject = _entry;
-//
-//		if (mSelectedProject != null) {
-//			Fragment f = mSectionsPagerAdapter.getItem(3);
-//			if (f instanceof ProjectDetailFragment) {
-//				((ProjectDetailFragment) f).setProject(mSelectedProject);
-//			}
-//			mViewPager.setCurrentItem(3);
-//		}
-//	}
+	// public void onItemSelected(KvtProject _entry) {
+	// mSelectedProject = _entry;
+	//
+	// if (mSelectedProject != null) {
+	// Fragment f = mSectionsPagerAdapter.getItem(3);
+	// if (f instanceof ProjectDetailFragment) {
+	// ((ProjectDetailFragment) f).setProject(mSelectedProject);
+	// }
+	// mViewPager.setCurrentItem(3);
+	// }
+	// }
 }

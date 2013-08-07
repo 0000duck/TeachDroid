@@ -27,5 +27,12 @@
     <string name="program_code_dummy">LIN(cp0)\nDyn(d0)\n</string>
     <string name="title_section_program_code">Program Code</string>
     <string name="title_program_info">Program Info</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string-array name="navigation_array">
+        <item>Projects</item>
+        <item>Positions</item>
+        <item>Information</item>
+    </string-array>
   
 </resources>

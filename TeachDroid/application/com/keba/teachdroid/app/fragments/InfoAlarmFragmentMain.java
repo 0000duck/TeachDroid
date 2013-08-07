@@ -1,36 +1,26 @@
 package com.keba.teachdroid.app.fragments;
 
-
-import com.keba.teachdroid.app.R;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
-
+import com.keba.teachdroid.app.R;
 
 public class InfoAlarmFragmentMain extends Fragment {
 
-
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-			 
-		 
-			 View rootView= inflater.inflate(R.layout.fragment_load_info_main, container, false);
+		View rootView = inflater.inflate(R.layout.fragment_load_info_main, container, false);
 
-//		     ListView listview = (ListView) findViewById(R.id.fragment_load_info_main);
-//		    String[] values = new String[] { "Android", "iPhone", "WindowsMobile",
-//		        "Blackberry", "WebOS", "Ubuntu", "Windows7", "Max OS X",
-//		        "Linux", "OS/2", "Ubuntu", "Windows7", "Max OS X", "Linux",
-//		        "OS/2", "Ubuntu", "Windows7", "Max OS X", "Linux", "OS/2",
-//		        "Android", "iPhone", "WindowsMobile" };
+		ListView listview = (ListView) rootView.findViewById(R.id.infoListView);
+		String[] values = new String[] { "some information", "more info", "extraordinary long infos", "some information", "more info", "extraordinary long infos", "some information", "more info", "extraordinary long infos" };
+		ArrayAdapter<String> adp = new ArrayAdapter<String>(getActivity(), R.layout.default_list_item, values);
+		listview.setAdapter(adp);
 
-	
-			 return rootView;
-}
+		return rootView;
+	}
 }
