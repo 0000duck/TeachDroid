@@ -6,11 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Spinner;
 
 import com.keba.teachdroid.app.ConfirmMessageDialog;
 import com.keba.teachdroid.app.Message;
@@ -19,7 +16,7 @@ import com.keba.teachdroid.app.MessageTypes;
 import com.keba.teachdroid.app.R;
 
 public class InfoAlarmFragmentMain extends Fragment {
-	
+	ConfirmMessageDialog dialog;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -33,14 +30,21 @@ public class InfoAlarmFragmentMain extends Fragment {
 		// ArrayAdapter<String> adp = new ArrayAdapter<String>(getActivity(),
 		// R.layout.default_list_item, values);
 		Message[] values = new Message[] { new Message("DebugMessage", MessageTypes.DEBUG), new Message("AlarmMessage", MessageTypes.ALARM), new Message("WarningMessage", MessageTypes.WARNING), new Message() };
-		MessageAdapter<Message> adp = new MessageAdapter<Message>(getActivity(), R.layout.default_list_item, values);
+		MessageAdapter<Message> adp = new MessageAdapter<Message>(getActivity(), R.layout.default_list_item);
+		for(Message msg : values){
+			adp.add(msg);
+		}
 		listview.setAdapter(adp);
 		
+		dialog = new ConfirmMessageDialog();
+		Bundle args = new Bundle();
+		args.putSerializable("msgadp",adp);
+		dialog.setArguments(args);
 		
 		listview.setOnItemLongClickListener(new OnItemLongClickListener() {
 
 			public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-				new ConfirmMessageDialog().show(getFragmentManager(), getTag());
+				dialog.show(getFragmentManager(), getTag());
 				return false;
 			}
 
