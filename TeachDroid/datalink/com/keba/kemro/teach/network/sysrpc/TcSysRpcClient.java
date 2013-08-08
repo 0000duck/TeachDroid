@@ -5,10 +5,9 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-import android.util.Log;
-
 import com.keba.jrpc.rpc.RPCException;
 import com.keba.jrpc.rpc.XDR;
+import com.keba.kemro.kvs.teach.util.Log;
 import com.keba.kemro.plc.network.sysrpc.TCI.SysRpcTcClientInfo;
 import com.keba.kemro.plc.network.sysrpc.TCI.SysRpcTcClientType;
 import com.keba.kemro.plc.network.sysrpc.TCI.SysRpcTcCloseTeachControlIn;
@@ -25,8 +24,6 @@ import com.keba.kemro.plc.network.sysrpc.TCI.SysRpcTcSetClientTypeOut;
 import com.keba.kemro.plc.network.sysrpc.TCI.TCI;
 import com.keba.kemro.teach.network.TcClient;
 import com.keba.kemro.teach.network.base.TcStructuralCache;
-import com.keba.kemro.teach.network.rpc.TcRpcStructuralModel;
-import com.keba.kemro.teach.network.rpc.protocol.RpcTcClientInfo;
 import com.keba.kemro.teach.network.rpc.protocol.RpcTcClientType;
 
 public class TcSysRpcClient extends TcClient {
@@ -66,6 +63,7 @@ public class TcSysRpcClient extends TcClient {
 	protected TcSysRpcClient() {
 	}
 
+	@Override
 	public int getHandle() {
 		return super.getHandle();
 	}
@@ -135,6 +133,7 @@ public class TcSysRpcClient extends TcClient {
 	/**
 	 * Disconnects the client.
 	 */
+	@Override
 	public void disconnect() {
 		if (isConnected) {
 			try {
@@ -149,6 +148,7 @@ public class TcSysRpcClient extends TcClient {
 		sendDisconnectEvent();
 	}
 
+	@Override
 	public void close() {
 		sendDisconnectEvent();
 	}
@@ -159,6 +159,7 @@ public class TcSysRpcClient extends TcClient {
 	 * @param ms
 	 *            timeout
 	 */
+	@Override
 	public void setTimeout(int ms) {
 		super.setTimeout(ms);
 		if (client != null) {
@@ -178,6 +179,7 @@ public class TcSysRpcClient extends TcClient {
 	 *            true for write access
 	 * @return true if write access was granted
 	 */
+	@Override
 	public boolean setWriteAccess(boolean writeAccessAllowed) {
 		if (client != null) {
 			try {
@@ -205,6 +207,7 @@ public class TcSysRpcClient extends TcClient {
 		return false;
 	}
 
+	@Override
 	public boolean isTcController() {
 		SysRpcTcClientInfo[] info = getClientInfo();
 		if (m_clientID <= 0)
@@ -234,6 +237,7 @@ public class TcSysRpcClient extends TcClient {
 		return null;
 	}
 
+	@Override
 	protected synchronized void sendDisconnectEvent() {
 		if (isConnected) {
 			try {
@@ -269,6 +273,7 @@ public class TcSysRpcClient extends TcClient {
 			start();
 		}
 
+		@Override
 		public void run() {
 			while (isConnected) {
 				try {
@@ -288,6 +293,7 @@ public class TcSysRpcClient extends TcClient {
 			super(host);
 		}
 
+		@Override
 		public synchronized void call(int prog, int version, int proc, XDR argValue, XDR[] retValue) throws RPCException, IOException {
 			try {
 				super.call(prog, version, proc, argValue, retValue);

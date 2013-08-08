@@ -10,7 +10,7 @@ package com.keba.kemro.teach.dfl.util;
 
 import java.util.Hashtable;
 
-import android.util.Log;
+import com.keba.kemro.kvs.teach.util.Log;
 
 /**
  * Manages the logging at KVS-Teach

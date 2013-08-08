@@ -14,8 +14,7 @@
  *------------------------------------------------------------------------*/
 package com.keba.kemro.teach.network;
 
-import android.util.Log;
-
+import com.keba.kemro.kvs.teach.util.Log;
 import com.keba.kemro.teach.network.rpc.TcRpcClient;
 import com.keba.kemro.teach.network.rpc.TcRpcDirectoryModel;
 import com.keba.kemro.teach.network.sysrpc.TcSysRpcClient;

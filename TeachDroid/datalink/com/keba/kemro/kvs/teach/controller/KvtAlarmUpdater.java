@@ -20,21 +20,21 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 																						 * LanguageChangedListener
 																						 * ,
 																						 */KvtMessageFilterListener {
-	private static Object m_actualMessage;
-	private static int m_actualMessageType;
+	private static Object							m_actualMessage;
+	private static int								m_actualMessageType;
 	private final Vector							m_messages			= new Vector();
-	private int[] m_alarmTypes;
-	private int MAX_MESSAGE_CLASSES = 32;
-	private boolean					LAST_MESSAGE_FIRST	= true;				// Config.getBooleanProperty("MsgDisplayNewest",
-																			// true);
-	
-	protected static final int ALARM = 1;
-	protected static final int WARNING = 2;
-	protected static final int INFO = 3;
-	protected static final int NONE = 0;
-	private static KvtAlarmUpdater updater;
+	private int[]									m_alarmTypes;
+	private int										MAX_MESSAGE_CLASSES	= 32;
+	private boolean									LAST_MESSAGE_FIRST	= true;									// Config.getBooleanProperty("MsgDisplayNewest",
+																													// true);
+
+	protected static final int						ALARM				= 1;
+	protected static final int						WARNING				= 2;
+	protected static final int						INFO				= 3;
+	protected static final int						NONE				= 0;
+	private static KvtAlarmUpdater					updater;
 	private static Vector<KvtAlarmUpdaterListener>	m_listener			= new Vector<KvtAlarmUpdaterListener>(5);
-	
+
 	public static interface KvtAlarmUpdaterListener {
 		public void messageUpdated(int lastMessageType, Object lastMessage);
 
@@ -44,13 +44,13 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 
 		public void messageChanged(String _bufferName, KMessage _msg);
 	}
-	
+
 	public static void addListener(KvtAlarmUpdaterListener listener) {
-		if (updater == null){
+		if (updater == null) {
 			updater = new KvtAlarmUpdater();
 		}
-		if (!m_listener.contains(listener)){
-    		m_listener.addElement(listener);
+		if (!m_listener.contains(listener)) {
+			m_listener.addElement(listener);
 		}
 		listener.messageUpdated(m_actualMessageType, m_actualMessage);
 	}

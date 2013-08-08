@@ -16,8 +16,6 @@ package com.keba.kemro.kvs.teach.util;
 
 import java.util.Vector;
 
-import android.util.Log;
-
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.kemro.teach.dfl.KTcDfl;
 import com.keba.kemro.teach.network.TcClient;
@@ -81,6 +79,10 @@ public class KvtSystemCommunicator {
 			fireConnected();
 
 		}
+	}
+
+	public static String getHostname() {
+		return m_hostName;
 	}
 
 	public static boolean connectOnce(String _host, int _to, String _globalFilter) {
@@ -211,7 +213,7 @@ public class KvtSystemCommunicator {
 
 			} catch (Exception ex) {
 				Log.e(KvtSystemCommunicator.class.toString(),
-						"Error in Call of KTeachviewConnectionListener.connected " + m_connectionListeners.elementAt(i), ex);
+						"Error in Call of KTeachviewConnectionListener.connected " + m_connectionListeners.elementAt(i) + " Excp: " + ex);
 			}
 
 		}
@@ -224,7 +226,7 @@ public class KvtSystemCommunicator {
 				((KvtTeachviewConnectionListener) (m_connectionListeners.elementAt(i))).teachviewDisconnected();
 			} catch (Exception ex) {
 				Log.e(KvtSystemCommunicator.class.toString(), "Error in Call of KTeachviewConnectionListener.disconnected "
-						+ m_connectionListeners.elementAt(i), ex);
+						+ m_connectionListeners.elementAt(i) + " Excp: " + ex);
 			}
 		}
 	}
