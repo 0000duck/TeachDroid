@@ -18,10 +18,7 @@ public class InnerListFragment extends ListFragment {
 	 * clicks.
 	 */
 	private SelectionCallback mCallbacks = sDummyCallbacks;
-	/**
-	 * The current activated item position. Only used on tablets.
-	 */
-	private int mActivatedPosition = ListView.INVALID_POSITION;
+	
 	private ArrayAdapter<String> mAdapter;
 
 	/**
@@ -55,6 +52,7 @@ public class InnerListFragment extends ListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mAdapter = new ArrayAdapter<String>(getActivity(), R.layout.default_list_item, ((ProjectActivity) getActivity()).getProjects());
+		setListAdapter(mAdapter);
 	}
 	
 	@Override

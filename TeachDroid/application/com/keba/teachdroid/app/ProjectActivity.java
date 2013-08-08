@@ -5,17 +5,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
-import com.keba.teachdroid.app.fragments.BaseActivity;
+import com.keba.teachdroid.app.BaseActivity;
 import com.keba.teachdroid.app.fragments.MasterFragment;
 import com.keba.teachdroid.app.fragments.ProgramCodeFragment;
 import com.keba.teachdroid.app.fragments.ProgramInfoFragment;
-import com.keba.teachdroid.app.fragments.ProjectNestingFragment;
 import com.keba.teachdroid.app.fragments.InnerListFragment;
 import com.keba.teachdroid.app.fragments.InnerDetailFragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -23,10 +21,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-public class ProjectActivity extends BaseActivity implements Serializable, InnerListFragment.SelectionCallback, InnerDetailFragment.SelectionCallback {
+public class ProjectActivity extends BaseActivity implements InnerListFragment.SelectionCallback, InnerDetailFragment.SelectionCallback {
 
-	ViewPager mViewPager;
-	SectionsPagerAdapter mSectionsPagerAdapter;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1859827857696981188L;
+	transient ViewPager mViewPager;
+	transient SectionsPagerAdapter mSectionsPagerAdapter;
 
 	// dummy contents for the Pages!
 	String[] projects = { "Project1", "Project2", "Project3" };
@@ -36,7 +38,8 @@ public class ProjectActivity extends BaseActivity implements Serializable, Inner
 
 	int selectedProject = 0;
 	int selectedProgram = 0;
-
+	
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -51,10 +54,6 @@ public class ProjectActivity extends BaseActivity implements Serializable, Inner
 		// set up the drawer's list view with items and click listener
 		mDrawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, mNavigationStrings));
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-
-		// // enable ActionBar app icon to behave as action to toggle nav drawer
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		getActionBar().setHomeButtonEnabled(true);
 
 		// ActionBarDrawerToggle ties together the the proper interactions
 		// between the sliding drawer and the action bar app icon
@@ -114,7 +113,6 @@ public class ProjectActivity extends BaseActivity implements Serializable, Inner
 
 	public void setSelectedProject(int selectedProject) {
 		this.selectedProject = selectedProject;
-//		((ProjectNestingFragment) mSectionsPagerAdapter.getItem(0)).setProgramListContent();
 		mViewPager.invalidate();
 	}
 
@@ -131,8 +129,8 @@ public class ProjectActivity extends BaseActivity implements Serializable, Inner
 		((ProgramCodeFragment) mSectionsPagerAdapter.getItem(1)).setProgramCode();
 
 		programInfos.clear();
-		programInfos.put(Integer.valueOf(0), "Project:" + projects[selectedProject] + "\nProgram:" + getPrograms()[selectedProgram] + "\nrunning..");
-		programInfos.put(Integer.valueOf(1), "Project:" + projects[selectedProject] + "\nProgram:" + getPrograms()[selectedProgram] + "\nrunning..");
+		programInfos.put(Integer.valueOf(0), "Project:" + projects[selectedProject] + "\nProgram:" + getPrograms()[selectedProgram] + "\npaused..");
+		programInfos.put(Integer.valueOf(1), "Project:" + projects[selectedProject] + "\nProgram:" + getPrograms()[selectedProgram] + "\nstopped..");
 		programInfos.put(Integer.valueOf(2), "Project:" + projects[selectedProject] + "\nProgram:" + getPrograms()[selectedProgram] + "\nrunning..");
 		((ProgramInfoFragment) mSectionsPagerAdapter.getItem(2)).setProgramInfo();
 
@@ -140,23 +138,27 @@ public class ProjectActivity extends BaseActivity implements Serializable, Inner
 
 	}
 
-	
 	public void onProjectSelected(int id) {
 		setSelectedProject(id);
 		((MasterFragment) mSectionsPagerAdapter.getItem(0)).detailSelected(id);
 	}
-	
+
 	public void onProgramSelected(int id) {
 		setSelectedProgram(id);
-//		((MasterFragment) mSectionsPagerAdapter.getItem(0)).detailSelected(id);
+		// ((MasterFragment)
+		// mSectionsPagerAdapter.getItem(0)).detailSelected(id);
 	}
 
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
 	 * one of the sections/tabs/pages.
 	 */
-	public class SectionsPagerAdapter extends FragmentPagerAdapter {
+	public class SectionsPagerAdapter extends FragmentPagerAdapter implements Serializable {
 
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 4669970919454414915L;
 		private Fragment[] mFragments;
 
 		public SectionsPagerAdapter(FragmentManager fm) {

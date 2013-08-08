@@ -1,41 +1,10 @@
-//package com.keba.teachdroid.app.fragments;
-//
-//import com.keba.teachdroid.app.R;
-//
-//import android.os.Bundle;
-//import android.support.v4.app.Fragment;
-//import android.view.LayoutInflater;
-//import android.view.View;
-//import android.view.ViewGroup;
-//import android.widget.ArrayAdapter;
-//import android.widget.ListView;
-//
-//public class InnerDetailFragment extends Fragment {
-//
-//	private ArrayAdapter<String> mAdapter;
-//	private ListView l;
-//
-//	@Override
-//	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//		View mRootView = inflater.inflate(R.layout.fragment_inner_detail, container, false);
-//		l = (ListView) mRootView.findViewById(R.id.listView1);
-//		l.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1, getArguments().getStringArray("programs")));
-//		return mRootView;
-//	}
-//
-//}
-
 package com.keba.teachdroid.app.fragments;
-
-import com.keba.teachdroid.app.ProjectActivity;
-import com.keba.teachdroid.app.R;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 public class InnerDetailFragment extends ListFragment {
@@ -44,11 +13,7 @@ public class InnerDetailFragment extends ListFragment {
 	 * clicks.
 	 */
 	private SelectionCallback mCallbacks = sDummyCallbacks;
-	/**
-	 * The current activated item position. Only used on tablets.
-	 */
-	private int mActivatedPosition = ListView.INVALID_POSITION;
-	private ArrayAdapter<String> mAdapter;
+	
 
 	/**
 	 * A dummy implementation of the {@link SelectionCallback} interface that
@@ -75,12 +40,6 @@ public class InnerDetailFragment extends ListFragment {
 
 	public InnerDetailFragment() {
 
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		mAdapter = new ArrayAdapter<String>(getActivity(), R.layout.default_list_item, ((ProjectActivity) getActivity()).getPrograms());
 	}
 	
 	@Override
@@ -112,7 +71,6 @@ public class InnerDetailFragment extends ListFragment {
 	public void onListItemClick(ListView listView, View view, int position, long id) {
 		super.onListItemClick(listView, view, position, id);
 		mCallbacks.onProgramSelected(position);
-		getListView().setItemChecked(position, true);
 	}
 }
 

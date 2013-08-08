@@ -1,4 +1,6 @@
-package com.keba.teachdroid.app.fragments;
+package com.keba.teachdroid.app;
+
+import java.io.Serializable;
 
 import com.keba.teachdroid.app.ProjectActivity;
 
@@ -12,10 +14,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-public abstract class BaseActivity extends FragmentActivity {
-	protected DrawerLayout mDrawerLayout;
-	protected ListView mDrawerList;
-	protected ActionBarDrawerToggle mDrawerToggle;
+public abstract class BaseActivity extends FragmentActivity  implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 127495936935186417L;
+	protected transient DrawerLayout mDrawerLayout;
+	protected transient ListView mDrawerList;
+	protected transient ActionBarDrawerToggle mDrawerToggle;
 	protected CharSequence mDrawerTitle;
 	protected CharSequence mTitle;
 	protected String[] mNavigationStrings;
@@ -25,12 +31,15 @@ public abstract class BaseActivity extends FragmentActivity {
 		switch (position) {
 		case 0:
 			if (!(this instanceof ProjectActivity)) {
-				intent = new Intent(this, ProjectActivity.class);
+				intent = new Intent(getBaseContext(), ProjectActivity.class);
 			}
 			break;
 		case 1:
 			break;
 		case 2:
+			if (!(this instanceof InfoActivity)) {
+				intent = new Intent(getBaseContext(), InfoActivity.class);
+			}
 			break;
 		default:
 			break;
@@ -60,7 +69,12 @@ public abstract class BaseActivity extends FragmentActivity {
 	}
 
 	/* The click listener for ListView in the navigation drawer */
-	protected class DrawerItemClickListener implements ListView.OnItemClickListener {
+	protected class DrawerItemClickListener implements ListView.OnItemClickListener, Serializable {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 6643918920693315503L;
+
 		public DrawerItemClickListener() {
 			super();
 		}

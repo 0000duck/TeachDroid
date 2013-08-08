@@ -5,6 +5,7 @@
     <string name="title_robotJogging">Manual Jogging</string>
     <string name="title_robotPrograms">Robot Programs</string>
     <string name="title_robotOverview">Robot Overview</string>
+    <string name="title_robotInfos">Infos</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main_teach_view">TeachDroid</string>
@@ -23,12 +24,18 @@
     <string name="title_section_overview">Overview</string>
     <string name="title_section_programs">Programs</string>
     <string name="title_section_projects">Projects</string>
+    <string name="title_section_trace">Trace</string>
+    <string name="title_section_alarms">Pending Alarms</string>
+    <string name="title_section_history">Alarm History</string>
     <string name="action_disconnect">Disconnect</string>
     <string name="program_code_dummy">LIN(cp0)\nDyn(d0)\n</string>
     <string name="title_section_program_code">Program Code</string>
     <string name="title_program_info">Program Info</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+    <string name="dialog_confirm_message">Confirm Message?</string>
+    <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
     <string-array name="navigation_array">
         <item>Projects</item>
         <item>Positions</item>

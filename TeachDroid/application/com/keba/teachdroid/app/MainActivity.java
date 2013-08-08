@@ -21,7 +21,7 @@ import android.widget.ListView;
 import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
-import com.keba.teachdroid.app.fragments.BaseActivity;
+import com.keba.teachdroid.app.BaseActivity;
 import com.keba.teachdroid.data.InitializationTask;
 import com.keba.teachdroid.data.InitializationTask.InitializationListener;
 import com.keba.teachdroid.data.RobotControlProxy;
@@ -94,6 +94,14 @@ public class MainActivity extends BaseActivity implements InitializationListener
 
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+
+			}
+		});
+		
+		findViewById(R.id.fragment_load_info_main).setOnClickListener(new View.OnClickListener() {
+
+			public void onClick(View v) {
+				onShowInfos(v);
 
 			}
 		});
@@ -207,6 +215,11 @@ public class MainActivity extends BaseActivity implements InitializationListener
 		// projectsActivity.putExtra("projects",
 		// RobotControlProxy.getProjects());
 		startActivity(projectsActivity);
+	}
+	
+	public void onShowInfos(View _v) {
+		Intent infoActivity = new Intent(this, InfoActivity.class);
+		startActivity(infoActivity);
 	}
 
 	public void onGenericButtonClick(View _view) {

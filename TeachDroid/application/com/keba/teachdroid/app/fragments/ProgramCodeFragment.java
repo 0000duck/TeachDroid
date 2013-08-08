@@ -1,5 +1,7 @@
 package com.keba.teachdroid.app.fragments;
 
+import java.io.Serializable;
+
 import com.keba.teachdroid.app.ProjectActivity;
 import com.keba.teachdroid.app.R;
 
@@ -10,11 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class ProgramCodeFragment extends Fragment {
+public class ProgramCodeFragment extends Fragment implements Serializable{
 
-	private View mRootView;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7012715919241719807L;
+	private transient View mRootView;
 	ProjectActivity callback;
-	TextView t;
+	transient TextView t;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {

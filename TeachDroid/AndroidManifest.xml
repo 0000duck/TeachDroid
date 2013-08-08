@@ -56,6 +56,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.keba.teachdroid.app.MainActivity" />
         </activity>
+        
+        <activity
+            android:name="com.keba.teachdroid.app.InfoActivity"
+            android:label="@string/title_robotInfos"
+            android:parentActivityName="com.keba.teachdroid.app.MainActivity"
+            android:screenOrientation="landscape" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.keba.teachdroid.app.MainActivity" />
+        </activity>
+        
         <activity
             android:name="com.keba.teachdroid.app.fragments.projectview.ProjectDetailActivity"
             android:label="@string/title_project_detail"
