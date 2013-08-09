@@ -14,8 +14,7 @@
 *------------------------------------------------------------------------*/
 package com.keba.kemro.teach.dfl;
 
-import android.util.Log;
-
+import com.keba.kemro.kvs.teach.util.Log;
 import com.keba.kemro.teach.dfl.codepoint.KCodePointAdministrator;
 import com.keba.kemro.teach.dfl.compilerError.KCompilerErrorAdministrator;
 import com.keba.kemro.teach.dfl.dir.KDirectoryAdministrator;

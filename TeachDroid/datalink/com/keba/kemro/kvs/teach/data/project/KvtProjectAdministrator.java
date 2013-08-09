@@ -16,10 +16,9 @@ package com.keba.kemro.kvs.teach.data.project;
 
 import java.util.Vector;
 
-import android.util.Log;
-
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
 import com.keba.kemro.kvs.teach.util.KvtTeachviewConnectionListener;
+import com.keba.kemro.kvs.teach.util.Log;
 import com.keba.kemro.teach.dfl.KTcDfl;
 import com.keba.kemro.teach.dfl.dir.KDirEntry;
 import com.keba.kemro.teach.dfl.dir.KDirectoryAdministratorListener;
@@ -342,7 +341,7 @@ public class KvtProjectAdministrator {
 			try {
 				((KvtProjectAdministratorListener) m_listener.elementAt(i)).projectStateChanged(prj);
 			} catch (Exception e) {
-				Log.e(KvtProjectAdministrator.class.toString(), "fireProjectStateChanged", e);
+				Log.e(KvtProjectAdministrator.class.toString(), "fireProjectStateChanged" + " Excp: " + e);
 			}
 		}
 	}
@@ -362,7 +361,7 @@ public class KvtProjectAdministrator {
 			try {
 				((KvtProjectAdministratorListener) m_listener.elementAt(i)).programStateChanged(prg);
 			} catch (Exception e) {
-				Log.e(KvtProjectAdministrator.class.toString(), "fireProgramStateChanged", e);
+				Log.e(KvtProjectAdministrator.class.toString(), "fireProgramStateChanged" + " Excp: " + e);
 			}
 		}
 	}
@@ -379,7 +378,7 @@ public class KvtProjectAdministrator {
 			try {
 				((KvtProjectAdministratorListener) m_listener.elementAt(i)).projectListChanged();
 			} catch (Exception e) {
-				Log.e(KvtProjectAdministrator.class.toString(), "fireProjectListChanged", e);
+				Log.e(KvtProjectAdministrator.class.toString(), "fireProjectListChanged" + " Excp: " + e);
 			}
 		}
 	}

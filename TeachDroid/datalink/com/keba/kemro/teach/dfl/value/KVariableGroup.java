@@ -260,7 +260,8 @@ public class KVariableGroup {
 					if (changedIds != null && changedIds.length > 0) {
 						System.out.println(m_sGroupName + " -- addedVars: " + m_addedVars.size() + " changed: " + changedIds.length);
 						for (int i = 0; i < changedIds.length; i++) {
-							String s = getVariableForId(changedIds[i]).m_rootPathString;
+							KStructVarWrapper wrp = getVariableForId(changedIds[i]);
+							String s = wrp != null ? wrp.m_rootPathString : "NOTHING";
 							System.out.println("\t" + s);
 						}
 					}
@@ -563,7 +564,7 @@ public class KVariableGroup {
 	 * @param _kstructVarWrappers
 	 */
 	private void setVarIds(int[] _ids, Vector _kstructVarWrappers) {
-		if (_ids.length <= _kstructVarWrappers.size()) {
+		if (_ids != null && _ids.length <= _kstructVarWrappers.size()) {
 			for (int i = 0; i < _ids.length; i++) {
 				((KStructVarWrapper) _kstructVarWrappers.elementAt(i)).setVarId(_ids[i]);
 			}
