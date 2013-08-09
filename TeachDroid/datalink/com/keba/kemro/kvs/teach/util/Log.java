@@ -14,7 +14,7 @@ public class Log {
 		eDebug, eInfo, eWarning, eError
 	};
 
-	private static String	mTagFilter	= "Message";
+	private static String	mTagFilter	= null;
 
 	private static boolean	isAndroid;
 	private static LogLevel	mLogLevel	= LogLevel.eDebug;
