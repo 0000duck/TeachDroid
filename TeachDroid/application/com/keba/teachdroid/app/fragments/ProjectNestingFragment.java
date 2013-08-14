@@ -38,9 +38,9 @@ public class ProjectNestingFragment extends Fragment {
 		adpProject = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_expandable_list_item_1);
 		adpProgram = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_expandable_list_item_1);
 
-		for (String s : callback.getProjects()) {
-			adpProject.add(s);
-		}
+//		for (String s : callback.getProjects()) {
+//			adpProject.add(s);
+//		}
 
 		setProgramListContent();
 		projectList.setAdapter(adpProject);
@@ -52,9 +52,9 @@ public class ProjectNestingFragment extends Fragment {
 	public void setProgramListContent() {
 		adpProgram.clear();
 		
-		for (String s : callback.getPrograms()) {
-			adpProgram.add(s);
-		}
+//		for (String s : callback.getPrograms()) {
+//			adpProgram.add(s);
+//		}
 	}
 
 	private class MyOnItemClickListener implements OnItemClickListener {

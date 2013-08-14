@@ -19,14 +19,15 @@
         android:text="@string/title_robotInfos"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <CheckedTextView
+    <CheckBox
         android:id="@+id/robotState"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/title"
-        android:text="@string/robotPower" />
+        android:text="@string/robotPower"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <ListView
         android:id="@+id/actualMessages"

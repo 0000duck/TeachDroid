@@ -1,16 +1,24 @@
 package com.keba.teachdroid.app;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import com.keba.kemro.kvs.teach.data.project.KvtProgram;
+import com.keba.kemro.kvs.teach.data.project.KvtProject;
+import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
+import com.keba.kemro.kvs.teach.model.KvtRoutineModel;
+import com.keba.kemro.teach.dfl.structural.routine.KRoutineFactory;
 import com.keba.teachdroid.app.BaseActivity;
 import com.keba.teachdroid.app.fragments.MasterFragment;
 import com.keba.teachdroid.app.fragments.ProgramCodeFragment;
 import com.keba.teachdroid.app.fragments.ProgramInfoFragment;
 import com.keba.teachdroid.app.fragments.InnerListFragment;
 import com.keba.teachdroid.app.fragments.InnerDetailFragment;
+import com.keba.teachdroid.data.RobotControlProxy;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -27,18 +35,21 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 	 * 
 	 */
 	private static final long serialVersionUID = -1859827857696981188L;
-	transient ViewPager mViewPager;
-	transient SectionsPagerAdapter mSectionsPagerAdapter;
+	private transient ViewPager mViewPager;
+	private transient SectionsPagerAdapter mSectionsPagerAdapter;
 
 	// dummy contents for the Pages!
-	String[] projects = { "Project1", "Project2", "Project3" };
-	Vector<String[]> programs = new Vector<String[]>();
-	Map<Integer, String> programCodes = new HashMap<Integer, String>();
-	Map<Integer, String> programInfos = new HashMap<Integer, String>();
+	// String[] projects = { "Project1", "Project2", "Project3" };
+	// Vector<String[]> programs = new Vector<String[]>();
+	private Map<Integer, String> programCodes = new HashMap<Integer, String>();
+	private Map<Integer, String> programInfos = new HashMap<Integer, String>();
 
-	int selectedProject = 0;
-	int selectedProgram = 0;
-	
+	private transient List<KvtProject> projects = RobotControlProxy.getProjects();
+	private transient List<List<KvtProgram>> programs = new Vector<List<KvtProgram>>();
+
+	private int selectedProject = 0;
+	private int selectedProgram = 0;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -74,20 +85,23 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 		mViewPager.setOffscreenPageLimit(3);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
+		for (KvtProject proj : projects) {
+			programs.add(Arrays.asList(proj.getPrograms()));
+		}
 		// dummy content building
-		String[] programs1 = { "Prog1", "Prog2", "Prog3" };
-		String[] programs2 = { "Prog44", "Prog45", "Prog46" };
-		String[] programs3 = { "Prog7", "Prog8", "Prog9" };
-		programs.add(programs1);
-		programs.add(programs2);
-		programs.add(programs3);
+		// String[] programs1 = { "Prog1", "Prog2", "Prog3" };
+		// String[] programs2 = { "Prog44", "Prog45", "Prog46" };
+		// String[] programs3 = { "Prog7", "Prog8", "Prog9" };
+		// programs.add(programs1);
+		// programs.add(programs2);
+		// programs.add(programs3);
 	}
 
-	public String[] getProjects() {
+	public List<KvtProject> getProjects() {
 		return projects;
 	}
 
-	public String[] getPrograms() {
+	public List<KvtProgram> getPrograms() {
 		return programs.get(selectedProject);
 	}
 
@@ -123,15 +137,56 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 	public void setSelectedProgram(int selectedProgram) {
 		this.selectedProgram = selectedProgram;
 		programCodes.clear();
-		programCodes.put(Integer.valueOf(0), "Project:" + projects[selectedProject] + "\nProgram:" + getPrograms()[selectedProgram] + "\nLIN(cp0)\nPTP(ap0)");
-		programCodes.put(Integer.valueOf(1), "Project:" + projects[selectedProject] + "\nProgram:" + getPrograms()[selectedProgram] + "\nLIN(cp0)\nPTP(ap0)");
-		programCodes.put(Integer.valueOf(2), "Project:" + projects[selectedProject] + "\nProgram:" + getPrograms()[selectedProgram] + "\nLIN(cp0)\nPTP(ap0)");
+		int i = 0;
+		for (KvtProgram prog : getPrograms()) {
+			StringBuffer programCode = new StringBuffer();
+			programCode.append(prog.getName() + "\n");
+
+			programCode.append(prog.getDirEntry().getDirEntryPath());
+			
+//			KRoutineFactory fact = new KRoutineFactory();
+//			fact.loadRoutines(prog.getStructProgram().getParent());
+			
+
+			// for (int j = 0; j <
+			// prog.getStructProgram().routines.getChildCount(); ++j) {
+			// programCode.append(prog.getStructProgram().routines.getChild(j).toString());
+			// }
+			programCodes.put(Integer.valueOf(i), programCode.toString());
+			i++;
+		}
+		// programCodes.put(Integer.valueOf(0), "Project:" +
+		// projects.get(selectedProject) + "\nProgram:" +
+		// getPrograms().get(selectedProgram) + "\nLIN(cp0)\nPTP(ap0)");
+		// programCodes.put(Integer.valueOf(1), "Project:" +
+		// projects.get(selectedProject) + "\nProgram:" +
+		// getPrograms().get(selectedProgram) + "\nLIN(cp0)\nPTP(ap0)");
+		// programCodes.put(Integer.valueOf(2), "Project:" +
+		// projects.get(selectedProject) + "\nProgram:" +
+		// getPrograms().get(selectedProgram) + "\nLIN(cp0)\nPTP(ap0)");
 		((ProgramCodeFragment) mSectionsPagerAdapter.getItem(1)).setProgramCode();
 
 		programInfos.clear();
-		programInfos.put(Integer.valueOf(0), "Project:" + projects[selectedProject] + "\nProgram:" + getPrograms()[selectedProgram] + "\npaused..");
-		programInfos.put(Integer.valueOf(1), "Project:" + projects[selectedProject] + "\nProgram:" + getPrograms()[selectedProgram] + "\nstopped..");
-		programInfos.put(Integer.valueOf(2), "Project:" + projects[selectedProject] + "\nProgram:" + getPrograms()[selectedProgram] + "\nrunning..");
+		i = 0;
+		for (KvtProgram prog : getPrograms()) {
+			StringBuffer programCode = new StringBuffer();
+			programCode.append("Project: " + prog.getParent().toString() + "\n");
+			programCode.append("Creation Date: " + prog.getProgramCreationDate() + "\n");
+			programCode.append("Modification Date: " + prog.getProgramModificationDate() + "\n");
+			programCode.append("Program Size: " + prog.getProgramSize() + "kB\n");
+			programCode.append("Program State: " + prog.getProgramStateString() + "\n");
+			programInfos.put(Integer.valueOf(i), programCode.toString());
+			i++;
+		}
+		// programInfos.put(Integer.valueOf(0), "Project:" +
+		// projects.get(selectedProject) + "\nProgram:" +
+		// getPrograms().get(selectedProgram) + "\npaused..");
+		// programInfos.put(Integer.valueOf(1), "Project:" +
+		// projects.get(selectedProject) + "\nProgram:" +
+		// getPrograms().get(selectedProgram) + "\nstopped..");
+		// programInfos.put(Integer.valueOf(2), "Project:" +
+		// projects.get(selectedProject) + "\nProgram:" +
+		// getPrograms().get(selectedProgram) + "\nrunning..");
 		((ProgramInfoFragment) mSectionsPagerAdapter.getItem(2)).setProgramInfo();
 
 		mViewPager.setCurrentItem(1);

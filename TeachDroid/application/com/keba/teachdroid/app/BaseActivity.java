@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -25,6 +27,13 @@ public abstract class BaseActivity extends FragmentActivity  implements Serializ
 	protected CharSequence mDrawerTitle;
 	protected CharSequence mTitle;
 	protected String[] mNavigationStrings;
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu_action_bar, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
 
 	protected void switchActivity(int position) {
 		Intent intent = null;

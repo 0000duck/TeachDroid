@@ -1,5 +1,6 @@
 package com.keba.teachdroid.app.fragments;
 
+import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.teachdroid.app.ProjectActivity;
 import com.keba.teachdroid.app.R;
 
@@ -18,7 +19,7 @@ public class InnerListFragment extends ListFragment {
 	 * clicks.
 	 */
 	private SelectionCallback mCallbacks = sDummyCallbacks;
-	
+
 	private ArrayAdapter<String> mAdapter;
 
 	/**
@@ -51,10 +52,13 @@ public class InnerListFragment extends ListFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mAdapter = new ArrayAdapter<String>(getActivity(), R.layout.default_list_item, ((ProjectActivity) getActivity()).getProjects());
+		mAdapter = new ArrayAdapter<String>(getActivity(), R.layout.default_list_item);
+		for (KvtProject p : ((ProjectActivity) getActivity()).getProjects()) {
+			mAdapter.add(p.toString());
+		}
 		setListAdapter(mAdapter);
 	}
-	
+
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);

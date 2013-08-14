@@ -1,0 +1,22 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:title="@string/action_settings"/>
+    <item
+        android:id="@+id/action_connect"
+        android:orderInCategory="101"
+        android:showAsAction="never"
+        android:title="@string/action_connect">
+    </item>
+    <item
+        android:id="@+id/action_robot"
+        android:actionViewClass="android.widget.SearchView"
+        android:icon="@drawable/ic_action_robot"
+        android:showAsAction="ifRoom|collapseActionView"
+        android:title="@string/action_robots"
+        android:hint="@string/action_robots"/>
+
+</menu>

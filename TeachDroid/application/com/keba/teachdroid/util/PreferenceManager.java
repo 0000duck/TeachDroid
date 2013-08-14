@@ -9,12 +9,13 @@ import com.keba.teachdroid.TeachdroidApplication;
 
 /**
  * @author ltz
- *
+ * 
  */
 public class PreferenceManager {
 
-	private static PreferenceManager	mInstance;
-	private SharedPreferences	mPrefs;
+	private static PreferenceManager mInstance;
+	private SharedPreferences mPrefs;
+	private String mHost = "127.0.0.1";
 
 	public static PreferenceManager getInstance() {
 		if (mInstance == null)
@@ -22,16 +23,16 @@ public class PreferenceManager {
 		return mInstance;
 	}
 
-	
-
 	protected PreferenceManager() {
 		mPrefs = android.preference.PreferenceManager.getDefaultSharedPreferences(TeachdroidApplication.getAppContext());
 	}
 
 	public String getHostname() {
+		return mPrefs.getString("hostname_ip", mHost);
+	}
 
-		// then you use
-		return mPrefs.getString("hostname_ip", "127.0.0.1");
+	public void setHostname(String _host) {
+		mHost = _host;
 	}
 
 }
