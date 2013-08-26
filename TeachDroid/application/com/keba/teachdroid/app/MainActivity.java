@@ -51,12 +51,9 @@ public class MainActivity extends BaseActivity /*
 		findViewById(R.id.fragment_prog_code_main).setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-
 				onShowProjects(v);
-
 			}
 		});
-
 		findViewById(R.id.fragment_robot_main).setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
@@ -68,11 +65,9 @@ public class MainActivity extends BaseActivity /*
 		findViewById(R.id.fragment_load_info_main).setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-//				onShowInfos(v);
-
+			// onShowInfos(v);
 			}
 		});
-
 	}
 
 	public void onShowProjects(View _v) {

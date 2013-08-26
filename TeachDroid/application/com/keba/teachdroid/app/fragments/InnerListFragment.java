@@ -68,7 +68,7 @@ public class InnerListFragment extends ListFragment {
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		// Activities containing this fragment must implement its callbacks.
+		// Activities containing this fragment must implement its Callbacks.
 		if (!(activity instanceof SelectionCallback)) {
 			Log.w("ProjectListFragment", "Activity must implement fragment's callbacks.");
 			mCallbacks = sDummyCallbacks;
@@ -79,8 +79,7 @@ public class InnerListFragment extends ListFragment {
 	@Override
 	public void onDetach() {
 		super.onDetach();
-
-		// Reset the active callbacks interface to the dummy implementation.
+		// Reset the active Callbacks interface to the dummy implementation.
 		mCallbacks = sDummyCallbacks;
 	}
 

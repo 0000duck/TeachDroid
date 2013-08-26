@@ -31,12 +31,8 @@ public class InfoAlarmFragmentMain extends Fragment {
 		View rootView = inflater.inflate(R.layout.fragment_load_info_main, container, false);
 
 		ListView listview = (ListView) rootView.findViewById(R.id.actualMessages);
-		// String[] values = new String[] { "some information", "more info",
-		// "extraordinary long infos", "some information", "more info",
-		// "extraordinary long infos", "some information", "more info",
-		// "extraordinary long infos" };
-		// ArrayAdapter<String> adp = new ArrayAdapter<String>(getActivity(),
-		// R.layout.default_list_item, values);
+
+
 		Message[] values = new Message[] { new Message("DebugMessage", MessageTypes.DEBUG), new Message("AlarmMessage", MessageTypes.ALARM), new Message("WarningMessage", MessageTypes.WARNING), new Message() };
 		MessageAdapter<Message> adp = new MessageAdapter<Message>(getActivity(), R.layout.default_list_item);
 		for (Message msg : values) {

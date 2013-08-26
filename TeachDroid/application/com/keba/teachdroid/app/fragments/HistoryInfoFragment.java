@@ -16,14 +16,13 @@ import android.widget.ListView;
 
 public class HistoryInfoFragment extends Fragment implements Serializable{
 
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = -5398636788493413524L;
 
-	private ListView list;
 	private InfoActivity  callback;
-
+	private ListView list;
+	
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View mRootView = inflater.inflate(R.layout.fragment_history_info, container, false);
