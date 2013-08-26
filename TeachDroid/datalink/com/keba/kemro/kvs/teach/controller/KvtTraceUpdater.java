@@ -232,4 +232,15 @@ public class KvtTraceUpdater implements Runnable {
 
 	}
 
+	/**
+	 * @param _host
+	 */
+	public static void connect(String _host) {
+		setHostname(_host);
+		if (mUpdater == null)
+			mUpdater = new KvtTraceUpdater();
+		mUpdater.createConnection();
+
+	}
+
 }
