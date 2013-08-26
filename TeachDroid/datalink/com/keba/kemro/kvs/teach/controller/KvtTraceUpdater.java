@@ -61,7 +61,7 @@ public class KvtTraceUpdater implements Runnable {
 	 */
 	private void createConnection() {
 		if (mHost == null)
-			throw new RuntimeException("KvtTraceUpdater: no hostname configured, call setHostname() first!");
+			throw new RuntimeException("KvtTraceUpdater: no hostname configured, call connec(<hostname>) first!");
 
 		try {
 			if (mHost.isReachable(5000)) {
