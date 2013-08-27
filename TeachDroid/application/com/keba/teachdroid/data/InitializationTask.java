@@ -5,6 +5,7 @@ package com.keba.teachdroid.data;
 
 import android.os.AsyncTask;
 
+import com.keba.kemro.kvs.teach.controller.KvtTraceUpdater;
 import com.keba.kemro.kvs.teach.data.program.KvtStatementAdministrator;
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor;
@@ -64,6 +65,8 @@ public class InitializationTask extends AsyncTask<String, Object, Boolean> {
 		KvtExecutionMonitor.init();
 		publishProgress("message service");
 		KMessageService.connect(host, 5000);
+
+		KvtTraceUpdater.connect(host);
 		RobotControlProxy.startup();
 
 		// fake progress bar :-)

@@ -4,12 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <ListView
-        android:id="@+id/traceList"
+    <TextView
+        android:id="@+id/trace_row_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:dividerHeight="0dp" >
-
-    </ListView>
+        android:clickable="false"
+        android:fontFamily="monospace"
+        android:textSize="10sp"/>
 
 </LinearLayout>

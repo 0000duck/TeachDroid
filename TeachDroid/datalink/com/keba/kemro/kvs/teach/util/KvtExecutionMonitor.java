@@ -154,21 +154,53 @@ public class KvtExecutionMonitor implements KvtTeachviewConnectionListener,
 		System.out.println("Mainflow pointer set to " + mRoutineModel.getMainFlowPointer());
 	}
 
+	/**
+	 * Reads the program sourcecode for a given Teachcontrol program. Lines are
+	 * separated with a "\n". Note that a network connection is established
+	 * within this method, so on some Operating Systems (e.g. Android) this
+	 * method must not be invoked from the UI thread!
+	 * 
+	 * @param _prog
+	 *            the {@link KvtProgram} whose source code is to be obtained
+	 * @return A newline-separated string containing the program lines
+	 */
 	public static String getTextForProgram(KvtProgram _prog) {
 
+		KvtProject p = KvtProjectAdministrator.getProject(_prog.getParent().getName());
+		_prog = p.getProgram(_prog.getName());
 		KExecUnitRoutine rout = _prog.getUnnamedExecUnitRoutine();
-		if (rout != null) {
-			mInstance.mRoutineModel.setKStructRoutine((KStructRoutine) rout.getKStructNode());
+		KStructRoutine kstructroutine = null;
 
-			int start = mInstance.mRoutineModel.getLineOfFirstStatement();
-			int lines = mInstance.mRoutineModel.getLineCount();
-			String str = "";
-			for (int i = start; i < lines; i++) {
-				str += mInstance.mRoutineModel.getLine(i);
-			}
-			return str;
+		if (rout == null) {
+			KStructProgram sp = _prog.getStructProgram();
+			KStructRoutine sr = (sp != null) ? sp.getUnNamedRoutine() : null;
+			kstructroutine = sr;
+			// if (sr != null && !sr.equals(m_structRoutine)) {
+			// m_structProgram = sp;
+			// m_structRoutine = sr;
+			// m_execRoutine = null;
+			// showRoutine();
+			// m_routineModel.setMainFlowPointer(-1);
+			// selectLine(0);
+			// } else if (m_execRoutine != null) {
+			// m_execRoutine = null;
+			// m_routineModel.setMainFlowPointer(-1);
+			// selectLine(0);
+			// }
+		} else /* (rout != null) */{
+			kstructroutine = (KStructRoutine) rout.getKStructNode();
+
 		}
-		return null;
+		mInstance.mRoutineModel.setKStructRoutine(kstructroutine);
+
+		int start = mInstance.mRoutineModel.getLineOfFirstStatement();
+		int lines = mInstance.mRoutineModel.getLineCount();
+		String str = "";
+		for (int i = start; i < lines; i++) {
+			str += mInstance.mRoutineModel.getLine(i);
+			str += "\n";
+		}
+		return str;
 
 	}
 

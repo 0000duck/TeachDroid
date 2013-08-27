@@ -14,6 +14,8 @@ import android.util.Log;
 
 import com.keba.kemro.kvs.teach.controller.KvtAlarmUpdater;
 import com.keba.kemro.kvs.teach.controller.KvtAlarmUpdater.KvtAlarmUpdaterListener;
+import com.keba.kemro.kvs.teach.controller.KvtTraceUpdater;
+import com.keba.kemro.kvs.teach.controller.KvtTraceUpdater.KvtTraceUpdateListener;
 import com.keba.kemro.kvs.teach.data.project.KvtProgram;
 import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
@@ -60,13 +62,15 @@ public class RobotControlProxy {
 	 * registering to them as a listener with the respective listener interfaces
 	 */
 	public synchronized static void startup() {
-		mDataListener = new RobotControlDataListener();
-		mDataListener.addObserver(new Observer() {
+		if (mDataListener == null) {
+			mDataListener = new RobotControlDataListener();
+			mDataListener.addObserver(new Observer() {
 
-			public void update(Observable _observable, Object _data) {
-				// Log.d(ROBOT_CONTROL_LOGTAG, _observable + " updated!");
-			}
-		});
+				public void update(Observable _observable, Object _data) {
+					// Log.d(ROBOT_CONTROL_LOGTAG, _observable + " updated!");
+				}
+			});
+		}
 
 		// add all listeners, consolidate here
 		KvtSystemCommunicator.addConnectionListener(mDataListener);
@@ -76,7 +80,7 @@ public class RobotControlProxy {
 		KvtAlarmUpdater.addListener(mDataListener);
 		KvtPositionMonitor.addListener(mDataListener);
 		KvtDriveStateMonitor.addListener(mDataListener);
-
+		KvtTraceUpdater.addListener(mDataListener);
 	}
 
 	/**
@@ -308,7 +312,7 @@ public class RobotControlProxy {
 	 */
 	private static class RobotControlDataListener extends Observable implements KvtTeachviewConnectionListener, KvtMainModeListener,
 			KvtMotionModeListener, KvtProjectAdministratorListener, KvtAlarmUpdaterListener, KvtPositionMonitorListener, KvtDriveStateListener,
-			KvtProgramStateListener {
+			KvtProgramStateListener, KvtTraceUpdateListener {
 
 		/**
 		 * reference to the data function layer
@@ -728,6 +732,15 @@ public class RobotControlProxy {
 		 * KvtPositionMonitorListener#pathVelocityChanged(float)
 		 */
 		public void pathVelocityChanged(float _velocityMms) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.keba.kemro.kvs.teach.controller.KvtTraceUpdater.
+		 * KvtTraceUpdateListener#lineReceived(java.lang.String)
+		 */
+		public void lineReceived(String _line) {
 		}
 	}
 

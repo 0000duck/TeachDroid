@@ -1,10 +1,15 @@
 package com.keba.teachdroid.app;
 
+import java.util.Date;
+
 public class Message {
-	protected MessageTypes mMessageType;
-	protected int mImageId;
-	protected String mMessageText;
-	protected boolean mConfirmed;
+	protected MessageTypes	mMessageType;
+	protected int			mImageId;
+	protected String		mMessageText;
+	protected boolean		mConfirmed;
+	private int				mId;			// corresponds to the hashcode of a
+											// KMessage
+	private java.util.Date	mDate;
 
 	public Message() {
 		this("DefaultMessage");
@@ -20,13 +25,13 @@ public class Message {
 		mConfirmed = false;
 		switch (mMessageType) {
 		case DEFAULT:
-			mImageId = R.drawable.ic_default_message;
+			mImageId = R.drawable.ic_info_message;
 			break;
 		case ALARM:
 			mImageId = R.drawable.ic_alarm_message;
 			break;
 		case WARNING:
-			mImageId = R.drawable.ic_info_message;
+			mImageId = R.drawable.ic_default_message;
 			break;
 		case DEBUG:
 			mImageId = R.drawable.ic_drawer;
@@ -49,4 +54,23 @@ public class Message {
 		return mMessageText;
 	}
 
+	public int getID() {
+		return mId;
+	};
+
+	public int getImageID() {
+		return mImageId;
+	}
+
+	public void setID(int _id) {
+		mId = _id;
+	}
+
+	public void setDate(Date _d) {
+		mDate = _d;
+	}
+
+	public Date getDate() {
+		return mDate;
+	}
 }

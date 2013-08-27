@@ -9,17 +9,22 @@ import android.widget.Toast;
 
 public class ConfirmMessageDialog extends DialogFragment {
 	private int position;
-	private MessageAdapter<Message> adp;
+
+	private MessageAdapter<Message>	adp;
 	
+	public ConfirmMessageDialog() {
+
+	}
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		
-		adp = (MessageAdapter<Message>)getArguments().getSerializable("msgadp");
+		adp = (MessageAdapter<Message>) getArguments().getSerializable("msgadp");
 		position = getArguments().getInt("position");
+
 		// Use the Builder class for convenient dialog construction
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-		builder.setMessage(R.string.dialog_confirm_message).setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+		builder.setMessage(R.string.dialog_confirm_message_title).setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				adp.remove(adp.getItem(position));
 				Toast.makeText(getActivity(), "Message confirmed!", Toast.LENGTH_SHORT).show();

@@ -6,20 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+import java.util.concurrent.ExecutionException;
 
-import com.keba.kemro.kvs.teach.data.project.KvtProgram;
-import com.keba.kemro.kvs.teach.data.project.KvtProject;
-import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
-import com.keba.kemro.kvs.teach.model.KvtRoutineModel;
-import com.keba.kemro.teach.dfl.structural.routine.KRoutineFactory;
-import com.keba.teachdroid.app.BaseActivity;
-import com.keba.teachdroid.app.fragments.MasterFragment;
-import com.keba.teachdroid.app.fragments.ProgramCodeFragment;
-import com.keba.teachdroid.app.fragments.ProgramInfoFragment;
-import com.keba.teachdroid.app.fragments.InnerListFragment;
-import com.keba.teachdroid.app.fragments.InnerDetailFragment;
-import com.keba.teachdroid.data.RobotControlProxy;
-
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -29,26 +18,36 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.keba.kemro.kvs.teach.data.project.KvtProgram;
+import com.keba.kemro.kvs.teach.data.project.KvtProject;
+import com.keba.kemro.kvs.teach.util.KvtExecutionMonitor;
+import com.keba.teachdroid.app.fragments.InnerDetailFragment;
+import com.keba.teachdroid.app.fragments.InnerListFragment;
+import com.keba.teachdroid.app.fragments.MasterFragment;
+import com.keba.teachdroid.app.fragments.ProgramCodeFragment;
+import com.keba.teachdroid.app.fragments.ProgramInfoFragment;
+import com.keba.teachdroid.data.RobotControlProxy;
+
 public class ProjectActivity extends BaseActivity implements InnerListFragment.SelectionCallback, InnerDetailFragment.SelectionCallback {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -1859827857696981188L;
-	private transient ViewPager mViewPager;
-	private transient SectionsPagerAdapter mSectionsPagerAdapter;
+	private static final long					serialVersionUID	= -1859827857696981188L;
+	private transient ViewPager					mViewPager;
+	private transient SectionsPagerAdapter		mSectionsPagerAdapter;
 
 	// dummy contents for the Pages!
 	// String[] projects = { "Project1", "Project2", "Project3" };
 	// Vector<String[]> programs = new Vector<String[]>();
-	private Map<Integer, String> programCodes = new HashMap<Integer, String>();
-	private Map<Integer, String> programInfos = new HashMap<Integer, String>();
+	private Map<Integer, String>				programCodes		= new HashMap<Integer, String>();
+	private Map<Integer, String>				programInfos		= new HashMap<Integer, String>();
 
-	private transient List<KvtProject> projects = RobotControlProxy.getProjects();
-	private transient List<List<KvtProgram>> programs = new Vector<List<KvtProgram>>();
+	private transient List<KvtProject>			projects			= RobotControlProxy.getProjects();
+	private transient List<List<KvtProgram>>	programs			= new Vector<List<KvtProgram>>();
 
-	private int selectedProject = 0;
-	private int selectedProgram = 0;
+	private int									selectedProject		= 0;
+	private int									selectedProgram		= 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +83,9 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setOffscreenPageLimit(3);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
+
+		// late-load the project list
+		projects = RobotControlProxy.getProjects();
 
 		for (KvtProject proj : projects) {
 			programs.add(Arrays.asList(proj.getPrograms()));
@@ -138,15 +140,34 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 		this.selectedProgram = selectedProgram;
 		programCodes.clear();
 		int i = 0;
-		for (KvtProgram prog : getPrograms()) {
+		for (final KvtProgram prog : getPrograms()) {
 			StringBuffer programCode = new StringBuffer();
 			programCode.append(prog.getName() + "\n");
 
-			programCode.append(prog.getDirEntry().getDirEntryPath());
-			
-//			KRoutineFactory fact = new KRoutineFactory();
-//			fact.loadRoutines(prog.getStructProgram().getParent());
-			
+			String code = null;
+			try {
+				// IMPORTANT: we need to spawn an asynctask here, because
+				// getTextForProgram() will
+				// use a network connection, which causes a
+				// NetworkOnMainthread-Exception if invoked on UI-Thread!
+				code = new AsyncTask<Void, Integer, String>() {
+
+					@Override
+					protected String doInBackground(Void... _params) {
+						return KvtExecutionMonitor.getTextForProgram(prog);
+					}
+				}.execute((Void) null).get();
+				programCode.append(code);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				programCode.append(e.getMessage());
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+				programCode.append(e.getMessage());
+			}
+
+			// KRoutineFactory fact = new KRoutineFactory();
+			// fact.loadRoutines(prog.getStructProgram().getParent());
 
 			// for (int j = 0; j <
 			// prog.getStructProgram().routines.getChildCount(); ++j) {
@@ -199,6 +220,7 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 	}
 
 	public void onProgramSelected(int id) {
+
 		setSelectedProgram(id);
 		// ((MasterFragment)
 		// mSectionsPagerAdapter.getItem(0)).detailSelected(id);
@@ -213,8 +235,8 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 		/**
 		 * 
 		 */
-		private static final long serialVersionUID = 4669970919454414915L;
-		private Fragment[] mFragments;
+		private static final long	serialVersionUID	= 4669970919454414915L;
+		private Fragment[]			mFragments;
 
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);

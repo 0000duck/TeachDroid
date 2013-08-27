@@ -35,7 +35,8 @@
     <string name="title_program_info">Program Info</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
-    <string name="dialog_confirm_message">Confirm Message?</string>
+    <string name="dialog_confirm_message_title">Confirm Message?</string>
+    <string name="dialog_confirm_message_text">Do you really want to confirm the selected message?</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
     <string-array name="navigation_array">

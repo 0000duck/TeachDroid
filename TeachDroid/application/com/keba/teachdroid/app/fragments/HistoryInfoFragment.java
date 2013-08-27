@@ -1,41 +1,27 @@
 package com.keba.teachdroid.app.fragments;
 
-import java.io.Serializable;
-import java.util.List;
-
-import com.keba.teachdroid.app.InfoActivity;
-import com.keba.teachdroid.app.R;
-
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
-public class HistoryInfoFragment extends Fragment implements Serializable{
+public class HistoryInfoFragment extends AlarmInfoFragment {
 
-	
-	private static final long serialVersionUID = -5398636788493413524L;
+	private static final long	serialVersionUID	= -4263232762352449273L;
 
-	private InfoActivity  callback;
-	private ListView list;
-	
-	
+	public HistoryInfoFragment() {
+		super();
+	}
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View mRootView = inflater.inflate(R.layout.fragment_history_info, container, false);
-
-		callback = (InfoActivity) getArguments().getSerializable("connector");
-		list = (ListView) mRootView.findViewById(R.id.historyList);
-		List<String> history = callback.getMessageHistory();
-		setAdapter(history);
-		return mRootView;
+		return super.onCreateView(inflater, container, savedInstanceState);
 	}
 
-	public void setAdapter(List<String> history) {
-		if (list != null)
-			list.setAdapter(new ArrayAdapter<String>(callback, R.layout.default_list_item, history));
+	@Override
+	public boolean appliesFilter(String _input) {
+		return false;
 	}
+
+
 }
