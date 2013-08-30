@@ -1,0 +1,1 @@
+all images in this folder were created for the application using Photoshop
