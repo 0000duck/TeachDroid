@@ -142,12 +142,12 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 		int i = 0;
 		for (final KvtProgram prog : getPrograms()) {
 			StringBuffer programCode = new StringBuffer();
-			programCode.append(prog.getName() + "\n");
+			// programCode.append(prog.getName() + "\n");
 
 			String code = null;
 			try {
 				// IMPORTANT: we need to spawn an asynctask here, because
-				// getTextForProgram() will
+				// getTextForProgram() will internally
 				// use a network connection, which causes a
 				// NetworkOnMainthread-Exception if invoked on UI-Thread!
 				code = new AsyncTask<Void, Integer, String>() {
