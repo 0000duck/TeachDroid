@@ -64,6 +64,7 @@ public class ProjectNestingFragment extends Fragment {
 				callback.setSelectedProject(position);
 			} else {
 				callback.setSelectedProgram(position);
+				
 			}
 		}
 
