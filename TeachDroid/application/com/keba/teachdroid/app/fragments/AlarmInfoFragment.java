@@ -41,7 +41,7 @@ import com.keba.teachdroid.app.Message;
 import com.keba.teachdroid.app.MessageTypes;
 import com.keba.teachdroid.app.R;
 
-public class AlarmInfoFragment extends Fragment implements Serializable, Observer {
+public class AlarmInfoFragment extends Fragment implements Serializable, Observer, KvtAlarmUpdaterListener {
 
 	/**
 	 * @author ltz
@@ -92,21 +92,28 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 				holder = (MessageHolder) row.getTag();
 			}
 
-			Message line = mData.get(_position);
-			DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
+			if (_position >= 0 && _position < mData.size()) {
+				Message line = mData.get(_position);
+				DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
 
-			holder.mDateView.setText(df.format(line.getDate()));
-			holder.mMessageText.setText(line.toString());
-			holder.mIcon.setImageResource(line.getImageID());
-
+				holder.mDateView.setText(df.format(line.getDate()));
+				holder.mMessageText.setText(line.toString());
+				holder.mIcon.setImageResource(line.getImageID());
+			}
 			return row;
 		}
 	}
 
+	/**
+	 * @deprecated Functionality has been migrated to the enclosing type,
+	 *             {@link AlarmInfoFragment}
+	 * @author ltz
+	 * 
+	 */
+	@SuppressWarnings("unused")
+	@Deprecated
 	private class MessageUpdateListener extends Observable implements Serializable, KvtAlarmUpdaterListener {
-		/**
-		 * 
-		 */
+
 		private static final long					serialVersionUID	= 7810826760470192309L;
 		/**
 		 * This list is populated as messages are reported. all past messages
@@ -120,14 +127,6 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 		 * are confirmed via a button
 		 */
 		private Hashtable<String, List<KMessage>>	mMessageQueue		= new Hashtable<String, List<KMessage>>();
-
-		// /**
-		// * three latest messages are stored here, and are removed from the
-		// list
-		// * when they are confirmed via a button
-		// */
-		// Hashtable<String, List<KMessage>> mLatestMessages = new
-		// Hashtable<String, List<KMessage>>();
 
 		public MessageUpdateListener(Observer _obs) {
 			addObserver(_obs);
@@ -231,17 +230,26 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 
 	}
 
-	private static final long		serialVersionUID	= -1436151971908046236L;
-	private ListView				mList;
-	private MessageUpdateListener	mMsgUpdaterListener;
-	private LinkedList<Message>		mMessages			= new LinkedList<Message>();
-	private MessageArrayAdapter		mAdapter;
-	private HashMap<Long, Long>	mTypeMap;
+	private static final long					serialVersionUID	= -1436151971908046236L;
+	private ListView							mList;
+	// private MessageUpdateListener mMsgUpdaterListener;
+	private LinkedList<Message>					mMessages			= new LinkedList<Message>();
+	private MessageArrayAdapter					mAdapter;
+	private HashMap<Long, Long>					mTypeMap;
+
+	private Hashtable<String, List<KMessage>>	mMessageHistory		= new Hashtable<String, List<KMessage>>();
+	private Object								mMsgHistoryLock		= new Object();
+	private Object								mMsgBufferLock		= new Object();
+	/**
+	 * new messages are stored here, and are removed from the list when they are
+	 * confirmed via a button
+	 */
+	private Hashtable<String, List<KMessage>>	mMessageQueue		= new Hashtable<String, List<KMessage>>();
 
 	public AlarmInfoFragment() {
 		initMsgTypeMap();
-		mMsgUpdaterListener = new MessageUpdateListener(this);
-		KvtAlarmUpdater.addListener(mMsgUpdaterListener);
+		// mMsgUpdaterListener = new MessageUpdateListener(this);
+		KvtAlarmUpdater.addListener(this);
 
 	}
 
@@ -270,7 +278,6 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 							public void onClick(DialogInterface dialog, int id) {
 								Message m = mMessages.get(_position);
 
-
 								boolean success = false;
 								if (m != null) {
 									try {
@@ -279,7 +286,8 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 											@Override
 											protected Boolean doInBackground(Message... _params) {
 												KMessage toConfirm = findInQueue(_params[0]);
-												return toConfirm.quitMessage();
+
+												return toConfirm != null ? toConfirm.quitMessage() : false;
 											}
 										}.execute(m).get();
 									} catch (InterruptedException e) {
@@ -287,7 +295,6 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 									} catch (Exception e) {
 										e.printStackTrace();
 									}
-
 
 								}
 								Log.i("AlarmInfoFragment", "confirming was " + (success ? "successful" : "unsuccessful"));
@@ -316,7 +323,7 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 	private KMessage findInQueue(Message _m) {
 		int hash = _m.getID();
 
-		for (List<KMessage> curBuffer : mMsgUpdaterListener.mMessageQueue.values()) {
+		for (List<KMessage> curBuffer : /* mMsgUpdaterListener. */mMessageQueue.values()) {
 			for (KMessage msg : curBuffer) {
 				if (msg.hashCode() == hash)
 					return msg;
@@ -334,7 +341,7 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 	 */
 	public void update(Observable _observable, Object _data) {
 
-		if (_observable == mMsgUpdaterListener && _data != null && _data instanceof KMessage) {
+		if (/* _observable == mMsgUpdaterListener && */_data != null && _data instanceof KMessage) {
 			String text = _data.toString();
 			KMessage km = (KMessage) _data;
 			final Message m = new Message(text, getMessageType(km));
@@ -395,4 +402,97 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 	protected boolean appliesFilter(String _input) {
 		return _input.equals("Info");
 	}
+
+	public void messageUpdated(int lastMessageType, Object lastMessage) {
+		// do nothing
+	}
+
+	public void messageAdded(String _bufferName, KMessage _msg) {
+
+		// add to unmodifiable history queue
+		synchronized (mMsgHistoryLock) {
+			List<KMessage> h = mMessageHistory.get(_bufferName);
+			if (h == null) {
+				mMessageHistory.put(_bufferName, new Vector<KMessage>());
+				h = mMessageHistory.get(_bufferName);
+			}
+			if (h != null) {
+				h.add(_msg);
+			}
+
+		}
+
+		// add to temporary message buffer
+		synchronized (mMsgBufferLock) {
+			List<KMessage> q = mMessageQueue.get(_bufferName);
+			if (q == null) {
+				mMessageQueue.put(_bufferName, new Vector<KMessage>());
+				q = mMessageQueue.get(_bufferName);
+			}
+			if (q != null) {
+				q.add(_msg);
+			}
+		}
+
+		// set the last message
+		// if (_bufferName.contains("RC"))
+		// mLastMessage = _msg;
+		// else
+		// mLastMessage = null;
+
+		if (!appliesFilter(_bufferName)) {
+			update(null, _msg);
+		}
+
+	}
+
+	public void messageRemoved(String _bufferName, KMessage _msg) {
+		synchronized (mMsgBufferLock) {
+			// remove message from queue
+			List<KMessage> q = mMessageQueue.get(_bufferName);
+			if (q != null)
+				q.remove(_msg);
+
+			// update last message
+			// if (q != null && !q.isEmpty() && _bufferName.contains("RC"))
+			// {
+			// mLastMessage = q.get(0);
+			// } else
+			// mLastMessage = null;
+		}
+
+		List<Message> toRemove = new ArrayList<Message>();
+
+		for (Message m : mMessages) {
+			if (m.getID() == _msg.hashCode()) {
+				// mMessages.remove(m); //will provoke a
+				// ConcurrentModificationException
+				toRemove.add(m);
+			}
+		}
+
+		mMessages.removeAll(toRemove);
+		update(null, _msg);
+
+	}
+
+	public void messageChanged(String _bufferName, KMessage _msg) {
+
+		messageRemoved(_bufferName, _msg); // first remove the message...
+		synchronized (mMsgBufferLock) {
+			List<KMessage> q = mMessageQueue.get(_bufferName);
+			if (q == null) {
+				mMessageQueue.put(_bufferName, new Vector<KMessage>());
+				q = mMessageQueue.get(_bufferName);
+			}
+			if (q != null) {
+				q.add(_msg);
+			}
+
+		}
+		if (!appliesFilter(_bufferName)) {
+			update(null, _msg);
+		}
+	}
+
 }
