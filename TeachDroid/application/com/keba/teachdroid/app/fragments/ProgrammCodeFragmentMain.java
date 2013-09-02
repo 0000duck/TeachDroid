@@ -12,7 +12,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.keba.kemro.kvs.teach.data.project.KvtProgram;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtOverrideChangedListener;
 import com.keba.kemro.kvs.teach.util.KvtProgramStateMonitor;
@@ -41,9 +40,9 @@ public class ProgrammCodeFragmentMain extends Fragment implements KvtProgramStat
 
 		// label for the loaded program's name
 		mProgName = (TextView) rootView.findViewById(R.id.programNameLabel);
-		KvtProgram p = RobotControlProxy.getLoadedProgram();
-		if (p != null)
-			loadedProgramNameChanged(p.getName());
+		// KvtProgram p = RobotControlProxy.getLoadedProgram();
+		// if (p != null)
+		// loadedProgramNameChanged(p.getName());
 
 		// label for the project name
 		mProgMode = (TextView) rootView.findViewById(R.id.programModeLabel);

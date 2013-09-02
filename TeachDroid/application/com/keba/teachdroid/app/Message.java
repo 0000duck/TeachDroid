@@ -1,6 +1,9 @@
 package com.keba.teachdroid.app;
 
 import java.util.Date;
+import java.util.HashMap;
+
+import com.keba.kemro.serviceclient.alarm.KMessage;
 
 public class Message {
 	protected MessageTypes	mMessageType;
@@ -11,15 +14,19 @@ public class Message {
 											// KMessage
 	private java.util.Date	mDate;
 
+	private KMessage		mRawData;
+
+	static {
+		initMsgTypeMap();
+	}
+
+	@Deprecated
 	public Message() {
-		this("DefaultMessage");
+		this("NO_TEXT", MessageTypes.DEFAULT);
 	}
 
-	public Message(String _msgText) {
-		this(_msgText, MessageTypes.DEFAULT);
-	}
 
-	public Message(String _msgText, MessageTypes _msgType) {
+	private Message(String _msgText, MessageTypes _msgType) {
 		mMessageText = _msgText;
 		mMessageType = _msgType;
 		mConfirmed = false;
@@ -41,9 +48,60 @@ public class Message {
 		}
 	}
 
+	/**
+	 * @param _rawMessage
+	 */
+	public Message(KMessage _rawMessage) {
+		this(_rawMessage.toString(), getMessageType(_rawMessage));
+		mRawData = _rawMessage;
+		setID(_rawMessage.hashCode());
+		setDate(new Date(_rawMessage.getTimeMSec()));
+	}
+
 	public boolean getConfirmed() {
 		return mConfirmed;
 	}
+
+	private static MessageTypes getMessageType(KMessage _data) {
+		long classId = _data.getBuffer().getClassId() & 0xFFFFFFFFL;
+		if (classId < -1) {
+			classId = -2L * classId + 1L;
+		}
+
+		classId = mTypeMap.get(classId);
+
+		// if (classId > 32)
+		// return MessageTypes.DEFAULT;
+
+		switch ((int) classId) {
+		case 1:
+		case 2:
+		case 3:
+		case 6:
+		case 7:
+		case 10:
+			return MessageTypes.ALARM;
+		case 4:
+		case 8:
+		case 11:
+			return MessageTypes.WARNING;
+
+		default:
+			return MessageTypes.DEFAULT;
+		}
+	}
+
+	private static void initMsgTypeMap() {
+		mTypeMap = new HashMap<Long, Long>();
+
+		for (long i = 1; i <= 32; i++) {
+			mTypeMap.put(i, i);
+			mTypeMap.put((1L << (i - 1)), i);
+		}
+	}
+
+	private static HashMap<Long, Long>	mTypeMap;
+
 
 	public void setConfirmed(boolean _confirmed) {
 		mConfirmed = _confirmed;
@@ -62,11 +120,11 @@ public class Message {
 		return mImageId;
 	}
 
-	public void setID(int _id) {
+	protected void setID(int _id) {
 		mId = _id;
 	}
 
-	public void setDate(Date _d) {
+	protected void setDate(Date _d) {
 		mDate = _d;
 	}
 

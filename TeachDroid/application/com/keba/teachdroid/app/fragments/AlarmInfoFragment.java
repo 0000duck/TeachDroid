@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +19,6 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,8 +35,8 @@ import com.keba.kemro.kvs.teach.controller.KvtAlarmUpdater.KvtAlarmUpdaterListen
 import com.keba.kemro.kvs.teach.util.Log;
 import com.keba.kemro.serviceclient.alarm.KMessage;
 import com.keba.teachdroid.app.Message;
-import com.keba.teachdroid.app.MessageTypes;
 import com.keba.teachdroid.app.R;
+import com.keba.teachdroid.data.RobotControlProxy;
 
 public class AlarmInfoFragment extends Fragment implements Serializable, Observer, KvtAlarmUpdaterListener {
 
@@ -235,7 +232,6 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 	// private MessageUpdateListener mMsgUpdaterListener;
 	private LinkedList<Message>					mMessages			= new LinkedList<Message>();
 	private MessageArrayAdapter					mAdapter;
-	private HashMap<Long, Long>					mTypeMap;
 
 	private Hashtable<String, List<KMessage>>	mMessageHistory		= new Hashtable<String, List<KMessage>>();
 	private Object								mMsgHistoryLock		= new Object();
@@ -247,7 +243,7 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 	private Hashtable<String, List<KMessage>>	mMessageQueue		= new Hashtable<String, List<KMessage>>();
 
 	public AlarmInfoFragment() {
-		initMsgTypeMap();
+
 		// mMsgUpdaterListener = new MessageUpdateListener(this);
 		KvtAlarmUpdater.addListener(this);
 
@@ -257,6 +253,8 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View mRootView = inflater.inflate(R.layout.fragment_alarm_info, container, false);
 		mList = (ListView) mRootView.findViewById(R.id.alarmList);
+
+		mMessages.addAll(RobotControlProxy.getMessageBacklog());
 
 		mAdapter = new MessageArrayAdapter(getActivity(), R.layout.fragment_alarm_row_layout, mMessages);
 		// mAdapter = new MessageAdapter<Message>(getActivity(),
@@ -342,61 +340,25 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 	public void update(Observable _observable, Object _data) {
 
 		if (/* _observable == mMsgUpdaterListener && */_data != null && _data instanceof KMessage) {
-			String text = _data.toString();
 			KMessage km = (KMessage) _data;
-			final Message m = new Message(text, getMessageType(km));
+			// final Message m = new Message(text, getMessageType(km));
+			final Message m = new Message(km);
 
-			m.setID(km.hashCode());
-			m.setDate(new Date(km.getTimeMSec()));
+			// m.setID(km.hashCode());
+			// m.setDate(new Date(km.getTimeMSec()));
 			mMessages.offerFirst(m);
 		}
-		Handler mainLooper = new Handler(Looper.getMainLooper());
-		mainLooper.post(new Runnable() {
+		if (getActivity() != null) {
+			Handler mainLooper = new Handler(getActivity().getMainLooper());
+			mainLooper.post(new Runnable() {
 
-			public void run() {
-				mAdapter.notifyDataSetChanged();
-				mList.invalidate();
-			}
-		});
-
-	}
-
-	private MessageTypes getMessageType(KMessage _data) {
-		long classId = _data.getBuffer().getClassId() & 0xFFFFFFFFL;
-		if (classId < -1) {
-			classId = -2L * classId + 1L;
+				public void run() {
+					mAdapter.notifyDataSetChanged();
+					mList.invalidate();
+				}
+			});
 		}
 
-		classId = mTypeMap.get(classId);
-
-		// if (classId > 32)
-		// return MessageTypes.DEFAULT;
-
-		switch ((int) classId) {
-		case 1:
-		case 2:
-		case 3:
-		case 6:
-		case 7:
-		case 10:
-			return MessageTypes.ALARM;
-		case 4:
-		case 8:
-		case 11:
-			return MessageTypes.WARNING;
-
-		default:
-			return MessageTypes.DEFAULT;
-		}
-	}
-
-	private void initMsgTypeMap() {
-		mTypeMap = new HashMap<Long, Long>();
-
-		for (long i = 1; i <= 32; i++) {
-			mTypeMap.put(i, i);
-			mTypeMap.put((1L << (i - 1)), i);
-		}
 	}
 
 	protected boolean appliesFilter(String _input) {
@@ -472,7 +434,7 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 		}
 
 		mMessages.removeAll(toRemove);
-		update(null, _msg);
+		update(null, null);
 
 	}
 

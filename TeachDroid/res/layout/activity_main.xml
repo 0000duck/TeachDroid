@@ -1,12 +1,47 @@
 <android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
     <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:columnCount="6"
+        android:rowCount="6" >
+
+        <fragment
+            android:id="@+id/fragment_robot_main"
+            android:name="com.keba.teachdroid.app.fragments.RobotFragmentMain"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            tools:layout="@layout/fragment_robot_main" />
+
+        <fragment
+            android:id="@+id/fragment_prog_code_main"
+            android:name="com.keba.teachdroid.app.fragments.ProgrammCodeFragmentMain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/fragment_robot_main"
+            android:layout_alignRight="@+id/fragment_robot_main"
+            android:layout_below="@+id/fragment_robot_main"
+            android:layout_marginTop="10dp"
+            tools:layout="@layout/fragment_prog_code_main" />
+
+        <fragment
+            android:id="@+id/fragment_load_info_main"
+            android:name="com.keba.teachdroid.app.fragments.InfoAlarmFragmentMain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/imageView2"
+            android:layout_alignRight="@+id/imageView2"
+            android:layout_alignTop="@+id/fragment_robot_main"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/fragment_prog_code_main"
+            tools:layout="@layout/fragment_load_info_main" />
 
         <ImageView
             android:id="@+id/imageView2"
@@ -14,41 +49,11 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_marginRight="10dp"
+            android:contentDescription="logo"
             android:src="@drawable/logo" />
-
-        <fragment
-            android:id="@+id/fragment_load_info_main"
-            android:name="com.keba.teachdroid.app.fragments.InfoAlarmFragmentMain"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/fragment_robot_main"
-            android:layout_alignTop="@+id/fragment_robot_main"
-            android:layout_above="@+id/imageView2"
-            android:layout_marginBottom="15dp"
-            android:layout_marginLeft="10dp" />
-
-        <fragment
-            android:id="@+id/fragment_prog_code_main"
-            android:name="com.keba.teachdroid.app.fragments.ProgrammCodeFragmentMain"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/imageView2"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="15dp" />
-
-        <fragment
-            android:id="@+id/fragment_robot_main"
-            android:name="com.keba.teachdroid.app.fragments.RobotFragmentMain"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_alignRight="@+id/fragment_prog_code_main"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp" />
     </RelativeLayout>
 
     <ListView

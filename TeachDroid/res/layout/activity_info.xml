@@ -20,7 +20,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top"
-                android:background="#57a639"
+                android:background="@color/info_main_red"
                 android:paddingBottom="4dp"
                 android:paddingTop="4dp"
                 android:textColor="#fff" />

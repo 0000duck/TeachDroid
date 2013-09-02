@@ -1,13 +1,13 @@
 package com.keba.teachdroid.app;
 
-import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor;
 
 public class MainActivity extends BaseActivity /*
 												 * implements
@@ -65,7 +65,7 @@ public class MainActivity extends BaseActivity /*
 		findViewById(R.id.fragment_load_info_main).setOnClickListener(new View.OnClickListener() {
 
 			public void onClick(View v) {
-			// onShowInfos(v);
+				onShowInfos(v);
 			}
 		});
 	}

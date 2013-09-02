@@ -2,4 +2,7 @@
 <resources>
     <color name="kebagreen">#57a639</color>
     <color name="pc_background">#E6E6E6</color>
+    <color name="robot_main_orange">#FFCC00</color>
+    <color name="program_main_blue">#5FDFFF</color>
+    <color name="info_main_red">#FF2E2E</color>
 </resources>

@@ -37,6 +37,7 @@ import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
 import com.keba.kemro.kvs.teach.util.KvtTeachviewConnectionListener;
 import com.keba.kemro.serviceclient.alarm.KMessage;
 import com.keba.kemro.teach.dfl.KTcDfl;
+import com.keba.teachdroid.app.Message;
 
 /**
  * Class that administers all data related to the robot controller, such as
@@ -109,15 +110,15 @@ public class RobotControlProxy {
 	 * @return a list of strings, each of which contains one RC/MCU message (no
 	 *         Info-Traces!)
 	 */
-	public static List<String> getMessageBacklog() {
+	public static List<Message> getMessageBacklog() {
 		//
-		final List<String> list = new Vector<String>();
+		final List<Message> list = new Vector<Message>();
 
 		try {
-			return new AsyncTask<Void, Void, List<String>>() {
+			return new AsyncTask<Void, Void, List<Message>>() {
 
 				@Override
-				protected List<String> doInBackground(Void... _params) {
+				protected List<Message> doInBackground(Void... _params) {
 					String filter = "RC";
 
 					Set<Entry<String, List<KMessage>>> s = mDataListener.mMessageQueue.entrySet();
@@ -126,14 +127,12 @@ public class RobotControlProxy {
 						if (e.getKey().contains(filter)) {
 
 							for (KMessage msg : e.getValue()) {
-								list.add(msg.toString());
+								list.add(new Message(msg));
 							}
-
-							return list;
 
 						}
 					}
-					return null;
+					return list;
 				}
 			}.execute((Void) null).get();
 		} catch (InterruptedException e) {

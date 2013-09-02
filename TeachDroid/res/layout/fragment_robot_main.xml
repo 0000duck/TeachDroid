@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:background="@android:color/holo_orange_light"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:background="@color/robot_main_orange" >
 
     <ImageView
         android:id="@+id/imageView1"
@@ -10,29 +10,43 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="8dp"
+        android:layout_marginBottom="10dp"
         android:layout_marginRight="25dp"
+        android:layout_marginTop="8dp"
         android:src="@drawable/robot_small" />
 
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/textView1"
-        android:layout_below="@+id/textView1"
-        android:layout_marginTop="16dp"
-        android:text="Medium Text"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+    <!-- <TextView -->
+    <!-- android:id="@+id/refsysLabel" -->
+    <!-- android:layout_width="wrap_content" -->
+    <!-- android:layout_height="wrap_content" -->
+    <!-- android:layout_alignRight="@+id/robotNameLabel" -->
+    <!-- android:layout_below="@+id/robotNameLabel" -->
+    <!-- android:layout_marginTop="16dp" -->
+    <!-- android:layout_marginRight="5dp" -->
+    <!-- android:text="Medium Text" -->
+    <!-- android:textAppearance="?android:attr/textAppearanceMedium" /> -->
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/robotNameLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/imageView1"
         android:layout_alignTop="@+id/imageView1"
         android:layout_marginLeft="69dp"
+        android:layout_marginRight="5dp"
         android:layout_marginTop="42dp"
-        android:text="Large Text"
+        android:text="RobotName"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <CheckBox
+        android:id="@+id/robotPower"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/robotNameLabel"
+        android:layout_below="@+id/robotNameLabel"
+        android:layout_marginTop="17dp"
+        android:text="@string/robotPower"
+        android:clickable="false"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </RelativeLayout>
