@@ -54,6 +54,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	private float									mOldOvr;
 
 	private static List<KvtPositionMonitorListener>	mListeners					= new Vector<KvtPositionMonitor.KvtPositionMonitorListener>();
+	private static List<KvtOverrideChangedListener>	mOverrideListeners			= new Vector<KvtPositionMonitor.KvtOverrideChangedListener>();
 	private static Object							mInstancelock				= new Object();
 
 	public static void init() {
@@ -97,7 +98,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 			float ovt = ((Number) _variable.readActualValue(null)).floatValue();
 			if (ovt != mOldOvr) {
 				mOldOvr = ovt;
-				for (KvtPositionMonitorListener l : mListeners)
+				for (KvtOverrideChangedListener l : mOverrideListeners)
 					l.overrideChanged(ovt / 10);
 			}
 		}
@@ -295,8 +296,23 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 			mListeners.add(_listener);
 	}
 
+	public synchronized static void addListener(KvtOverrideChangedListener _listener) {
+		if (mOverrideListeners == null)
+			mOverrideListeners = new Vector<KvtPositionMonitor.KvtOverrideChangedListener>();
+		if (!mOverrideListeners.contains(_listener))
+			mOverrideListeners.add(_listener);
+	}
+
 	public synchronized static void removeListener(KvtPositionMonitorListener _listener) {
 		mListeners.remove(_listener);
+	}
+
+	public synchronized static void removeListener(KvtOverrideChangedListener _listener) {
+		mOverrideListeners.remove(_listener);
+	}
+
+	public static interface KvtOverrideChangedListener {
+		public void overrideChanged(Number _override);
 	}
 
 	public static interface KvtPositionMonitorListener {
@@ -309,8 +325,6 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 		public void pathVelocityChanged(float _velocityMms);
 
 		public void axisPositionChanged(int axisNo, Number _value, String _axisName);
-
-		public void overrideChanged(Number _override);
 
 		/**
 		 * Called when the robot's geometric frame of reference has changed

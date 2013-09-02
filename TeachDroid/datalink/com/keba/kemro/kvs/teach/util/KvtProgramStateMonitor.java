@@ -98,22 +98,37 @@ public class KvtProgramStateMonitor implements KvtTeachviewConnectionListener, K
 	private static List<KvtProgramStateListener>	mListeners					= new Vector<KvtProgramStateListener>();
 
 	/**
-	 * enumeration type for the program mode
+	 * enumeration type for the program mode, i.e. in which execution mode the
+	 * program is, such as stepping, continuous, etc.
 	 * 
 	 * @author ltz
 	 * 
 	 */
 	public static enum ProgramMode {
-		eProgModeNoProg, eProgModeContinous, eProgModeInterpreterStep, eProgModeMotionStep, eProgModeBackward, eMotionStepMax;
+
+		eProgModeNoProg("N/A"), eProgModeContinous("CONT"), eProgModeInterpreterStep("STEP"), eProgModeMotionStep("MSTEP"), eProgModeBackward(
+				"BACK"), eMotionStepMax("STEMPAX");
+
+		private String	mStringValue;
+
+		private ProgramMode(String _val) {
+			this.mStringValue=_val;
+		}
+
 		private static ProgramMode[]	allValues	= values();
 
 		public static ProgramMode fromOrdinal(int n) {
 			return allValues[n];
 		}
+
+		@Override
+		public String toString() {
+			return mStringValue;
+		}
 	};
 
 	/**
-	 * enumeration type for the program state
+	 * enumeration type for the program state, i.e. running, stopped, etc.
 	 * 
 	 * @author ltz
 	 * 
@@ -202,8 +217,9 @@ public class KvtProgramStateMonitor implements KvtTeachviewConnectionListener, K
 
 			createVariables();
 
-			mVarGroup.setPollInterval(100);
+			// mVarGroup.setPollInterval(100);
 			mVarGroup.activate();
+
 		}
 	}
 

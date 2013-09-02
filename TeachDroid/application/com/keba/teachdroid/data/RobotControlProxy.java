@@ -339,8 +339,8 @@ public class RobotControlProxy {
 		private String								mChosenRefsys;
 		private String								mToolName;
 		private boolean								mIsAnyProgRunning;
-		private ProgramState						mProgState;
-		private ProgramMode							mProgMode;
+		private ProgramState						mProgState			= null;
+		private ProgramMode							mProgMode			= null;
 		private String								mLoadedProgram;
 		private Boolean								mDrivesRerenced;
 		private Boolean								mDrivesReady;

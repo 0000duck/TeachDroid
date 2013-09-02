@@ -1,7 +1,8 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="horizontal" >
+    android:background="@android:color/holo_red_light"
+    android:orientation="vertical" >
 
     <!-- <ListView -->
     <!-- android:id="@+id/infoListView" -->
@@ -13,27 +14,20 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:text="@string/title_robotInfos"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <CheckBox
-        android:id="@+id/robotState"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/title"
-        android:text="@string/robotPower"
+        android:text="@string/title_section_alarms"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <ListView
         android:id="@+id/actualMessages"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/robotState" />
+/>
 
-</RelativeLayout>
+    <CheckBox
+        android:id="@+id/robotPower"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/robotPower"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+</LinearLayout>

@@ -42,7 +42,7 @@ public class InfoAlarmFragmentMain extends Fragment implements KvtDriveStateList
 			adp.add(msg);
 		}
 
-		cb = (CheckBox)rootView.findViewById(R.id.robotState);
+		cb = (CheckBox)rootView.findViewById(R.id.robotPower);
 		cb.setClickable(false);
 		cb.setChecked(RobotControlProxy.drivesPower());
 
@@ -84,6 +84,8 @@ public class InfoAlarmFragmentMain extends Fragment implements KvtDriveStateList
 	 */
 	public void drivePowerChanged(final boolean _hasPower) {
 		// need a handler task to execute UI modifications
+		if (getActivity() == null)
+			return;
 		Handler h = new Handler(getActivity().getMainLooper());
 		h.post(new Runnable() {
 

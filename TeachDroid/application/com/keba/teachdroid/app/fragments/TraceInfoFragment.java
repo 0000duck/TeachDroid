@@ -119,6 +119,9 @@ public class TraceInfoFragment extends Fragment implements KvtTraceUpdateListene
 	 */
 	public void lineReceived(final String _line) {
 
+		if (getActivity() == null)
+			return;
+
 		// need to run on the main looper thread, otherwise an exception will be
 		// hurled in your face
 		Handler refresh = new Handler(Looper.getMainLooper());
