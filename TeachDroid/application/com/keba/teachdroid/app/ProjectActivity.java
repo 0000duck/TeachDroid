@@ -21,7 +21,9 @@ import android.widget.ListView;
 
 import com.keba.kemro.kvs.teach.data.project.KvtProgram;
 import com.keba.kemro.kvs.teach.data.project.KvtProject;
+import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtExecutionMonitor;
+import com.keba.kemro.kvs.teach.util.Log;
 import com.keba.teachdroid.app.fragments.InnerDetailFragment;
 import com.keba.teachdroid.app.fragments.InnerListFragment;
 import com.keba.teachdroid.app.fragments.MasterFragment;
@@ -185,8 +187,23 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 
 				@Override
 				protected String doInBackground(Void... _params) {
-					String code = KvtExecutionMonitor.getTextForProgram(prog);
-					return code;
+					// String code =
+					// KvtExecutionMonitor.getTextForProgram(prog);
+					// return code;
+
+					KvtProject parent = prog.getParent();
+					boolean isBuilt = true;
+					if (parent != null) {
+						if (parent.getProjectState() <= KvtProject.NOT_BUILDED) {
+							isBuilt = KvtProjectAdministrator.build(parent);
+							Log.d("ProjectActivity", "building project \"" + parent.getName() + "\" was "
+									+ (isBuilt ? "successful" : "not successful"));
+						}
+					} else
+						throw new IllegalStateException("Parent project of program \"" + prog.getName() + "\" could not be obtained!");
+					if (isBuilt)
+						return KvtExecutionMonitor.getTextForProgram(prog);
+					return null;
 				}
 
 				@Override
