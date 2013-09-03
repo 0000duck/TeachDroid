@@ -21,6 +21,9 @@
     <string name="hint_ip_address">IP Address of PLC</string>
     <string name="toolname_prompt">Select tool</string>
     <string name="refsysname_prompt">Select RefSys</string>
+    <string name="axis_position">Axis Position</string>
+    <string name="cartesian_position">Cartesian Position</string>
+    <string name="default_robot_name">ArtarmTX60L</string>
     <string name="title_project_list">Projects</string>
     <string name="title_project_detail">Project Detail</string>
     <string name="title_section_connect">Connection</string>
@@ -30,6 +33,10 @@
     <string name="title_section_trace">Trace</string>
     <string name="title_section_alarms">Pending Alarms</string>
     <string name="title_section_history">Alarm History</string>
+    <string name="title_robot">Robot</string>
+    <string name="title_section_refsys_tool">Refsys/Tool</string>
+    <string name="title_section_robot_overview">Overview</string>
+    <string name="title_section_robot_detail">Details</string>
     <string name="program_code_dummy">LIN(cp0)\nDyn(d0)\n</string>
     <string name="title_section_program_code">Program Code</string>
     <string name="title_program_info">Program Info</string>

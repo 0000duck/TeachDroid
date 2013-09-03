@@ -44,6 +44,9 @@ public abstract class BaseActivity extends FragmentActivity  implements Serializ
 			}
 			break;
 		case 1:
+			if (!(this instanceof RobotActivity)) {
+				intent = new Intent(getBaseContext(), RobotActivity.class);
+			}
 			break;
 		case 2:
 			if (!(this instanceof InfoActivity)) {

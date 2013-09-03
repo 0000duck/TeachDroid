@@ -22,12 +22,16 @@ import com.keba.kemro.teach.dfl.value.KVariableGroupListener;
  */
 public class KvtMainModeAdministrator implements KMultikinematicListener, KVariableGroupListener, KvtTeachviewConnectionListener {
 
+
+
 	private final Object						m_dlfLock			= new Object();
 	private int									m_actualMainMode	= -1;
 	private int									mSafetyState		= -1;
 
+
 	private static KVariableGroup				mVarGroup;
 	private static KStructVarWrapper			mMainModeVar;
+
 
 	private static KStructVarWrapper			mSafetyStateVar;
 	private static KvtMainModeAdministrator		instance;
@@ -110,11 +114,15 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 			}
 		}
 
+
 	}
+
 
 	public static SafetyState getSafetyState() {
 		return SafetyState.fromOrdinal(instance.mSafetyState);
 	}
+
+
 
 	/*
 	 * (non-Javadoc)
@@ -157,11 +165,18 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 								+ "].selectedMainMode");
 					}
 
+
+
+
+
 					mSafetyStateVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcData.userIcon[4]");
 
 					if (mMainModeVar != null) {
 						mVarGroup.add(mMainModeVar);
 					}
+
+
+
 
 					if (mSafetyStateVar != null) {
 						mVarGroup.add(mSafetyStateVar);

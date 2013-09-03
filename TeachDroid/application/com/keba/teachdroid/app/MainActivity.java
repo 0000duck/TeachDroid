@@ -1,5 +1,7 @@
 package com.keba.teachdroid.app;
 
+import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -58,7 +60,7 @@ public class MainActivity extends BaseActivity /*
 
 			public void onClick(View v) {
 				onShowPositions(v);
-				KvtDriveStateMonitor.toggleDrivesPower();
+//				KvtDriveStateMonitor.toggleDrivesPower();
 			}
 		});
 
@@ -76,7 +78,8 @@ public class MainActivity extends BaseActivity /*
 	}
 
 	public void onShowPositions(View _v) {
-		// TODO implement
+		Intent robotActivity = new Intent(this, RobotActivity.class);
+		startActivity(robotActivity);
 	}
 
 	public void onShowInfos(View _v) {
