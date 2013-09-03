@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Vector;
@@ -65,7 +66,9 @@ public class KvtTraceUpdater implements Runnable {
 
 		try {
 			if (mHost.isReachable(5000)) {
-				mClientSocket = new Socket(mHost, mTcpPort);
+				// mClientSocket = new Socket(mHost, mTcpPort);
+				mClientSocket = new Socket();
+				mClientSocket.connect(new InetSocketAddress(mHost, mTcpPort), 2000);
 
 				mListenerThread = new Thread(this, getClass().getSimpleName());
 				mListenerThread.start();
@@ -192,6 +195,13 @@ public class KvtTraceUpdater implements Runnable {
 
 		InputStream netStream = null;
 		boolean initialMessage = true;
+
+		if (!mClientSocket.isConnected()) {
+			for (KvtTraceUpdateListener l : mListeners) {
+				l.lineReceived("No connection to the trace server established! Maybe another Client is already connected?");
+			}
+			return;
+		}
 
 		try {
 			netStream = mClientSocket.getInputStream();
