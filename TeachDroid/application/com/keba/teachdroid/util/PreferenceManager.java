@@ -15,7 +15,7 @@ public class PreferenceManager {
 
 	private static PreferenceManager mInstance;
 	private SharedPreferences mPrefs;
-	private String mHost = "127.0.0.1";
+	private String mHost = "10.0.0.5";
 
 	public static PreferenceManager getInstance() {
 		if (mInstance == null)

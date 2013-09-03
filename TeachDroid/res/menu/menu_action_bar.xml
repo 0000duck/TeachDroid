@@ -11,12 +11,12 @@
         android:showAsAction="never"
         android:title="@string/action_connect">
     </item>
-    <item
-        android:id="@+id/action_robot"
-        android:actionViewClass="android.widget.SearchView"
-        android:icon="@drawable/ic_action_robot"
-        android:showAsAction="ifRoom|collapseActionView"
-        android:title="@string/action_robots"
-        android:hint="@string/action_robots"/>
+<!--     <item -->
+<!--         android:id="@+id/action_robot" -->
+<!--         android:actionViewClass="android.widget.SearchView" -->
+<!--         android:icon="@drawable/ic_action_robot" -->
+<!--         android:showAsAction="ifRoom|collapseActionView" -->
+<!--         android:title="@string/action_robots" -->
+<!--         android:hint="@string/action_robots"/> -->
 
 </menu>

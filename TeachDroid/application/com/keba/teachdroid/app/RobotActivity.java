@@ -107,11 +107,11 @@ public class RobotActivity extends BaseActivity {
 		public CharSequence getPageTitle(int position) {
 			switch (position) {
 			case 0:
-				return getString(R.string.title_project_list);
+				return getString(R.string.title_section_refsys_tool);
 			case 1:
-				return getString(R.string.title_section_program_code);
+				return getString(R.string.title_section_robot_overview);
 			case 2:
-				return getString(R.string.title_program_info);
+				return getString(R.string.title_section_robot_detail);
 			default:
 				return "NOT_DEFINED_" + position;
 			}

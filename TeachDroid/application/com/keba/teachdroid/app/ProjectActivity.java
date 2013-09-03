@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -33,21 +34,22 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 	/**
 	 * 
 	 */
-	private static final long					serialVersionUID	= -1859827857696981188L;
-	private transient ViewPager					mViewPager;
-	private transient SectionsPagerAdapter		mSectionsPagerAdapter;
+	private static final long serialVersionUID = -1859827857696981188L;
+	private transient ViewPager mViewPager;
+	private transient SectionsPagerAdapter mSectionsPagerAdapter;
+	private transient ProgressDialog m_dlg;
 
 	// dummy contents for the Pages!
 	// String[] projects = { "Project1", "Project2", "Project3" };
 	// Vector<String[]> programs = new Vector<String[]>();
-	private Map<Integer, String>				programCodes		= new HashMap<Integer, String>();
-	private Map<Integer, String>				programInfos		= new HashMap<Integer, String>();
+	private Map<Integer, String> programCodes = new HashMap<Integer, String>();
+	private Map<Integer, String> programInfos = new HashMap<Integer, String>();
 
-	private transient List<KvtProject>			projects			= RobotControlProxy.getProjects();
-	private transient List<List<KvtProgram>>	programs			= new Vector<List<KvtProgram>>();
+	private transient List<KvtProject> projects = RobotControlProxy.getProjects();
+	private transient List<List<KvtProgram>> programs = new Vector<List<KvtProgram>>();
 
-	private int									selectedProject		= 0;
-	private int									selectedProgram		= 0;
+	private int selectedProject = 0;
+	private int selectedProgram = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +131,8 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 
 	public void setSelectedProject(int selectedProject) {
 		this.selectedProject = selectedProject;
+		programCodes.clear();
+		programInfos.clear();
 		mViewPager.invalidate();
 	}
 
@@ -138,34 +142,69 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 
 	public void setSelectedProgram(int selectedProgram) {
 		this.selectedProgram = selectedProgram;
-		programCodes.clear();
-		int i = 0;
-		for (final KvtProgram prog : getPrograms()) {
-			StringBuffer programCode = new StringBuffer();
-			// programCode.append(prog.getName() + "\n");
+		// programCodes.clear();
+		final KvtProgram prog = getPrograms().get(selectedProgram);
 
-			String code = null;
+		// int i = 0;
+		// for (final KvtProgram prog : getPrograms()) {
+		final StringBuffer programCode = new StringBuffer();
+		programCode.append("Program: " + prog.getName() + "\n");
+
+		// String code = null;
+		if (programCodes.get(Integer.valueOf(selectedProgram)) == null) {
+
+			// IMPORTANT: we need to spawn an asynctask here, because
+			// getTextForProgram() will internally
+			// use a network connection, which causes a
+			// NetworkOnMainthread-Exception if invoked on UI-Thread!
+			AsyncTask<Void, Integer, String> progLoader = new AsyncTask<Void, Integer, String>() {
+
+				@Override
+				protected void onPreExecute() {
+					runOnUiThread(new Runnable() {
+						public void run() {
+
+							// m_dlg =
+							// ProgressDialog.show(MainActivity.this,
+							// "Connecting...", "Connecting to " + m_host,
+							// true, true);
+							m_dlg = new ProgressDialog(ProjectActivity.this, ProgressDialog.STYLE_SPINNER);
+							m_dlg.setTitle("Loading...");
+
+							m_dlg.setCancelable(true);
+							m_dlg.setCanceledOnTouchOutside(false);
+							m_dlg.setMessage("Loading Program: " + getPrograms().get(ProjectActivity.this.selectedProgram).toString());
+
+							m_dlg.setIndeterminate(true);
+
+							m_dlg.show();
+							// m_dlg.setMessage("Begin initialization...");
+						}
+					});
+				}
+
+				@Override
+				protected String doInBackground(Void... _params) {
+					String code = KvtExecutionMonitor.getTextForProgram(prog);
+					return code;
+				}
+
+				@Override
+				protected void onPostExecute(String result) {
+					super.onPostExecute(result);
+					m_dlg.dismiss();
+				}
+			}.execute((Void) null);// .get();
+
 			try {
-				// IMPORTANT: we need to spawn an asynctask here, because
-				// getTextForProgram() will internally
-				// use a network connection, which causes a
-				// NetworkOnMainthread-Exception if invoked on UI-Thread!
-				code = new AsyncTask<Void, Integer, String>() {
-
-					@Override
-					protected String doInBackground(Void... _params) {
-						return KvtExecutionMonitor.getTextForProgram(prog);
-					}
-				}.execute((Void) null).get();
-				programCode.append(code);
+				programCode.append(progLoader.get());
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-				programCode.append(e.getMessage());
+				programCode.append(e.getStackTrace());
 			} catch (ExecutionException e) {
 				e.printStackTrace();
-				programCode.append(e.getMessage());
+				programCode.append(e.getStackTrace());
 			}
-
 			// KRoutineFactory fact = new KRoutineFactory();
 			// fact.loadRoutines(prog.getStructProgram().getParent());
 
@@ -173,42 +212,44 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 			// prog.getStructProgram().routines.getChildCount(); ++j) {
 			// programCode.append(prog.getStructProgram().routines.getChild(j).toString());
 			// }
-			programCodes.put(Integer.valueOf(i), programCode.toString());
-			i++;
-		}
-		// programCodes.put(Integer.valueOf(0), "Project:" +
-		// projects.get(selectedProject) + "\nProgram:" +
-		// getPrograms().get(selectedProgram) + "\nLIN(cp0)\nPTP(ap0)");
-		// programCodes.put(Integer.valueOf(1), "Project:" +
-		// projects.get(selectedProject) + "\nProgram:" +
-		// getPrograms().get(selectedProgram) + "\nLIN(cp0)\nPTP(ap0)");
-		// programCodes.put(Integer.valueOf(2), "Project:" +
-		// projects.get(selectedProject) + "\nProgram:" +
-		// getPrograms().get(selectedProgram) + "\nLIN(cp0)\nPTP(ap0)");
-		((ProgramCodeFragment) mSectionsPagerAdapter.getItem(1)).setProgramCode();
+			programCodes.put(Integer.valueOf(selectedProgram), programCode.toString());
+			// i++;
+			// }
+			// programCodes.put(Integer.valueOf(0), "Project:" +
+			// projects.get(selectedProject) + "\nProgram:" +
+			// getPrograms().get(selectedProgram) + "\nLIN(cp0)\nPTP(ap0)");
+			// programCodes.put(Integer.valueOf(1), "Project:" +
+			// projects.get(selectedProject) + "\nProgram:" +
+			// getPrograms().get(selectedProgram) + "\nLIN(cp0)\nPTP(ap0)");
+			// programCodes.put(Integer.valueOf(2), "Project:" +
+			// projects.get(selectedProject) + "\nProgram:" +
+			// getPrograms().get(selectedProgram) + "\nLIN(cp0)\nPTP(ap0)");
+			((ProgramCodeFragment) mSectionsPagerAdapter.getItem(1)).setProgramCode();
 
-		programInfos.clear();
-		i = 0;
-		for (KvtProgram prog : getPrograms()) {
-			StringBuffer programCode = new StringBuffer();
-			programCode.append("Project: " + prog.getParent().toString() + "\n");
-			programCode.append("Creation Date: " + prog.getProgramCreationDate() + "\n");
-			programCode.append("Modification Date: " + prog.getProgramModificationDate() + "\n");
-			programCode.append("Program Size: " + prog.getProgramSize() + "kB\n");
-			programCode.append("Program State: " + prog.getProgramStateString() + "\n");
-			programInfos.put(Integer.valueOf(i), programCode.toString());
-			i++;
+			// programInfos.clear();
+			// i = 0;
+			// for (KvtProgram prog : getPrograms()) {
+
+			StringBuffer programInfo = new StringBuffer();
+			programInfo.append("Project: " + prog.getParent().toString() + "\n");
+			programInfo.append("Creation Date: " + prog.getProgramCreationDate() + "\n");
+			programInfo.append("Modification Date: " + prog.getProgramModificationDate() + "\n");
+			programInfo.append("Program Size: " + prog.getProgramSize() + "kB\n");
+			programInfo.append("Program State: " + prog.getProgramStateString() + "\n");
+			programInfos.put(Integer.valueOf(selectedProgram), programInfo.toString());
+			// i++;
+			// }
+			// programInfos.put(Integer.valueOf(0), "Project:" +
+			// projects.get(selectedProject) + "\nProgram:" +
+			// getPrograms().get(selectedProgram) + "\npaused..");
+			// programInfos.put(Integer.valueOf(1), "Project:" +
+			// projects.get(selectedProject) + "\nProgram:" +
+			// getPrograms().get(selectedProgram) + "\nstopped..");
+			// programInfos.put(Integer.valueOf(2), "Project:" +
+			// projects.get(selectedProject) + "\nProgram:" +
+			// getPrograms().get(selectedProgram) + "\nrunning..");
+			((ProgramInfoFragment) mSectionsPagerAdapter.getItem(2)).setProgramInfo();
 		}
-		// programInfos.put(Integer.valueOf(0), "Project:" +
-		// projects.get(selectedProject) + "\nProgram:" +
-		// getPrograms().get(selectedProgram) + "\npaused..");
-		// programInfos.put(Integer.valueOf(1), "Project:" +
-		// projects.get(selectedProject) + "\nProgram:" +
-		// getPrograms().get(selectedProgram) + "\nstopped..");
-		// programInfos.put(Integer.valueOf(2), "Project:" +
-		// projects.get(selectedProject) + "\nProgram:" +
-		// getPrograms().get(selectedProgram) + "\nrunning..");
-		((ProgramInfoFragment) mSectionsPagerAdapter.getItem(2)).setProgramInfo();
 
 		mViewPager.setCurrentItem(1);
 
@@ -235,8 +276,8 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 		/**
 		 * 
 		 */
-		private static final long	serialVersionUID	= 4669970919454414915L;
-		private Fragment[]			mFragments;
+		private static final long serialVersionUID = 4669970919454414915L;
+		private Fragment[] mFragments;
 
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
