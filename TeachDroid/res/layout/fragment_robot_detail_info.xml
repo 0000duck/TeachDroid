@@ -1,15 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical" >
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:baselineAligned="false"
+    android:divider="?android:attr/dividerHorizontal"
+    android:orientation="horizontal"
+    android:showDividers="middle" >
 
-    <ListView
-        android:id="@+id/infoList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:divider="@null"
-        android:dividerHeight="0dp" >
-    </ListView>
+    <FrameLayout
+        android:id="@+id/fragment_robot_cartesian"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+    
+    <FrameLayout
+        android:id="@+id/fragment_robot_axis"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+    
+<!--     <fragment -->
+<!--         android:id="@+id/fragment_robot_cartesian" -->
+<!--         android:name="com.keba.teachdroid.app.fragments.RobotCartesianFragment" -->
+<!--         android:layout_width="0dp" -->
+<!--         android:layout_height="wrap_content" -->
+<!--         android:layout_gravity="fill_horizontal" -->
+<!--         android:layout_weight="1" -->
+<!--         tools:layout="@layout/fragment_robot_cartesian" /> -->
+
+<!--     <fragment -->
+<!--         android:id="@+id/fragment_robot_axis" -->
+<!--         android:name="com.keba.teachdroid.app.fragments.RobotAxisFragment" -->
+<!--         android:layout_width="0dp" -->
+<!--         android:layout_height="wrap_content" -->
+<!--         android:layout_gravity="fill_horizontal" -->
+<!--         android:layout_weight="1.00" -->
+<!--         tools:layout="@layout/fragment_robot_axis" /> -->
 
 </LinearLayout>

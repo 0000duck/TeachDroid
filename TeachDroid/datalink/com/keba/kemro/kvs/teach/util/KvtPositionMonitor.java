@@ -19,43 +19,43 @@ import com.keba.kemro.teach.dfl.value.KVariableGroupListener;
  */
 public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewConnectionListener {
 
-	private static KvtPositionMonitor				mInstance;
-	private KTcDfl									mDfl;
-	private KVariableGroup							mVarGroup;
-	private final String							mAxisNameVarnameStub		= "_system.gRcSelectedRobotData.axesName[{0}]";
-	private final String							mAxisPosValueVarnameStub	= "_system.gRcSelectedRobotData.axisPosValue[{0}]";
+	private static KvtPositionMonitor mInstance;
+	private KTcDfl mDfl;
+	private KVariableGroup mVarGroup;
+	private final String mAxisNameVarnameStub = "_system.gRcSelectedRobotData.axesName[{0}]";
+	private final String mAxisPosValueVarnameStub = "_system.gRcSelectedRobotData.axisPosValue[{0}]";
 
-	private final String							mCartPosNameVarnameStub		= "_system.gRcSelectedRobotData.cartCompName[{0}]";
-	private final String							mCartPosVarVarnameStub		= "_system.gRcSelectedRobotData.worldPosValue[{0}]";
-	private final String							mCartVelVarname				= "_system.gRcSelectedRobotData.cartPathVel";
-	private final String							mSelToolName				= "_system.gRcSelectedRobotData.selectedToolName";
-	private final String							mSelRefsysVarname			= "_system.gRcSelectedRobotData.selectedRefSysName";
-	private final String							mChosenRefsysVarname		= "_system.gRcSelectedRobotData.chosenRefSys";
-	private final String							mChosenToolVarname			= "_system.gRcSelectedRobotData.chosenTool";
+	private final String mCartPosNameVarnameStub = "_system.gRcSelectedRobotData.cartCompName[{0}]";
+	private final String mCartPosVarVarnameStub = "_system.gRcSelectedRobotData.worldPosValue[{0}]";
+	private final String mCartVelVarname = "_system.gRcSelectedRobotData.cartPathVel";
+	private final String mSelToolName = "_system.gRcSelectedRobotData.selectedToolName";
+	private final String mSelRefsysVarname = "_system.gRcSelectedRobotData.selectedRefSysName";
+	private final String mChosenRefsysVarname = "_system.gRcSelectedRobotData.chosenRefSys";
+	private final String mChosenToolVarname = "_system.gRcSelectedRobotData.chosenTool";
 
-	private final String							mOverrideVarname			= "_system.gRcData.override";
+	private final String mOverrideVarname = "_system.gRcData.override";
 
-	private List<KStructVarWrapper>					mAxisPositionVars			= new Vector<KStructVarWrapper>();
-	private List<KStructVarWrapper>					mNameVars					= new Vector<KStructVarWrapper>();
+	private List<KStructVarWrapper> mAxisPositionVars = new Vector<KStructVarWrapper>();
+	private List<KStructVarWrapper> mNameVars = new Vector<KStructVarWrapper>();
 
-	private List<KStructVarWrapper>					mCartPosVars				= new Vector<KStructVarWrapper>();
-	private List<KStructVarWrapper>					mCartNameVars				= new Vector<KStructVarWrapper>();
-	private KStructVarWrapper						mOverrideVar;
-	private KStructVarWrapper						mCartVelVar;
-	private KStructVarWrapper						mSelectedRefSysVar;
-	private KStructVarWrapper						mChosenRefSysVar;
-	private KStructVarWrapper						mChosenToolVar;
-	private KStructVarWrapper						mSelectedToolVar;
+	private List<KStructVarWrapper> mCartPosVars = new Vector<KStructVarWrapper>();
+	private List<KStructVarWrapper> mCartNameVars = new Vector<KStructVarWrapper>();
+	private KStructVarWrapper mOverrideVar;
+	private KStructVarWrapper mCartVelVar;
+	private KStructVarWrapper mSelectedRefSysVar;
+	private KStructVarWrapper mChosenRefSysVar;
+	private KStructVarWrapper mChosenToolVar;
+	private KStructVarWrapper mSelectedToolVar;
 
-	private String									mSelectedRefSys;
-	private String									mChosenTool;
-	protected DataModel								mRefsysmodel;
-	protected DataModel								mToolmodel;
-	private float									mOldOvr;
+	private String mSelectedRefSys;
+	private String mChosenTool;
+	protected DataModel mRefsysmodel;
+	protected DataModel mToolmodel;
+	private float mOldOvr;
 
-	private static List<KvtPositionMonitorListener>	mListeners					= new Vector<KvtPositionMonitor.KvtPositionMonitorListener>();
-	private static List<KvtOverrideChangedListener>	mOverrideListeners			= new Vector<KvtPositionMonitor.KvtOverrideChangedListener>();
-	private static Object							mInstancelock				= new Object();
+	private static List<KvtPositionMonitorListener> mListeners = new Vector<KvtPositionMonitor.KvtPositionMonitorListener>();
+	private static List<KvtOverrideChangedListener> mOverrideListeners = new Vector<KvtPositionMonitor.KvtOverrideChangedListener>();
+	private static Object mInstancelock = new Object();
 
 	public static void init() {
 		mInstance = new KvtPositionMonitor();
@@ -103,12 +103,15 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 			}
 		}
 
-		else if (_variable.equals(mCartVelVar))
-			for (KvtPositionMonitorListener l : mListeners)
-				l.pathVelocityChanged(((Number) _variable.readActualValue(null)).floatValue());
-		else if (_variable.equals(mSelectedRefSysVar)) {
+		else if (_variable.equals(mCartVelVar)) {
+			if (!_variable.readActualValue(null).equals(mCartVelVar.readActualValue(null)))
+				for (KvtPositionMonitorListener l : mListeners)
+					l.pathVelocityChanged(((Number) _variable.readActualValue(null)).floatValue());
+		} else if (_variable.equals(mSelectedRefSysVar)) {
 			Object v = _variable.readActualValue(null);
-			if (v != null && v instanceof String) {
+			if(mSelectedRefSys == null)
+				mSelectedRefSys = new String();
+			if (v != null && v instanceof String && !mSelectedRefSys.equals(v)) {
 				mSelectedRefSys = (String) v;
 				for (KvtPositionMonitorListener l : mListeners)
 					l.chosenRefSysChanged(mSelectedRefSys);

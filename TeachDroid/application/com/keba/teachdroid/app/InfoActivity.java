@@ -31,17 +31,17 @@ public class InfoActivity extends BaseActivity implements Serializable, Observer
 	/**
 	 * 
 	 */
-	private static final long				serialVersionUID	= 289874216604394469L;
-	private transient ViewPager				mViewPager;
-	private transient SectionsPagerAdapter	mSectionsPagerAdapter;
+	private static final long serialVersionUID = 289874216604394469L;
+	private transient ViewPager mViewPager;
+	private transient SectionsPagerAdapter mSectionsPagerAdapter;
 
-	private List<String>					mTrace				= new Vector<String>();
+	private List<String> mTrace = new Vector<String>();
 	// private transient AlarmInfoFragment.MessageUpdateListener
 	// mInfoUpdateListener;
 
-	private transient TraceInfoFragment		tif;
-	private transient AlarmInfoFragment		aif;
-	private transient HistoryInfoFragment	hif;
+	private transient TraceInfoFragment tif;
+	private transient AlarmInfoFragment aif;
+	private transient HistoryInfoFragment hif;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +77,6 @@ public class InfoActivity extends BaseActivity implements Serializable, Observer
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setOffscreenPageLimit(3);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
-		mViewPager.setCurrentItem(1);
 
 		// mInfoUpdateListener = new MessageUpdateListener();
 		// mInfoUpdateListener.addObserver(this);
@@ -93,12 +92,10 @@ public class InfoActivity extends BaseActivity implements Serializable, Observer
 		aif = new AlarmInfoFragment();
 		hif = new HistoryInfoFragment();
 
-
 	}
 
 	public void update(Observable _observable, Object _data) {
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(R.drawable.logo)
-				.setContentTitle("My notification").setContentText("Hello World!");
+		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(R.drawable.logo).setContentTitle("My notification").setContentText("Hello World!");
 		// Creates an explicit intent for an Activity in your app
 		Intent resultIntent = new Intent(this, InfoActivity.class);
 
@@ -148,7 +145,7 @@ public class InfoActivity extends BaseActivity implements Serializable, Observer
 	 */
 	public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-		private Fragment[]	mFragments;
+		private Fragment[] mFragments;
 
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
@@ -163,7 +160,7 @@ public class InfoActivity extends BaseActivity implements Serializable, Observer
 
 			if (mFragments == null) {
 				Bundle args = new Bundle();
-				mFragments = new Fragment[] { tif, aif, hif };
+				mFragments = new Fragment[] { aif, hif, tif };
 				args.putSerializable("connector", InfoActivity.this);
 				mFragments[0].setArguments(args);
 				mFragments[1].setArguments(args);
@@ -182,11 +179,11 @@ public class InfoActivity extends BaseActivity implements Serializable, Observer
 		public CharSequence getPageTitle(int position) {
 			switch (position) {
 			case 0:
-				return getString(R.string.title_section_trace);
-			case 1:
 				return getString(R.string.title_section_alarms);
-			case 2:
+			case 1:
 				return getString(R.string.title_section_history);
+			case 2:
+				return getString(R.string.title_section_trace);
 			default:
 				return "NOT_DEFINED_" + position;
 			}

@@ -19,14 +19,14 @@ import com.keba.teachdroid.app.fragments.RobotOverviewFragment;
 import com.keba.teachdroid.app.fragments.RobotRefsysToolFragment;
 
 public class RobotActivity extends BaseActivity {
-	
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -7579040555436438843L;
-	private transient ViewPager					mViewPager;
-	private transient SectionsPagerAdapter		mSectionsPagerAdapter;
-	
+	private transient ViewPager mViewPager;
+	private transient SectionsPagerAdapter mSectionsPagerAdapter;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -62,7 +62,7 @@ public class RobotActivity extends BaseActivity {
 		mViewPager.setOffscreenPageLimit(3);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 	}
-	
+
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
 	 * one of the sections/tabs/pages.
@@ -72,8 +72,8 @@ public class RobotActivity extends BaseActivity {
 		/**
 		 * 
 		 */
-		private static final long	serialVersionUID	= 4669970919454414915L;
-		private Fragment[]			mFragments;
+		private static final long serialVersionUID = 4669970919454414915L;
+		private Fragment[] mFragments;
 
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
@@ -88,7 +88,7 @@ public class RobotActivity extends BaseActivity {
 
 			if (mFragments == null) {
 				Bundle args = new Bundle();
-				mFragments = new Fragment[] { new RobotRefsysToolFragment(), new RobotOverviewFragment(), new RobotDetailInfoFragment() };
+				mFragments = new Fragment[] { new RobotOverviewFragment(), new RobotDetailInfoFragment(), new RobotRefsysToolFragment() };
 				args.putSerializable("connector", RobotActivity.this);
 				mFragments[0].setArguments(args);
 				mFragments[1].setArguments(args);
@@ -107,11 +107,11 @@ public class RobotActivity extends BaseActivity {
 		public CharSequence getPageTitle(int position) {
 			switch (position) {
 			case 0:
-				return getString(R.string.title_section_refsys_tool);
-			case 1:
 				return getString(R.string.title_section_robot_overview);
-			case 2:
+			case 1:
 				return getString(R.string.title_section_robot_detail);
+			case 2:
+				return getString(R.string.title_section_refsys_tool);
 			default:
 				return "NOT_DEFINED_" + position;
 			}

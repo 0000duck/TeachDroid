@@ -37,6 +37,12 @@
     <string name="title_section_refsys_tool">Refsys/Tool</string>
     <string name="title_section_robot_overview">Overview</string>
     <string name="title_section_robot_detail">Details</string>
+    <string name="opMode">Operation Mode:</string>
+    <string name="safetyMode">Safety Mode:</string>
+    <string name="powerLabel">Power:</string>
+    <string name="vjogLabel">Vjog [%]:</string>
+    <string name="vpathLabel">Vpath [mm/s]</string>
+    <string name="progLabel">proj.prog</string>
     <string name="program_code_dummy">LIN(cp0)\nDyn(d0)\n</string>
     <string name="title_section_program_code">Program Code</string>
     <string name="title_program_info">Program Info</string>

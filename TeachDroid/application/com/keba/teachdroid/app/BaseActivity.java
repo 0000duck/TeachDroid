@@ -16,7 +16,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-public abstract class BaseActivity extends FragmentActivity  implements Serializable {
+public abstract class BaseActivity extends FragmentActivity implements Serializable {
 	/**
 	 * 
 	 */
@@ -27,7 +27,7 @@ public abstract class BaseActivity extends FragmentActivity  implements Serializ
 	protected CharSequence mDrawerTitle;
 	protected CharSequence mTitle;
 	protected String[] mNavigationStrings;
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
@@ -41,19 +41,26 @@ public abstract class BaseActivity extends FragmentActivity  implements Serializ
 		case 0:
 			if (!(this instanceof ProjectActivity)) {
 				intent = new Intent(getBaseContext(), ProjectActivity.class);
+			} else {
+				mDrawerLayout.closeDrawers();
 			}
 			break;
 		case 1:
 			if (!(this instanceof RobotActivity)) {
 				intent = new Intent(getBaseContext(), RobotActivity.class);
+			} else {
+				mDrawerLayout.closeDrawers();
 			}
 			break;
 		case 2:
 			if (!(this instanceof InfoActivity)) {
 				intent = new Intent(getBaseContext(), InfoActivity.class);
+			} else {
+				mDrawerLayout.closeDrawers();
 			}
 			break;
 		default:
+			mDrawerLayout.closeDrawers();
 			break;
 		}
 		if (intent != null) {

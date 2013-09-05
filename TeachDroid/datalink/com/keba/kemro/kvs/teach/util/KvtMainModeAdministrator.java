@@ -22,26 +22,23 @@ import com.keba.kemro.teach.dfl.value.KVariableGroupListener;
  */
 public class KvtMainModeAdministrator implements KMultikinematicListener, KVariableGroupListener, KvtTeachviewConnectionListener {
 
+	private final Object m_dlfLock = new Object();
+	private int m_actualMainMode = -1;
+	private int mSafetyState = -1;
 
+	private static KVariableGroup mVarGroup;
+	private static KStructVarWrapper mMainModeVar;
+	private static boolean changed = false;
 
-	private final Object						m_dlfLock			= new Object();
-	private int									m_actualMainMode	= -1;
-	private int									mSafetyState		= -1;
-
-
-	private static KVariableGroup				mVarGroup;
-	private static KStructVarWrapper			mMainModeVar;
-
-
-	private static KStructVarWrapper			mSafetyStateVar;
-	private static KvtMainModeAdministrator		instance;
-	private static Vector<KvtMainModeListener>	m_listeners;
+	private static KStructVarWrapper mSafetyStateVar;
+	private static KvtMainModeAdministrator instance;
+	private static Vector<KvtMainModeListener> m_listeners;
 
 	public static enum SafetyState {
 		eIconSafetyOK, eIconSafetyNOK, // obsolete (deprecated use detailed info
 										// icons instead)
 		eIconSafetyUnknown, eIconSafety2EStopInt, eIconSafety2EStopExt, eIconSafety2EStopBoth, eIconSafetyEStop, eIconSafetySafetyDoor, eIconSafetyEnableSwitch, eIconSafetyPowerRelease;
-		private static SafetyState[]	allValues	= values();
+		private static SafetyState[] allValues = values();
 
 		public static SafetyState fromOrdinal(int n) {
 			return allValues[n];
@@ -105,6 +102,7 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 				m_actualMainMode = mode.intValue();
 
 			}
+			changed = true;
 		} else if (_variable.equals(mSafetyStateVar)) {
 			Object v = _variable.readActualValue(null);
 			if (v != null && v instanceof Number) {
@@ -114,15 +112,11 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 			}
 		}
 
-
 	}
-
 
 	public static SafetyState getSafetyState() {
 		return SafetyState.fromOrdinal(instance.mSafetyState);
 	}
-
-
 
 	/*
 	 * (non-Javadoc)
@@ -132,9 +126,13 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 	 * ()
 	 */
 	public void allActualValuesUpdated() {
-		for (int i = 0; i < m_listeners.size(); i++) {
-			((KvtMainModeListener) m_listeners.elementAt(i)).mainModeChanged(m_actualMainMode);
+		if (changed) {
+			for (int i = 0; i < m_listeners.size(); i++) {
+				((KvtMainModeListener) m_listeners.elementAt(i)).mainModeChanged(m_actualMainMode);
+			}
+			changed = false;
 		}
+		
 	}
 
 	/*
@@ -161,22 +159,14 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 					mMainModeVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcData.selectedMainMode");
 
 					if (mMainModeVar == null) { // try the gRcData-path
-						mMainModeVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcDataRobot[" + kin
-								+ "].selectedMainMode");
+						mMainModeVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcDataRobot[" + kin + "].selectedMainMode");
 					}
-
-
-
-
 
 					mSafetyStateVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcData.userIcon[4]");
 
 					if (mMainModeVar != null) {
 						mVarGroup.add(mMainModeVar);
 					}
-
-
-
 
 					if (mSafetyStateVar != null) {
 						mVarGroup.add(mSafetyStateVar);
