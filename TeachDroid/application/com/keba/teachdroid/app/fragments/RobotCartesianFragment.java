@@ -9,13 +9,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class RobotCartesianFragment extends Fragment implements KvtPositionMonitorListener {
-	int i = 0;
-	int j = 0;
-	int k = 0;
-	int l = 0;
-	int m = 0;
+	private transient View mRootView;
+	private int i = 0;
 
 	public RobotCartesianFragment() {
 		KvtPositionMonitor.addListener((KvtPositionMonitorListener) this);
@@ -23,26 +21,32 @@ public class RobotCartesianFragment extends Fragment implements KvtPositionMonit
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		View mRootView = inflater.inflate(R.layout.fragment_robot_cartesian, container, false);
+		mRootView = inflater.inflate(R.layout.fragment_robot_cartesian, container, false);
 		return mRootView;
 	}
 
 	public void cartesianPositionChanged(String _compName, Number _value) {
-		
+
 	}
 
 	public void pathVelocityChanged(float _velocityMms) {
-		System.out.println("pathvelocity changed: " + j);
-		j++;
+		final float vel = _velocityMms;
+		final TextView t1 = (TextView) mRootView.findViewById(R.id.textView1);
+		getActivity().runOnUiThread(new Runnable() {
+
+			public void run() {
+				t1.setText("actual path velocity: " + vel + "mm/s");
+				i++;
+			}
+		});
 	}
 
 	public void axisPositionChanged(int axisNo, Number _value, String _axisName) {
-		
+
 	}
 
 	public void chosenRefSysChanged(String _refsysName) {
-		System.out.println("Refsys changed: " + l);
-		l++;
+
 	}
 
 	public void chosenToolChanged(String _toolName) {

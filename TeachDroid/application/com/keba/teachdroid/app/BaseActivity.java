@@ -29,6 +29,11 @@ public abstract class BaseActivity extends FragmentActivity implements Serializa
 	protected String[] mNavigationStrings;
 
 	@Override
+	protected void onResumeFragments() {
+		super.onResumeFragments();
+	}
+	
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.menu_action_bar, menu);

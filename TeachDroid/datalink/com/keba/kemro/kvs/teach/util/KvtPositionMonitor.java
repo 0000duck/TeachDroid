@@ -36,9 +36,11 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	private final String mOverrideVarname = "_system.gRcData.override";
 
 	private List<KStructVarWrapper> mAxisPositionVars = new Vector<KStructVarWrapper>();
+	private List<Number> mAxisPositionOldValue = new Vector<Number>();
 	private List<KStructVarWrapper> mNameVars = new Vector<KStructVarWrapper>();
 
 	private List<KStructVarWrapper> mCartPosVars = new Vector<KStructVarWrapper>();
+	private List<Number> mCartPosOldValue = new Vector<Number>();
 	private List<KStructVarWrapper> mCartNameVars = new Vector<KStructVarWrapper>();
 	private KStructVarWrapper mOverrideVar;
 	private KStructVarWrapper mCartVelVar;
@@ -76,9 +78,13 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	public void changed(KStructVarWrapper _variable) {
 		int index = mAxisPositionVars.indexOf(_variable);
 		if (index >= 0) {
-			String name = mNameVars.get(index).readActualValue(null).toString();
-			for (KvtPositionMonitorListener l : mListeners)
-				l.axisPositionChanged(index, (Number) _variable.readActualValue(null), name);
+			if (!mAxisPositionVars.get(index).readActualValue(null).equals(mAxisPositionOldValue.get(index))) {
+				String name = mNameVars.get(index).readActualValue(null).toString();
+				for (KvtPositionMonitorListener l : mListeners)
+					l.axisPositionChanged(index, (Number) _variable.readActualValue(null), name);
+				mAxisPositionOldValue.remove(index);
+				mAxisPositionOldValue.add(index, (Number) mAxisPositionVars.get(index).readActualValue(null));
+			}
 			// Log.d("KvtPositionMonitor", "Axis " + (index + 1) + " [" + name +
 			// "] has position " + _variable.getActualValue());
 			return;
@@ -87,8 +93,12 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 		index = mCartPosVars.indexOf(_variable);
 		if (index >= 0) {
 			String name = mCartNameVars.get(index).readActualValue(null).toString();
-			for (KvtPositionMonitorListener l : mListeners)
-				l.cartesianPositionChanged(name, (Number) _variable.readActualValue(null));
+			if (!mCartPosVars.get(index).readActualValue(null).equals(mCartPosOldValue.get(index))) {
+				for (KvtPositionMonitorListener l : mListeners)
+					l.cartesianPositionChanged(name, (Number) _variable.readActualValue(null));
+				mCartPosOldValue.remove(index);
+				mCartPosOldValue.add(index, (Number) mCartPosVars.get(index).readActualValue(null));
+			}
 			// Log.d("KvtPositionMonitor", "Component " + name + ": " +
 			// _variable.getActualValue());
 			return;
@@ -109,7 +119,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 					l.pathVelocityChanged(((Number) _variable.readActualValue(null)).floatValue());
 		} else if (_variable.equals(mSelectedRefSysVar)) {
 			Object v = _variable.readActualValue(null);
-			if(mSelectedRefSys == null)
+			if (mSelectedRefSys == null)
 				mSelectedRefSys = new String();
 			if (v != null && v instanceof String && !mSelectedRefSys.equals(v)) {
 				mSelectedRefSys = (String) v;
@@ -136,6 +146,12 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	 */
 	public void allActualValuesUpdated() {
 		for (KvtPositionMonitorListener l : mListeners) {
+			for (int i = 0; i < mAxisPositionVars.size(); i++) {
+				changed(mAxisPositionVars.get(i));
+			}
+			for (int i = 0; i < mCartPosVars.size(); i++) {
+				changed(mCartPosVars.get(i));
+			}
 			changed(mCartVelVar);
 			changed(mSelectedRefSysVar);
 			changed(mSelectedToolVar);
@@ -217,6 +233,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 			KStructVarWrapper w2 = mDfl.variable.createKStructVarWrapper(posVar);
 			if (w2 != null) {
 				mCartPosVars.add(w2);
+				mCartPosOldValue.add(0);
 				mVarGroup.add(w2);
 			}
 
@@ -254,6 +271,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 			KStructVarWrapper wrpP = mDfl.variable.createKStructVarWrapper(posVar);
 			if (wrpP != null) {
 				mAxisPositionVars.add(wrpP);
+				mAxisPositionOldValue.add(0);
 				mVarGroup.add(wrpP);
 			}
 
