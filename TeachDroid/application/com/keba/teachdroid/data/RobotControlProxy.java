@@ -248,6 +248,8 @@ public class RobotControlProxy {
 	}
 
 	public static boolean drivesPower() {
+		if (mDataListener == null)
+			return false;
 		return mDataListener.mHasPower;
 	}
 

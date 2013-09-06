@@ -511,7 +511,7 @@ public class KStructVarWrapper {
 	 * @return Objektfeld von Variablenwrapper-Objekten
 	 */
 	public Object[] getVariableComponentPath() {
-		if (m_rootPath == null || m_rootPath.length == 0) {
+		if (m_rootPath == null) {
 			if (getParent() != null) {
 				KStructVarWrapper p = getParent();
 				Object[] path = p.getVariableComponentPath();

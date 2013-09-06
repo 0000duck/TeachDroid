@@ -3,6 +3,7 @@
  */
 package com.keba.kemro.kvs.teach.util;
 
+import java.util.List;
 import java.util.Vector;
 
 import com.keba.kemro.kvs.teach.data.project.KvtProgram;
@@ -41,16 +42,20 @@ public class KvtExecutionMonitor implements KvtTeachviewConnectionListener,
 	private KStructRoutine				m_structRoutine;
 	private static KvtExecutionMonitor	mInstance;
 	private static KTcDfl				mDfl;
+	private static List<KvtExecutionListener>	mListeners;
 
 	protected KvtExecutionMonitor() {
 		getRoutineModel();
+
 	}
 
 	public static void init() {
 		mInstance = new KvtExecutionMonitor();
+		mListeners = new Vector<KvtExecutionListener>();
 		KvtSystemCommunicator.addConnectionListener(mInstance);
 		KvtProjectAdministrator.addProjectListener(mInstance);
 		KvtProgramStateMonitor.addListener(mInstance);
+
 	}
 
 	protected KvtRoutineModel getRoutineModel() {
@@ -204,6 +209,15 @@ public class KvtExecutionMonitor implements KvtTeachviewConnectionListener,
 
 	}
 
+	public static void addListener(KvtExecutionListener _listener) {
+		if (!mListeners.contains(_listener))
+			mListeners.add(_listener);
+	}
+
+	public static boolean removeListener(KvtExecutionListener _listener) {
+		return mListeners.remove(_listener);
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -233,6 +247,12 @@ public class KvtExecutionMonitor implements KvtTeachviewConnectionListener,
 		if (m_execRoutine != null) {
 			int mf = m_execRoutine.getMainFlowLine();
 			mRoutineModel.setMainFlowPointer(mf);
+			for (KvtExecutionListener l : mListeners) { // its ok to use a
+														// static variable since
+														// we're using a
+														// singleton
+				l.programCounterChanged(mf);
+			}
 		}
 	}
 
@@ -431,6 +451,7 @@ public class KvtExecutionMonitor implements KvtTeachviewConnectionListener,
 		 * @param _source
 		 */
 		void programCodeChanged(String _source);
+
 
 	}
 }

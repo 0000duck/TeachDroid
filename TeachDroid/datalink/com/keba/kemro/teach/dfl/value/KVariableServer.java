@@ -139,7 +139,7 @@ public class KVariableServer implements KVariableGroupListener {
 							// synchronized (varAccessLock) {
 							if (variableRegistry.isDirty()) {
 								variableRegistry.refresh();
-								// setDirty(false);
+								// System.out.println("refreshing...");
 
 							}
 							variableRegistry.update();

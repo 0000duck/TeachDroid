@@ -36,22 +36,22 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -1859827857696981188L;
-	private transient ViewPager mViewPager;
-	private transient SectionsPagerAdapter mSectionsPagerAdapter;
-	private transient ProgressDialog m_dlg;
+	private static final long					serialVersionUID	= -1859827857696981188L;
+	private transient ViewPager					mViewPager;
+	private transient SectionsPagerAdapter		mSectionsPagerAdapter;
+	private transient ProgressDialog			m_dlg;
 
 	// dummy contents for the Pages!
 	// String[] projects = { "Project1", "Project2", "Project3" };
 	// Vector<String[]> programs = new Vector<String[]>();
-	private Map<Integer, String> programCodes = new HashMap<Integer, String>();
-	private Map<Integer, String> programInfos = new HashMap<Integer, String>();
+	private Map<Integer, String>				programCodes		= new HashMap<Integer, String>();
+	private Map<Integer, String>				programInfos		= new HashMap<Integer, String>();
 
-	private transient List<KvtProject> projects = RobotControlProxy.getProjects();
-	private transient List<List<KvtProgram>> programs = new Vector<List<KvtProgram>>();
+	private transient List<KvtProject>			projects			= RobotControlProxy.getProjects();
+	private transient List<List<KvtProgram>>	programs			= new Vector<List<KvtProgram>>();
 
-	private int selectedProject = 0;
-	private int selectedProgram = 0;
+	private int									selectedProject		= 0;
+	private int									selectedProgram		= 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -153,68 +153,65 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 		programCode.append("Program: " + prog.getName() + "\n");
 
 		// String code = null;
-		if (programCodes.get(Integer.valueOf(selectedProgram)) == null) {
+		String progCode = programCodes.get(Integer.valueOf(selectedProgram));
+		if (progCode == null) {
 
 			// IMPORTANT: we need to spawn an asynctask here, because
 			// getTextForProgram() will internally
 			// use a network connection, which causes a
 			// NetworkOnMainthread-Exception if invoked on UI-Thread!
-			AsyncTask<Void, Integer, String> progLoader = new AsyncTask<Void, Integer, String>() {
 
-				@Override
-				protected void onPreExecute() {
-					runOnUiThread(new Runnable() {
-						public void run() {
 
-							// m_dlg =
-							// ProgressDialog.show(MainActivity.this,
-							// "Connecting...", "Connecting to " + m_host,
-							// true, true);
-							m_dlg = new ProgressDialog(ProjectActivity.this, ProgressDialog.STYLE_SPINNER);
-							m_dlg.setTitle("Loading...");
-
-							m_dlg.setCancelable(true);
-							m_dlg.setCanceledOnTouchOutside(false);
-							m_dlg.setMessage("Loading Program: " + getPrograms().get(ProjectActivity.this.selectedProgram).toString());
-
-							m_dlg.setIndeterminate(true);
-
-							m_dlg.show();
-							// m_dlg.setMessage("Begin initialization...");
-						}
-					});
-				}
-
-				@Override
-				protected String doInBackground(Void... _params) {
-					// String code =
-					// KvtExecutionMonitor.getTextForProgram(prog);
-					// return code;
-
-					KvtProject parent = prog.getParent();
-					boolean isBuilt = true;
-					if (parent != null) {
-						if (parent.getProjectState() <= KvtProject.NOT_BUILDED) {
-							isBuilt = KvtProjectAdministrator.build(parent);
-							Log.d("ProjectActivity", "building project \"" + parent.getName() + "\" was "
-									+ (isBuilt ? "successful" : "not successful"));
-						}
-					} else
-						throw new IllegalStateException("Parent project of program \"" + prog.getName() + "\" could not be obtained!");
-					if (isBuilt)
-						return KvtExecutionMonitor.getTextForProgram(prog);
-					return null;
-				}
-
-				@Override
-				protected void onPostExecute(String result) {
-					super.onPostExecute(result);
-					m_dlg.dismiss();
-				}
-			}.execute((Void) null);// .get();
 
 			try {
-				programCode.append(progLoader.get());
+				progCode = new AsyncTask<Void, Integer, String>() {
+
+					// @Override
+					// protected void onPreExecute() {
+					// super.onPreExecute();
+					// m_dlg = new ProgressDialog(ProjectActivity.this,
+					// ProgressDialog.STYLE_SPINNER);
+					// m_dlg.setTitle("Loading...");
+					// m_dlg.setCancelable(true);
+					// m_dlg.setCanceledOnTouchOutside(false);
+					// m_dlg.setMessage("Loading Program: " +
+					// getPrograms().get(ProjectActivity.this.selectedProgram).toString());
+					// m_dlg.setIndeterminate(true);
+					// m_dlg.show();
+					// while (!m_dlg.isShowing())
+					// try {
+					// Thread.sleep(10);
+					// } catch (InterruptedException e) {
+					// e.printStackTrace();
+					// }
+					// }
+
+					@Override
+					protected String doInBackground(Void... _params) {
+
+
+						KvtProject parent = prog.getParent();
+						boolean isBuilt = true;
+						if (parent != null) {
+							if (parent.getProjectState() <= KvtProject.NOT_BUILDED) {
+								isBuilt = KvtProjectAdministrator.build(parent);
+								Log.d("ProjectActivity", "building project \"" + parent.getName() + "\" was "
+										+ (isBuilt ? "successful" : "not successful"));
+							}
+						} else
+							throw new IllegalStateException("Parent project of program \"" + prog.getName() + "\" could not be obtained!");
+						if (isBuilt)
+							return KvtExecutionMonitor.getTextForProgram(prog);
+						return null;
+					}
+
+					// @Override
+					// protected void onPostExecute(String result) {
+					// super.onPostExecute(result);
+					// m_dlg.dismiss();
+					// }
+				}.execute((Void) null).get();// .get();
+
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 				programCode.append(e.getStackTrace());
@@ -222,51 +219,23 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 				e.printStackTrace();
 				programCode.append(e.getStackTrace());
 			}
-			// KRoutineFactory fact = new KRoutineFactory();
-			// fact.loadRoutines(prog.getStructProgram().getParent());
 
-			// for (int j = 0; j <
-			// prog.getStructProgram().routines.getChildCount(); ++j) {
-			// programCode.append(prog.getStructProgram().routines.getChild(j).toString());
-			// }
+			programCode.append(progCode);
 			programCodes.put(Integer.valueOf(selectedProgram), programCode.toString());
-			// i++;
-			// }
-			// programCodes.put(Integer.valueOf(0), "Project:" +
-			// projects.get(selectedProject) + "\nProgram:" +
-			// getPrograms().get(selectedProgram) + "\nLIN(cp0)\nPTP(ap0)");
-			// programCodes.put(Integer.valueOf(1), "Project:" +
-			// projects.get(selectedProject) + "\nProgram:" +
-			// getPrograms().get(selectedProgram) + "\nLIN(cp0)\nPTP(ap0)");
-			// programCodes.put(Integer.valueOf(2), "Project:" +
-			// projects.get(selectedProject) + "\nProgram:" +
-			// getPrograms().get(selectedProgram) + "\nLIN(cp0)\nPTP(ap0)");
+
 			((ProgramCodeFragment) mSectionsPagerAdapter.getItem(1)).setProgramCode();
 
-			// programInfos.clear();
-			// i = 0;
-			// for (KvtProgram prog : getPrograms()) {
-
-			StringBuffer programInfo = new StringBuffer();
-			programInfo.append("Project: " + prog.getParent().toString() + "\n");
-			programInfo.append("Creation Date: " + prog.getProgramCreationDate() + "\n");
-			programInfo.append("Modification Date: " + prog.getProgramModificationDate() + "\n");
-			programInfo.append("Program Size: " + prog.getProgramSize() + "kB\n");
-			programInfo.append("Program State: " + prog.getProgramStateString() + "\n");
-			programInfos.put(Integer.valueOf(selectedProgram), programInfo.toString());
-			// i++;
-			// }
-			// programInfos.put(Integer.valueOf(0), "Project:" +
-			// projects.get(selectedProject) + "\nProgram:" +
-			// getPrograms().get(selectedProgram) + "\npaused..");
-			// programInfos.put(Integer.valueOf(1), "Project:" +
-			// projects.get(selectedProject) + "\nProgram:" +
-			// getPrograms().get(selectedProgram) + "\nstopped..");
-			// programInfos.put(Integer.valueOf(2), "Project:" +
-			// projects.get(selectedProject) + "\nProgram:" +
-			// getPrograms().get(selectedProgram) + "\nrunning..");
-			((ProgramInfoFragment) mSectionsPagerAdapter.getItem(2)).setProgramInfo();
 		}
+
+		StringBuffer programInfo = new StringBuffer();
+		programInfo.append("Project: " + prog.getParent().toString() + "\n");
+		programInfo.append("Creation Date: " + prog.getProgramCreationDate() + "\n");
+		programInfo.append("Modification Date: " + prog.getProgramModificationDate() + "\n");
+		programInfo.append("Program Size: " + prog.getProgramSize() + "kB\n");
+		programInfo.append("Program State: " + prog.getProgramStateString() + "\n");
+		programInfos.put(Integer.valueOf(selectedProgram), programInfo.toString());
+
+		((ProgramInfoFragment) mSectionsPagerAdapter.getItem(2)).setProgramInfo();
 
 		mViewPager.setCurrentItem(1);
 
@@ -293,8 +262,8 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 		/**
 		 * 
 		 */
-		private static final long serialVersionUID = 4669970919454414915L;
-		private Fragment[] mFragments;
+		private static final long	serialVersionUID	= 4669970919454414915L;
+		private Fragment[]			mFragments;
 
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
