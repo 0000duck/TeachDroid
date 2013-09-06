@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 public class RobotCartesianFragment extends Fragment implements KvtPositionMonitorListener {
 	private transient View mRootView;
-	private int i = 0;
 
 	public RobotCartesianFragment() {
 		KvtPositionMonitor.addListener((KvtPositionMonitorListener) this);
@@ -32,13 +31,14 @@ public class RobotCartesianFragment extends Fragment implements KvtPositionMonit
 	public void pathVelocityChanged(float _velocityMms) {
 		final float vel = _velocityMms;
 		final TextView t1 = (TextView) mRootView.findViewById(R.id.textView1);
-		getActivity().runOnUiThread(new Runnable() {
+		if (getActivity() != null) {
+			getActivity().runOnUiThread(new Runnable() {
 
-			public void run() {
-				t1.setText("actual path velocity: " + vel + "mm/s");
-				i++;
-			}
-		});
+				public void run() {
+					t1.setText("actual path velocity: " + vel + "mm/s");
+				}
+			});
+		}
 	}
 
 	public void axisPositionChanged(int axisNo, Number _value, String _axisName) {

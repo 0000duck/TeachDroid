@@ -21,7 +21,6 @@ public class MainActivity extends BaseActivity /*
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private transient Thread mNotificationThread;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +72,7 @@ public class MainActivity extends BaseActivity /*
 		});
 		
 		
-		mNotificationThread = new NotificationThread(getBaseContext());
-		mNotificationThread.start();
+		
 	}
 	
 	

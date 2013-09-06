@@ -145,18 +145,18 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	 * ()
 	 */
 	public void allActualValuesUpdated() {
-		for (KvtPositionMonitorListener l : mListeners) {
-			for (int i = 0; i < mAxisPositionVars.size(); i++) {
-				changed(mAxisPositionVars.get(i));
-			}
-			for (int i = 0; i < mCartPosVars.size(); i++) {
-				changed(mCartPosVars.get(i));
-			}
-			changed(mCartVelVar);
-			changed(mSelectedRefSysVar);
-			changed(mSelectedToolVar);
-			changed(mOverrideVar);
-		}
+//		for (KvtPositionMonitorListener l : mListeners) {
+//			for (int i = 0; i < mAxisPositionVars.size(); i++) {
+//				changed(mAxisPositionVars.get(i));
+//			}
+//			for (int i = 0; i < mCartPosVars.size(); i++) {
+//				changed(mCartPosVars.get(i));
+//			}
+//			changed(mCartVelVar);
+//			changed(mSelectedRefSysVar);
+//			changed(mSelectedToolVar);
+//			changed(mOverrideVar);
+//		}
 	}
 
 	protected int getNumAxes() {
@@ -186,7 +186,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 			createOverrideVariables();
 
 			// activate
-			mVarGroup.setPollInterval(100);
+			//mVarGroup.setPollInterval(100);
 			mVarGroup.activate();
 
 		}

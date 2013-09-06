@@ -97,18 +97,20 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 	 */
 	public void changed(KStructVarWrapper _variable) {
 		if (_variable.equals(mMainModeVar)) {
-			Number mode = (Number) _variable.getActualValue();
-			if (mode != null) {
+			Number mode = (Number) _variable.readActualValue(null);
+			if (mode != null && mode.intValue() != m_actualMainMode) {
 				m_actualMainMode = mode.intValue();
-
+				for (KvtMainModeListener l : m_listeners) {
+					l.mainModeChanged(m_actualMainMode);
+				}
 			}
-			changed = true;
 		} else if (_variable.equals(mSafetyStateVar)) {
 			Object v = _variable.readActualValue(null);
-			if (v != null && v instanceof Number) {
+			if (v != null && v instanceof Number && ((Number) v).intValue() != mSafetyState) {
 				mSafetyState = ((Number) v).intValue();
-				for (KvtMainModeListener l : m_listeners)
+				for (KvtMainModeListener l : m_listeners) {
 					l.safetyStateChanged(SafetyState.fromOrdinal(mSafetyState));
+				}
 			}
 		}
 
@@ -126,13 +128,8 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 	 * ()
 	 */
 	public void allActualValuesUpdated() {
-		if (changed) {
-			for (int i = 0; i < m_listeners.size(); i++) {
-				((KvtMainModeListener) m_listeners.elementAt(i)).mainModeChanged(m_actualMainMode);
-			}
-			changed = false;
-		}
-		
+		changed(mMainModeVar);
+		changed(mSafetyStateVar);
 	}
 
 	/*
