@@ -25,13 +25,13 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	private final String mAxisNameVarnameStub = "_system.gRcSelectedRobotData.axesName[{0}]";
 	private final String mAxisPosValueVarnameStub = "_system.gRcSelectedRobotData.axisPosValue[{0}]";
 
-	private final String mCartPosNameVarnameStub = "_system.gRcSelectedRobotData.cartCompName[{0}]";
-	private final String mCartPosVarVarnameStub = "_system.gRcSelectedRobotData.worldPosValue[{0}]";
-	private final String mCartVelVarname = "_system.gRcSelectedRobotData.cartPathVel";
-	private final String mSelToolName = "_system.gRcSelectedRobotData.selectedToolName";
-	private final String mSelRefsysVarname = "_system.gRcSelectedRobotData.selectedRefSysName";
-	private final String mChosenRefsysVarname = "_system.gRcSelectedRobotData.chosenRefSys.sInstanceName";
-	private final String mChosenToolVarname = "_system.gRcSelectedRobotData.chosenTool.toolName";
+	private final String							mCartPosNameVarnameStub		= "_system.gRcSelectedRobotData.cartCompName[{0}]";
+	private final String							mCartPosVarVarnameStub		= "_system.gRcSelectedRobotData.worldPosValue[{0}]";
+	private final String							mCartVelVarname				= "_system.gRcSelectedRobotData.cartPathVel";
+	private final String							mSelToolName				= "_system.gRcSelectedRobotData.selectedToolName";
+	private final String							mSelRefsysVarname			= "_system.gRcSelectedRobotData.selectedRefSysName";
+	private final String							mChosenRefsysVarname		= "_system.gRcSelectedRobotData.chosenRefSys.sInstanceName";
+	private final String							mChosenToolVarname			= "_system.gRcSelectedRobotData.chosenTool.toolName";
 
 	private final String mOverrideVarname = "_system.gRcData.override";
 
