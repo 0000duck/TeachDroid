@@ -183,7 +183,7 @@ public class OverviewFragment extends Fragment implements KvtDriveStateListener,
 	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
 	 * #cartesianPositionChanged(java.lang.String, java.lang.Number)
 	 */
-	public void cartesianPositionChanged(String _compName, Number _value) {
+	public void cartesianPositionChanged(int _cartNo,String _compName, Number _value) {
 	}
 
 	/*

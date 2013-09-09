@@ -4,7 +4,7 @@
     android:layout_height="match_parent" >
 
     <TextView
-        android:id="@+id/textView1"
+        android:id="@+id/cartTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -13,13 +13,13 @@
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <ListView
-        android:id="@+id/listView1"
+        android:id="@+id/cartList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/textView1"
-        android:entries="@array/pref_example_list_titles" >
-
+        android:layout_below="@+id/cartTitle"
+        android:divider="@null"
+        android:dividerHeight="0dp" >
     </ListView>
 
 </RelativeLayout>

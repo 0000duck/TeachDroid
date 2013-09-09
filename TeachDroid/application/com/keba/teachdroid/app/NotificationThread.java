@@ -1,5 +1,9 @@
 package com.keba.teachdroid.app;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -31,8 +35,9 @@ public class NotificationThread extends Thread implements KvtAlarmUpdaterListene
 
 	public void messageAdded(String _bufferName, KMessage _msg) {
 		Message msg = new Message(_msg);
+		DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
 		Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context).setSmallIcon(msg.getImageID()).setContentTitle(msg.getDate().toString()).setContentText(_msg.getMessageText()).setSound(soundUri);
+		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context).setSmallIcon(msg.getImageID()).setContentTitle(df.format(msg.getDate()).toString()).setContentText(_msg.getMessageText()).setSound(soundUri);
 		// Creates an explicit intent for an Activity in your app
 		Intent resultIntent = new Intent(context, InfoActivity.class);
 

@@ -53,10 +53,10 @@ import com.keba.teachdroid.app.Message;
  */
 public class RobotControlProxy {
 
-	private static final String				ROBOT_CONTROL_LOGTAG	= "RobotControl";
-	private static String					mClientID;
-	private static boolean					mConnected;
-	private static RobotControlDataListener	mDataListener;
+	private static final String ROBOT_CONTROL_LOGTAG = "RobotControl";
+	private static String mClientID;
+	private static boolean mConnected;
+	private static RobotControlDataListener mDataListener;
 
 	/**
 	 * connects to all classes which load information from the PLC by
@@ -311,46 +311,45 @@ public class RobotControlProxy {
 	 * @author ltz
 	 * @since 04.07.2013
 	 */
-	private static class RobotControlDataListener extends Observable implements KvtTeachviewConnectionListener, KvtMainModeListener,
-			KvtMotionModeListener, KvtProjectAdministratorListener, KvtAlarmUpdaterListener, KvtPositionMonitorListener, KvtDriveStateListener,
-			KvtProgramStateListener, KvtTraceUpdateListener {
+	private static class RobotControlDataListener extends Observable implements KvtTeachviewConnectionListener, KvtMainModeListener, KvtMotionModeListener, KvtProjectAdministratorListener, KvtAlarmUpdaterListener, KvtPositionMonitorListener,
+			KvtDriveStateListener, KvtProgramStateListener, KvtTraceUpdateListener {
 
 		/**
 		 * reference to the data function layer
 		 */
-		private KTcDfl								mDfl;
+		private KTcDfl mDfl;
 		/**
 		 * the current main mode, could be 4 (AE), 1 (A) or 2 (T1)
 		 */
-		private int									mCurrentMainMode	= -1;
+		private int mCurrentMainMode = -1;
 		/**
 		 * This list is populated as messages are reported. all past messages
 		 * are stored there, they are never deleted
 		 */
-		private Hashtable<String, List<KMessage>>	mMessageHistory		= new Hashtable<String, List<KMessage>>();
-		private Object								mMsgHistoryLock		= new Object();
-		private Object								mMsgBufferLock		= new Object();
+		private Hashtable<String, List<KMessage>> mMessageHistory = new Hashtable<String, List<KMessage>>();
+		private Object mMsgHistoryLock = new Object();
+		private Object mMsgBufferLock = new Object();
 		/**
 		 * new messages are stored here, and are removed from the list when they
 		 * are confirmed via a button
 		 */
-		private Hashtable<String, List<KMessage>>	mMessageQueue		= new Hashtable<String, List<KMessage>>();
-		private KMessage							mLastMessage		= null;
-		private SafetyState							mSafetyState;
-		private String								mChosenRefsys;
-		private String								mToolName;
-		private boolean								mIsAnyProgRunning;
-		private ProgramState						mProgState			= null;
-		private ProgramMode							mProgMode			= null;
-		private String								mLoadedProgram;
-		private Boolean								mDrivesRerenced;
-		private Boolean								mDrivesReady;
-		private boolean								mHasPower;
-		private Number								mOverride			= 0;
-		private List<KvtProject>					mProjects			= new Vector<KvtProject>();
-		private float								mPathVelocity;
-		private String								mJogTool;
-		private String								mJogRefsys;
+		private Hashtable<String, List<KMessage>> mMessageQueue = new Hashtable<String, List<KMessage>>();
+		private KMessage mLastMessage = null;
+		private SafetyState mSafetyState;
+		private String mChosenRefsys;
+		private String mToolName;
+		private boolean mIsAnyProgRunning;
+		private ProgramState mProgState = null;
+		private ProgramMode mProgMode = null;
+		private String mLoadedProgram;
+		private Boolean mDrivesRerenced;
+		private Boolean mDrivesReady;
+		private boolean mHasPower;
+		private Number mOverride = 0;
+		private List<KvtProject> mProjects = new Vector<KvtProject>();
+		private float mPathVelocity;
+		private String mJogTool;
+		private String mJogRefsys;
 
 		public void teachviewConnected() {
 			mConnected = true;
@@ -570,7 +569,7 @@ public class RobotControlProxy {
 		 * KvtPositionMonitorListener
 		 * #cartesianPositionChanged(java.lang.String, java.lang.Number)
 		 */
-		public void cartesianPositionChanged(String _compName, Number _value) {
+		public void cartesianPositionChanged(int _cartNo, String _compName, Number _value) {
 			Log.d("KvtPositionMonitor", "Component " + _compName + ": " + _value);
 			notifyObservers();
 		}
