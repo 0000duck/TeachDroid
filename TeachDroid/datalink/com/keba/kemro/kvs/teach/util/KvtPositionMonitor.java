@@ -31,7 +31,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	private final String mSelToolName = "_system.gRcSelectedRobotData.selectedToolName";
 	private final String mSelRefsysVarname = "_system.gRcSelectedRobotData.selectedRefSysName";
 	private final String mChosenRefsysVarname = "_system.gRcSelectedRobotData.chosenRefSys.sInstanceName";
-	private final String mChosenToolVarname = "_system.gRcSelectedRobotData.chosenTool";
+	private final String							mChosenToolVarname			= "_system.gRcSelectedRobotData.chosenTool.toolName";
 
 	private final String mOverrideVarname = "_system.gRcData.override";
 
