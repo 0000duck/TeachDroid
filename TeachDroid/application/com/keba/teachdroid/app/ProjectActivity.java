@@ -23,6 +23,7 @@ import com.keba.kemro.kvs.teach.data.project.KvtProgram;
 import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtExecutionMonitor;
+import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
 import com.keba.kemro.kvs.teach.util.Log;
 import com.keba.teachdroid.app.fragments.InnerDetailFragment;
 import com.keba.teachdroid.app.fragments.InnerListFragment;
@@ -88,8 +89,9 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 		mViewPager.setOffscreenPageLimit(3);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
+
 		// late-load the project list
-		projects = RobotControlProxy.getProjects();
+		KvtSystemCommunicator.getTcDfl().directory.refreshProjects();
 
 		for (KvtProject proj : projects) {
 			programs.add(Arrays.asList(proj.getPrograms()));

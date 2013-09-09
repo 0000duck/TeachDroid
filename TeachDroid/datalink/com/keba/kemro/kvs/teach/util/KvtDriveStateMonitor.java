@@ -124,9 +124,9 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener,
 	 * ()
 	 */
 	public void allActualValuesUpdated() {
-		changed(mDriveIsReadyVar);
-		changed(mDriveIsRefVar);
-		changed(mDrivesPowerVar);
+		// changed(mDriveIsReadyVar);
+		// changed(mDriveIsRefVar);
+		// changed(mDrivesPowerVar);
 	}
 
 	/*

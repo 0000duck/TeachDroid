@@ -82,7 +82,7 @@ public class ProjectListFragment extends ListFragment implements KvtProjectAdmin
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		KvtProjectAdministrator.addProjectListener(this);
 		mAdapter = new ArrayAdapter<KvtProject>(getActivity(), android.R.layout.simple_list_item_activated_1, android.R.id.text1,
 				new Vector<KvtProject>());
 		setListAdapter(mAdapter);
