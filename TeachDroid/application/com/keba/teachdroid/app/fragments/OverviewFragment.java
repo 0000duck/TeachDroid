@@ -232,7 +232,7 @@ public class OverviewFragment extends Fragment implements KvtDriveStateListener,
 	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
 	 * #chosenRefSysChanged(java.lang.String)
 	 */
-	public void chosenRefSysChanged(String _refsysName) {
+	public void selectedRefSysChanged(String _refsysName) {
 	}
 
 	/*
@@ -242,7 +242,27 @@ public class OverviewFragment extends Fragment implements KvtDriveStateListener,
 	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
 	 * #chosenToolChanged(java.lang.String)
 	 */
-	public void chosenToolChanged(String _toolName) {
+	public void selectedToolChanged(String _toolName) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
+	 * #jogToolChanged(java.lang.String)
+	 */
+	public void jogToolChanged(String _jogTool) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
+	 * #jogRefsysChanged(java.lang.String)
+	 */
+	public void jogRefsysChanged(String _jogRefsys) {
 	}
 
 }

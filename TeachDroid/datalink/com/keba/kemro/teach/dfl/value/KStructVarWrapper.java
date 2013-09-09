@@ -444,6 +444,7 @@ public class KStructVarWrapper {
 					}
 				}
 			}
+			m_actualValue = value;
 		}
 		return value;
 	}
@@ -574,7 +575,8 @@ public class KStructVarWrapper {
 	 */
 	@Override
 	public String toString() {
-		return getKey();
+		// return getKey();
+		return getRootPathString();
 	}
 
 	/**

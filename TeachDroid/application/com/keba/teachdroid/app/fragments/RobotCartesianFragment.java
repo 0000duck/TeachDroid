@@ -1,15 +1,15 @@
 package com.keba.teachdroid.app.fragments;
 
-import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
-import com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener;
-import com.keba.teachdroid.app.R;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
+import com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener;
+import com.keba.teachdroid.app.R;
 
 public class RobotCartesianFragment extends Fragment implements KvtPositionMonitorListener {
 	private transient View mRootView;
@@ -45,11 +45,45 @@ public class RobotCartesianFragment extends Fragment implements KvtPositionMonit
 
 	}
 
-	public void chosenRefSysChanged(String _refsysName) {
 
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
+	 * #jogToolChanged(java.lang.String)
+	 */
+	public void jogToolChanged(String _jogTool) {
 	}
 
-	public void chosenToolChanged(String _toolName) {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
+	 * #jogRefsysChanged(java.lang.String)
+	 */
+	public void jogRefsysChanged(String _jogRefsys) {
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
+	 * #selectedRefSysChanged(java.lang.String)
+	 */
+	public void selectedRefSysChanged(String _refsysName) {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener
+	 * #selectedToolChanged(java.lang.String)
+	 */
+	public void selectedToolChanged(String _toolName) {
 	}
 }

@@ -19,45 +19,47 @@ import com.keba.kemro.teach.dfl.value.KVariableGroupListener;
  */
 public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewConnectionListener {
 
-	private static KvtPositionMonitor mInstance;
-	private KTcDfl mDfl;
-	private KVariableGroup mVarGroup;
-	private final String mAxisNameVarnameStub = "_system.gRcSelectedRobotData.axesName[{0}]";
-	private final String mAxisPosValueVarnameStub = "_system.gRcSelectedRobotData.axisPosValue[{0}]";
+	private static KvtPositionMonitor				mInstance;
+	private KTcDfl									mDfl;
+	private KVariableGroup							mVarGroup;
+	private final String							mAxisNameVarnameStub		= "_system.gRcSelectedRobotData.axesName[{0}]";
+	private final String							mAxisPosValueVarnameStub	= "_system.gRcSelectedRobotData.axisPosValue[{0}]";
 
-	private final String mCartPosNameVarnameStub = "_system.gRcSelectedRobotData.cartCompName[{0}]";
-	private final String mCartPosVarVarnameStub = "_system.gRcSelectedRobotData.worldPosValue[{0}]";
-	private final String mCartVelVarname = "_system.gRcSelectedRobotData.cartPathVel";
-	private final String mSelToolName = "_system.gRcSelectedRobotData.selectedToolName";
-	private final String mSelRefsysVarname = "_system.gRcSelectedRobotData.selectedRefSysName";
-	private final String mChosenRefsysVarname = "_system.gRcSelectedRobotData.chosenRefSys";
-	private final String mChosenToolVarname = "_system.gRcSelectedRobotData.chosenTool";
+	private final String							mCartPosNameVarnameStub		= "_system.gRcSelectedRobotData.cartCompName[{0}]";
+	private final String							mCartPosVarVarnameStub		= "_system.gRcSelectedRobotData.worldPosValue[{0}]";
+	private final String							mCartVelVarname				= "_system.gRcSelectedRobotData.cartPathVel";
+	private final String							mSelToolName				= "_system.gRcSelectedRobotData.selectedToolName";
+	private final String							mSelRefsysVarname			= "_system.gRcSelectedRobotData.selectedRefSysName";
+	private final String							mChosenRefsysVarname		= "_system.gRcSelectedRobotData.chosenRefSys.sInstanceName";
+	private final String							mChosenToolVarname			= "_system.gRcSelectedRobotData.chosenTool";
 
-	private final String mOverrideVarname = "_system.gRcData.override";
+	private final String							mOverrideVarname			= "_system.gRcData.override";
 
-	private List<KStructVarWrapper> mAxisPositionVars = new Vector<KStructVarWrapper>();
-	private List<Number> mAxisPositionOldValue = new Vector<Number>();
-	private List<KStructVarWrapper> mNameVars = new Vector<KStructVarWrapper>();
+	private List<KStructVarWrapper>					mAxisPositionVars			= new Vector<KStructVarWrapper>();
+	private List<Number>							mAxisPositionOldValue		= new Vector<Number>();
+	private List<KStructVarWrapper>					mNameVars					= new Vector<KStructVarWrapper>();
 
-	private List<KStructVarWrapper> mCartPosVars = new Vector<KStructVarWrapper>();
-	private List<Number> mCartPosOldValue = new Vector<Number>();
-	private List<KStructVarWrapper> mCartNameVars = new Vector<KStructVarWrapper>();
-	private KStructVarWrapper mOverrideVar;
-	private KStructVarWrapper mCartVelVar;
-	private KStructVarWrapper mSelectedRefSysVar;
-	private KStructVarWrapper mChosenRefSysVar;
-	private KStructVarWrapper mChosenToolVar;
-	private KStructVarWrapper mSelectedToolVar;
+	private List<KStructVarWrapper>					mCartPosVars				= new Vector<KStructVarWrapper>();
+	private List<Number>							mCartPosOldValue			= new Vector<Number>();
+	private List<KStructVarWrapper>					mCartNameVars				= new Vector<KStructVarWrapper>();
+	private KStructVarWrapper						mOverrideVar;
+	private KStructVarWrapper						mCartVelVar;
+	private KStructVarWrapper						mSelectedRefSysVar;
+	private KStructVarWrapper						mChosenRefSysVar;
+	private KStructVarWrapper						mChosenToolVar;
+	private KStructVarWrapper						mSelectedToolVar;
 
-	private String mSelectedRefSys;
-	private String mChosenTool;
-	protected DataModel mRefsysmodel;
-	protected DataModel mToolmodel;
-	private float mOldOvr;
+	private String									mChosenRefsys;
+	private String									mChosenTool;
+	protected DataModel								mRefsysmodel;
+	protected DataModel								mToolmodel;
+	private float									mOldOvr;
+	private String									mSelectedTool;
+	private String									mSelectedRefsys;
 
-	private static List<KvtPositionMonitorListener> mListeners = new Vector<KvtPositionMonitor.KvtPositionMonitorListener>();
-	private static List<KvtOverrideChangedListener> mOverrideListeners = new Vector<KvtPositionMonitor.KvtOverrideChangedListener>();
-	private static Object mInstancelock = new Object();
+	private static List<KvtPositionMonitorListener>	mListeners					= new Vector<KvtPositionMonitor.KvtPositionMonitorListener>();
+	private static List<KvtOverrideChangedListener>	mOverrideListeners			= new Vector<KvtPositionMonitor.KvtOverrideChangedListener>();
+	private static Object							mInstancelock				= new Object();
 
 	public static void init() {
 		mInstance = new KvtPositionMonitor();
@@ -117,23 +119,46 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 			if (!_variable.readActualValue(null).equals(mCartVelVar.readActualValue(null)))
 				for (KvtPositionMonitorListener l : mListeners)
 					l.pathVelocityChanged(((Number) _variable.readActualValue(null)).floatValue());
+
 		} else if (_variable.equals(mSelectedRefSysVar)) {
 			Object v = _variable.readActualValue(null);
-			if (mSelectedRefSys == null)
-				mSelectedRefSys = new String();
-			if (v != null && v instanceof String && !mSelectedRefSys.equals(v)) {
-				mSelectedRefSys = (String) v;
+			if (mSelectedRefsys == null)
+				mSelectedRefsys = new String();
+			if (v != null && v instanceof String && !mSelectedRefsys.equals(v)) {
+				mSelectedRefsys = (String) v;
 				for (KvtPositionMonitorListener l : mListeners)
-					l.chosenRefSysChanged(mSelectedRefSys);
+					l.selectedRefSysChanged(mSelectedRefsys);
 
 			}
 		} else if (_variable.equals(mSelectedToolVar)) {
 			Object v = _variable.getActualValue();
 			if (v != null && v instanceof String) {
+				mSelectedTool = (String) v;
+				for (KvtPositionMonitorListener l : mListeners)
+					l.selectedToolChanged(mSelectedTool);
+			}
+		} else if (_variable.equals(mChosenRefSysVar)) {
+			Object val = _variable.getActualValue();
+			if (mChosenRefsys == null)
+				mChosenRefsys = new String();
+
+			if (val != null && !mChosenRefsys.equals(val)) {
+				mChosenRefsys = val.toString();
+			}
+			for (KvtPositionMonitorListener l : mListeners)
+				l.jogRefsysChanged(mChosenRefsys);
+
+		} else if (_variable.equals(mChosenToolVar)) {
+			Object v = _variable.getActualValue();
+			if (mChosenTool == null)
+				mChosenTool = new String();
+			if (v != null && v instanceof String && !mChosenTool.equals(v)) {
 				mChosenTool = (String) v;
 				for (KvtPositionMonitorListener l : mListeners)
-					l.chosenToolChanged(mChosenTool);
+					l.jogToolChanged(mChosenTool);
 			}
+		} else {
+			System.out.println(_variable.getRootPathString() + ": " + _variable.readActualValue(null));
 		}
 	}
 
@@ -145,18 +170,18 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	 * ()
 	 */
 	public void allActualValuesUpdated() {
-//		for (KvtPositionMonitorListener l : mListeners) {
-//			for (int i = 0; i < mAxisPositionVars.size(); i++) {
-//				changed(mAxisPositionVars.get(i));
-//			}
-//			for (int i = 0; i < mCartPosVars.size(); i++) {
-//				changed(mCartPosVars.get(i));
-//			}
-//			changed(mCartVelVar);
-//			changed(mSelectedRefSysVar);
-//			changed(mSelectedToolVar);
-//			changed(mOverrideVar);
-//		}
+		// for (KvtPositionMonitorListener l : mListeners) {
+		// for (int i = 0; i < mAxisPositionVars.size(); i++) {
+		// changed(mAxisPositionVars.get(i));
+		// }
+		// for (int i = 0; i < mCartPosVars.size(); i++) {
+		// changed(mCartPosVars.get(i));
+		// }
+		// changed(mCartVelVar);
+		// changed(mSelectedRefSysVar);
+		// changed(mSelectedToolVar);
+		// changed(mOverrideVar);
+		// }
 	}
 
 	protected int getNumAxes() {
@@ -186,7 +211,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 			createOverrideVariables();
 
 			// activate
-			//mVarGroup.setPollInterval(100);
+			mVarGroup.setPollInterval(100);
 			mVarGroup.activate();
 
 		}
@@ -226,7 +251,8 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 			if (w1 != null) {
 				mCartNameVars.add(w1);
 				mVarGroup.add(w1);
-			}
+			} else
+				System.err.println("Variable " + compVar + " not created!");
 
 			// cartesian position vars
 			String posVar = MessageFormat.format(mCartPosVarVarnameStub, i);
@@ -235,6 +261,8 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 				mCartPosVars.add(w2);
 				mCartPosOldValue.add(0);
 				mVarGroup.add(w2);
+			} else {
+				System.err.println("Variable " + posVar + " not created!");
 			}
 
 		}
@@ -246,8 +274,9 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 		mChosenRefSysVar = mDfl.variable.createKStructVarWrapper(mChosenRefsysVarname);
 		mVarGroup.add(mChosenRefSysVar);
 
-		mChosenToolVar = mDfl.variable.createKStructVarWrapper(mChosenToolVarname);
-		mVarGroup.add(mChosenToolVar);
+		// mChosenToolVar =
+		// mDfl.variable.createKStructVarWrapper(mChosenToolVarname);
+		// mVarGroup.add(mChosenToolVar);
 
 		mSelectedRefSysVar = mDfl.variable.createKStructVarWrapper(mSelRefsysVarname);
 		if (mSelectedRefSysVar != null)
@@ -341,6 +370,25 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 		public void cartesianPositionChanged(String _compName, Number _value);
 
 		/**
+		 * Called when the tool setting used for manual jogging has changed.
+		 * This does not affect automatic programs!
+		 * 
+		 * @param _jogTool
+		 *            The name of the now selected jog tool.
+		 */
+		public void jogToolChanged(String _jogTool);
+
+		/**
+		 * Called then the cartesian system of reference used for manual jogging
+		 * has been changed. Note that this does not affect automatic programs!
+		 * This method may also be invoked when an automatic program starts.
+		 * 
+		 * @param _jogRefsys
+		 *            The name of the now selected frame of reference
+		 */
+		public void jogRefsysChanged(String _jogRefsys);
+
+		/**
 		 * @param _velocityMms
 		 */
 		public void pathVelocityChanged(float _velocityMms);
@@ -348,24 +396,26 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 		public void axisPositionChanged(int axisNo, Number _value, String _axisName);
 
 		/**
-		 * Called when the robot's geometric frame of reference has changed
+		 * Called when the robot's geometric frame of reference has changed from
+		 * within an automatic program.
 		 * 
 		 * @param _mChosenRefSys
 		 *            The name of the new reference system
 		 */
-		void chosenRefSysChanged(String _refsysName);
+		void selectedRefSysChanged(String _refsysName);
 
 		/**
-		 * Called when the chosen tool of the robot has changed
+		 * Called when the chosen tool of the robot has changed from within an
+		 * automatic program
 		 * 
 		 * @param _mChosenTool
 		 *            The name of the new tool
 		 */
-		void chosenToolChanged(String _toolName);
+		void selectedToolChanged(String _toolName);
 	}
 
 	public static String getChosenRefSys() {
-		return mInstance.mSelectedRefSys;
+		return mInstance.mChosenRefsys;
 	}
 
 	public static String getChosenTool() {

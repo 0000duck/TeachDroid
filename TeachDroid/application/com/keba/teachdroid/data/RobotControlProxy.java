@@ -348,6 +348,9 @@ public class RobotControlProxy {
 		private boolean								mHasPower;
 		private Number								mOverride			= 0;
 		private List<KvtProject>					mProjects			= new Vector<KvtProject>();
+		private float								mPathVelocity;
+		private String								mJogTool;
+		private String								mJogRefsys;
 
 		public void teachviewConnected() {
 			mConnected = true;
@@ -687,7 +690,7 @@ public class RobotControlProxy {
 		 * @see com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.
 		 * KvtMainModeListener#chosenToolChanged(java.lang.String)
 		 */
-		public void chosenToolChanged(String _toolName) {
+		public void selectedToolChanged(String _toolName) {
 			mToolName = _toolName;
 			notifyObservers();
 		}
@@ -698,7 +701,7 @@ public class RobotControlProxy {
 		 * @see com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.
 		 * KvtMainModeListener#chosenRefSysChanged(java.lang.String)
 		 */
-		public void chosenRefSysChanged(String _refsysName) {
+		public void selectedRefSysChanged(String _refsysName) {
 			mChosenRefsys = _refsysName;
 			notifyObservers();
 		}
@@ -733,6 +736,9 @@ public class RobotControlProxy {
 		 * KvtPositionMonitorListener#pathVelocityChanged(float)
 		 */
 		public void pathVelocityChanged(float _velocityMms) {
+			setPathVelocity(_velocityMms);
+			setChanged();
+			notifyObservers(_velocityMms);
 		}
 
 		/*
@@ -742,6 +748,58 @@ public class RobotControlProxy {
 		 * KvtTraceUpdateListener#lineReceived(java.lang.String)
 		 */
 		public void lineReceived(String _line) {
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.keba.kemro.kvs.teach.util.KvtPositionMonitor.
+		 * KvtPositionMonitorListener#jogToolChanged(java.lang.String)
+		 */
+		public void jogToolChanged(String _jogTool) {
+			setJogTool(_jogTool);
+			notifyObservers();
+		}
+
+		/*
+		 * (non-Javadoc)
+		 * 
+		 * @see com.keba.kemro.kvs.teach.util.KvtPositionMonitor.
+		 * KvtPositionMonitorListener#jogRefsysChanged(java.lang.String)
+		 */
+		public void jogRefsysChanged(String _jogRefsys) {
+			mJogRefsys = _jogRefsys;
+			notifyObservers();
+		}
+
+		/**
+		 * @return the pathVelocity
+		 */
+		public float getPathVelocity() {
+			return mPathVelocity;
+		}
+
+		/**
+		 * @param pathVelocity
+		 *            the pathVelocity to set
+		 */
+		public void setPathVelocity(float pathVelocity) {
+			mPathVelocity = pathVelocity;
+		}
+
+		/**
+		 * @return the jogTool
+		 */
+		public String getJogTool() {
+			return mJogTool;
+		}
+
+		/**
+		 * @param jogTool
+		 *            the jogTool to set
+		 */
+		public void setJogTool(String jogTool) {
+			mJogTool = jogTool;
 		}
 	}
 

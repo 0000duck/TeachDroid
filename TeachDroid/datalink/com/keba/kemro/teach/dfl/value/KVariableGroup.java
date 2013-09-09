@@ -265,7 +265,8 @@ public class KVariableGroup {
 						}
 					}
 					// if (changedIds != null && changedIds.length > 0) {
-					// System.out.println(refreshCnt + ": " + m_sGroupName + " updated " + changedIds.length + " variables ");
+					// System.out.println(refreshCnt + ": " + m_sGroupName +
+					// " updated " + changedIds.length + " variables ");
 
 					// }
 				}
@@ -562,11 +563,13 @@ public class KVariableGroup {
 	 * @param _kstructVarWrappers
 	 */
 	private void setVarIds(int[] _ids, Vector _kstructVarWrappers) {
-		if (_ids.length <= _kstructVarWrappers.size()) {
+		if (_ids.length == _kstructVarWrappers.size()) {
 			for (int i = 0; i < _ids.length; i++) {
 				((KStructVarWrapper) _kstructVarWrappers.elementAt(i)).setVarId(_ids[i]);
 			}
-		}
+		} else
+			throw new IllegalArgumentException("Number of the IDs (" + _ids.length + ") and number of variables (" + _kstructVarWrappers.size()
+					+ ") do not match!");
 
 	}
 
