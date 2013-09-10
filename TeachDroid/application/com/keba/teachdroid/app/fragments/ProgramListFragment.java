@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
-public class InnerDetailFragment extends ListFragment {
+public class ProgramListFragment extends ListFragment {
 	/**
 	 * The fragment's current callback object, which is notified of list item
 	 * clicks.
@@ -38,7 +38,7 @@ public class InnerDetailFragment extends ListFragment {
 		public void onProgramSelected(int id);
 	}
 
-	public InnerDetailFragment() {
+	public ProgramListFragment() {
 
 	}
 	

@@ -66,6 +66,7 @@ public class KDirectoryAdministrator {
 			/**
 			 * @see com.keba.kemro.teach.network.TcConnectionListener#connectionStateChanged(boolean)
 			 */
+			@Override
 			public void connectionStateChanged(boolean isConnected) {
 				if (isConnected) {
 				} else {
@@ -139,8 +140,8 @@ public class KDirectoryAdministrator {
 			if (m_projectList == null) {
 				loadAllProjectEntries();
 			}
+			return m_projectList;
 		}
-		return m_projectList;
 	}
 
 	/**
