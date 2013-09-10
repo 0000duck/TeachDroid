@@ -83,19 +83,25 @@ public class KvtProgramStateMonitor implements KvtTeachviewConnectionListener, K
 
 	}
 
-	private static KvtProgramStateMonitor			mInstance;
+	private static KvtProgramStateMonitor mInstance;
 
-	private final String							mRobotDataPrefix			= "_system.gRcDataRobot[{0}]";
-	private final String							mProgNamePostfix			= ".progName";
-	private final String							mProgStatePostfix			= ".progState";
-	private final String							mProgModePostfix			= ".progMode";
-	private final String							mNoProgramRunningPostfix	= ".noProgramRunning";
+	private final String mRobotDataPrefix = "_system.gRcDataRobot[{0}]";
+	private final String mProgNamePostfix = ".progName";
+	private final String mProgStatePostfix = ".progState";
+	private final String mProgModePostfix = ".progMode";
+	private final String mNoProgramRunningPostfix = ".noProgramRunning";
 
-	private KStructVarWrapper						mProgNameVar, mProgStateVar, mProgModeVar, mNoProgRunningVar;
+	private KStructVarWrapper mProgNameVar, mProgStateVar, mProgModeVar, mNoProgRunningVar;
 
-	private KVariableGroup							mVarGroup;
-	private KTcDfl									mDfl;
-	private static List<KvtProgramStateListener>	mListeners					= new Vector<KvtProgramStateListener>();
+	private static String mProgName;
+	private static ProgramState mProgState;
+	private static ProgramMode mProgMode;
+	private static boolean mNoProgRunning;
+
+	private KVariableGroup mVarGroup;
+	private KTcDfl mDfl;
+
+	private static List<KvtProgramStateListener> mListeners = new Vector<KvtProgramStateListener>();
 
 	/**
 	 * enumeration type for the program mode, i.e. in which execution mode the
@@ -106,16 +112,15 @@ public class KvtProgramStateMonitor implements KvtTeachviewConnectionListener, K
 	 */
 	public static enum ProgramMode {
 
-		eProgModeNoProg("N/A"), eProgModeContinous("CONT"), eProgModeInterpreterStep("STEP"), eProgModeMotionStep("MSTEP"), eProgModeBackward(
-				"BACK"), eMotionStepMax("STEMPAX");
+		eProgModeNoProg("N/A"), eProgModeContinous("CONT"), eProgModeInterpreterStep("STEP"), eProgModeMotionStep("MSTEP"), eProgModeBackward("BACK"), eMotionStepMax("STEMPAX");
 
-		private String	mStringValue;
+		private String mStringValue;
 
 		private ProgramMode(String _val) {
-			this.mStringValue=_val;
+			this.mStringValue = _val;
 		}
 
-		private static ProgramMode[]	allValues	= values();
+		private static ProgramMode[] allValues = values();
 
 		public static ProgramMode fromOrdinal(int n) {
 			return allValues[n];
@@ -135,7 +140,7 @@ public class KvtProgramStateMonitor implements KvtTeachviewConnectionListener, K
 	 */
 	public static enum ProgramState {
 		eProgStateNoProg, eProgStateStopped, eProgStateRunning, eProgStateInterrupted, eProgStateRepositioning, eMotionStateMax;
-		private static ProgramState[]	allValues	= values();
+		private static ProgramState[] allValues = values();
 
 		public static ProgramState fromOrdinal(int n) {
 			return allValues[n];
@@ -153,6 +158,22 @@ public class KvtProgramStateMonitor implements KvtTeachviewConnectionListener, K
 
 	}
 
+	public static String getLoadedProgram() {
+		return mProgName;
+	}
+
+	public static ProgramState getProgramState() {
+		return mProgState;
+	}
+
+	public static ProgramMode getProgramMode() {
+		return mProgMode;
+	}
+
+	public static boolean getNoProgramRunning() {
+		return mNoProgRunning;
+	}
+
 	/**
 	 * avoid instance creation by making the CTor invisible
 	 */
@@ -168,23 +189,25 @@ public class KvtProgramStateMonitor implements KvtTeachviewConnectionListener, K
 	 * .kemro.teach.dfl.value.KStructVarWrapper)
 	 */
 	public void changed(KStructVarWrapper _variable) {
-		if (_variable.equals(mProgNameVar))
+		if (_variable.equals(mProgNameVar)) {
+			mProgName = (String) _variable.readActualValue(null);
 			for (KvtProgramStateListener l : mListeners) {
-				l.loadedProgramNameChanged((String) _variable.readActualValue(null));
+				l.loadedProgramNameChanged(mProgName);
 			}
-		else if (_variable.equals(mProgModeVar)) {
+		} else if (_variable.equals(mProgModeVar)) {
+			mProgMode = ProgramMode.fromOrdinal((Integer) _variable.readActualValue(null));
 			for (KvtProgramStateListener l : mListeners) {
-				l.loadedProgramModeChanged(ProgramMode.fromOrdinal((Integer) _variable.readActualValue(null)));
+				l.loadedProgramModeChanged(mProgMode);
 			}
 		} else if (_variable.equals(mProgStateVar)) {
+			mProgState = ProgramState.fromOrdinal((Integer) _variable.readActualValue(null));
 			for (KvtProgramStateListener l : mListeners) {
-				l.loadedProgramStateChanged(ProgramState.fromOrdinal((Integer) _variable.readActualValue(null)));
+				l.loadedProgramStateChanged(mProgState);
 			}
-		}
-
-		else if (_variable.equals(mNoProgRunningVar)) {
+		} else if (_variable.equals(mNoProgRunningVar)) {
+			mNoProgRunning = !(Boolean) _variable.readActualValue(null);
 			for (KvtProgramStateListener l : mListeners) {
-				l.isAnyProgramRunning(!(Boolean) _variable.readActualValue(null));
+				l.isAnyProgramRunning(mNoProgRunning);
 			}
 		}
 	}
@@ -234,20 +257,27 @@ public class KvtProgramStateMonitor implements KvtTeachviewConnectionListener, K
 			String prefix = MessageFormat.format(mRobotDataPrefix, KvtMultiKinematikAdministrator.getKinematicIndex());
 
 			mProgNameVar = mDfl.variable.createKStructVarWrapper(prefix + mProgNamePostfix);
-			if (mProgNameVar != null)
+			if (mProgNameVar != null) {
+				mProgName = (String) mProgNameVar.readActualValue(null);
 				mVarGroup.add(mProgNameVar);
+			}
 
 			mProgStateVar = mDfl.variable.createKStructVarWrapper(prefix + mProgStatePostfix);
-			if (mProgStateVar != null)
+			if (mProgStateVar != null) {
+				mProgState = ProgramState.fromOrdinal((Integer) mProgStateVar.readActualValue(null));
 				mVarGroup.add(mProgStateVar);
+			}
 
 			mProgModeVar = mDfl.variable.createKStructVarWrapper(prefix + mProgModePostfix);
-			if (mProgModeVar != null)
+			if (mProgModeVar != null) {
+				mProgMode = ProgramMode.fromOrdinal((Integer) mProgModeVar.readActualValue(null));
 				mVarGroup.add(mProgModeVar);
-
+			}
 			mNoProgRunningVar = mDfl.variable.createKStructVarWrapper(prefix + mNoProgramRunningPostfix);
-			if (mNoProgRunningVar != null)
+			if (mNoProgRunningVar != null){
+				mNoProgRunning = !(Boolean) mNoProgRunningVar.readActualValue(null);
 				mVarGroup.add(mNoProgRunningVar);
+			}
 
 		}
 	}

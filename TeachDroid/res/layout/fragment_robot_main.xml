@@ -4,49 +4,53 @@
     android:layout_height="match_parent"
     android:background="@color/robot_main_orange" >
 
-    <ImageView
-        android:id="@+id/imageView1"
+    <TextView
+        android:id="@+id/refsysLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/robotNameLabel"
+        android:layout_below="@+id/robotNameLabel"
+        android:text="World"
+        android:drawableLeft="@drawable/ic_refsys"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <ImageView
+        android:id="@+id/robotImg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="10dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginBottom="10dp"
-        android:layout_marginRight="25dp"
-        android:layout_marginTop="8dp"
         android:src="@drawable/robot_small" />
-
-    <!-- <TextView -->
-    <!-- android:id="@+id/refsysLabel" -->
-    <!-- android:layout_width="wrap_content" -->
-    <!-- android:layout_height="wrap_content" -->
-    <!-- android:layout_alignRight="@+id/robotNameLabel" -->
-    <!-- android:layout_below="@+id/robotNameLabel" -->
-    <!-- android:layout_marginTop="16dp" -->
-    <!-- android:layout_marginRight="5dp" -->
-    <!-- android:text="Medium Text" -->
-    <!-- android:textAppearance="?android:attr/textAppearanceMedium" /> -->
 
     <TextView
         android:id="@+id/robotNameLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/imageView1"
-        android:layout_alignTop="@+id/imageView1"
-        android:layout_marginLeft="69dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginTop="42dp"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/robotImg"
         android:text="RobotName"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/toolLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/robotPower"
+        android:layout_below="@+id/refsysLabel"        
+        android:drawableLeft="@drawable/ic_tool"
+        android:text="Tool"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <CheckBox
         android:id="@+id/robotPower"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/robotNameLabel"
-        android:layout_below="@+id/robotNameLabel"
-        android:layout_marginTop="17dp"
-        android:text="@string/robotPower"
+        android:layout_alignLeft="@+id/refsysLabel"
+        android:layout_below="@+id/toolLabel"
         android:clickable="false"
+        android:text="@string/robotPower"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </RelativeLayout>

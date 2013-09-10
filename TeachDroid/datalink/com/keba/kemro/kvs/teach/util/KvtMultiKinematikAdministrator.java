@@ -9,6 +9,7 @@ import com.keba.kemro.teach.dfl.structural.KStructAdministratorListener;
 import com.keba.kemro.teach.dfl.structural.KStructNode;
 import com.keba.kemro.teach.dfl.structural.KStructRoot;
 import com.keba.kemro.teach.dfl.structural.KStructSystem;
+import com.keba.kemro.teach.dfl.structural.var.KStructVarLReal;
 import com.keba.kemro.teach.dfl.value.KStructVarWrapper;
 import com.keba.kemro.teach.dfl.value.KVariableGroup;
 import com.keba.kemro.teach.dfl.value.KVariableGroupListener;
@@ -17,15 +18,24 @@ public class KvtMultiKinematikAdministrator implements KMultikinematicListener, 
 	private static KStructVarWrapper kinematic;
 	private static KVariableGroup varGroup;
 	private static KvtMultiKinematikAdministrator admin;
+	private static boolean mInitialized;
 	private String filter;
 	private Hashtable masks = new Hashtable(19);
 	private String oldKinematic;
+	private KTcDfl mDfl;
+	private static Object mLck = new Object();
 
-	public static KvtMultiKinematikAdministrator init() {
-		if (admin == null) {
-			admin = new KvtMultiKinematikAdministrator();
+	public static void init() {
+		synchronized (mLck) {
+			if (!mInitialized) {
+				if (admin == null) {
+					admin = new KvtMultiKinematikAdministrator();
+				}
+				mInitialized = true;
+			}
+
 		}
-		return admin;
+		// return admin;
 	}
 
 	private KvtMultiKinematikAdministrator() {
@@ -69,25 +79,25 @@ public class KvtMultiKinematikAdministrator implements KMultikinematicListener, 
 
 	public void teachviewConnected() {
 		synchronized (this) {
-			KTcDfl dfl = KvtSystemCommunicator.getTcDfl();
-			if (dfl != null) {
-				synchronized (dfl.getLockObject()) {
-					varGroup = dfl.variable.createVariableGroup("masksettingadmin");
+			mDfl = KvtSystemCommunicator.getTcDfl();
+			if (mDfl != null) {
+				synchronized (mDfl.getLockObject()) {
+					varGroup = mDfl.variable.createVariableGroup("masksettingadmin");
 					varGroup.addListener(this);
 					varGroup.setPollInterval(500);
-					dfl.structure.addMultikinematikListener(this);
-					dfl.structure.addStructAdministratorListener(this);
-					treeChanged(dfl.structure.getRoot());
+					mDfl.structure.addMultikinematikListener(this);
+					mDfl.structure.addStructAdministratorListener(this);
+					treeChanged(mDfl.structure.getRoot());
 				}
 			}
 		}
 	}
 
 	public void teachviewDisconnected() {
-		KTcDfl dfl = KvtSystemCommunicator.getTcDfl();
-		if (dfl != null) {
-			dfl.structure.removeMultikinematicListener(this);
-			dfl.structure.removeStructAdministratorListener(this);
+		// mdfl = KvtSystemCommunicator.getTcDfl();
+		if (mDfl != null) {
+			mDfl.structure.removeMultikinematicListener(this);
+			mDfl.structure.removeStructAdministratorListener(this);
 			if (varGroup != null) {
 				varGroup.release();
 			}
@@ -130,7 +140,7 @@ public class KvtMultiKinematikAdministrator implements KMultikinematicListener, 
 
 	private synchronized String setFilterString() {
 		filter = "_global";
-		KTcDfl dfl = KvtSystemCommunicator.getTcDfl();
+		// KTcDfl dfl = KvtSystemCommunicator.getTcDfl();
 		int kin = -1;
 		if (kinematic != null) {
 			Object o = kinematic.readActualValue(null);
@@ -138,9 +148,9 @@ public class KvtMultiKinematikAdministrator implements KMultikinematicListener, 
 				kin = ((Integer) o).intValue();
 			}
 		}
-		if (dfl != null) {
+		if (mDfl != null) {
 			if (0 <= kin) {
-				KStructVarWrapper w = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcData.robotDir[" + kin + "]");
+				KStructVarWrapper w = mDfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcData.robotName[" + kin + "]");
 				if (w != null) {
 					filter = (String) w.readActualValue(null);
 					if ((filter == null) || (filter.length() == 0)) {

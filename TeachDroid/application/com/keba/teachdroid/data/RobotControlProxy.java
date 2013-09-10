@@ -214,8 +214,8 @@ public class RobotControlProxy {
 	}
 
 	public static String getRefsysName() {
-		// return KvtMainModeAdministrator.getChosenRefSys();
-		return mDataListener.mChosenRefsys;
+		 return KvtPositionMonitor.getChosenRefSys();
+//		return mDataListener.mChosenRefsys;
 	}
 
 	public static void setRefsysName(String _newRefsys) {
@@ -224,8 +224,8 @@ public class RobotControlProxy {
 	}
 
 	public static String getToolName() {
-		// return KvtMainModeAdministrator.getChosenTool();
-		return mDataListener.mToolName;
+		return KvtPositionMonitor.getChosenTool();
+//		return mDataListener.mToolName;
 	}
 
 	public static SafetyState getSafetyState() {
@@ -336,8 +336,8 @@ public class RobotControlProxy {
 		private Hashtable<String, List<KMessage>> mMessageQueue = new Hashtable<String, List<KMessage>>();
 		private KMessage mLastMessage = null;
 		private SafetyState mSafetyState;
-		private String mChosenRefsys;
-		private String mToolName;
+		private String mChosenRefsys = KvtPositionMonitor.getChosenRefSys();
+		private String mToolName = KvtPositionMonitor.getChosenTool();
 		private boolean mIsAnyProgRunning;
 		private ProgramState mProgState = null;
 		private ProgramMode mProgMode = null;
@@ -348,8 +348,8 @@ public class RobotControlProxy {
 		private Number mOverride = 0;
 		private List<KvtProject> mProjects = new Vector<KvtProject>();
 		private float mPathVelocity;
-		private String mJogTool;
-		private String mJogRefsys;
+		private String mJogTool = KvtPositionMonitor.getJogTool();
+		private String mJogRefsys = KvtPositionMonitor.getJogRefSys();
 
 		public void teachviewConnected() {
 			mConnected = true;

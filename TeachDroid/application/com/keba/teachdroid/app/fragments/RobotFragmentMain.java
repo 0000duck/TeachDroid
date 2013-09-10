@@ -1,5 +1,8 @@
 package com.keba.teachdroid.app.fragments;
 
+import java.util.concurrent.ExecutionException;
+
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -11,50 +14,75 @@ import android.widget.TextView;
 
 import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor;
 import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener;
+import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
+import com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener;
 import com.keba.kemro.kvs.teach.util.KvtMultiKinematikAdministrator;
 import com.keba.teachdroid.app.R;
 import com.keba.teachdroid.data.RobotControlProxy;
 
-public class RobotFragmentMain extends Fragment implements KvtDriveStateListener {
-	
-	TextView	mRobotNameLabel;
-	TextView	mRefSysLabel;
-	CheckBox	cb;
+public class RobotFragmentMain extends Fragment implements KvtDriveStateListener, KvtPositionMonitorListener {
+
+	TextView mRobotNameLabel;
+	TextView mRefSysLabel;
+	TextView mToolLabel;
+	CheckBox cb;
 	View mRootView;
-	
+
 	public RobotFragmentMain() {
 		KvtDriveStateMonitor.addListener(this);
+		KvtPositionMonitor.addListener((KvtPositionMonitorListener) this);
 	}
-	
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
 		mRootView = inflater.inflate(R.layout.fragment_robot_main, container, false);
 
 		mRobotNameLabel = (TextView) mRootView.findViewById(R.id.robotNameLabel);
-
+		mRefSysLabel = (TextView) mRootView.findViewById(R.id.refsysLabel);
+		mToolLabel = (TextView) mRootView.findViewById(R.id.toolLabel);
 		cb = (CheckBox) mRootView.findViewById(R.id.robotPower);
 		cb.setClickable(false);
 		cb.setChecked(RobotControlProxy.drivesPower());
 
-		// mRefSysLabel = (TextView) mRootView.findViewById(R.id.refsysLabel);
-		updateUI();
+		try {
+			updateUI();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return mRootView;
 	}
 
 	/**
+	 * @throws ExecutionException 
+	 * @throws InterruptedException 
 	 * 
 	 */
-	private void updateUI() {
-		final String kin = KvtMultiKinematikAdministrator.getKinematicFilter();
-		// final String refsys = RobotControlProxy.getRefsysName();
+	private void updateUI() throws InterruptedException, ExecutionException {
+		
+		//readKinematicFilter() needs a network connection! -> AsyncTask!!!		
+		final String kin = new AsyncTask<Void, Void, String>() {
+
+			@Override
+			protected String doInBackground(Void... params) {
+				return KvtMultiKinematikAdministrator.readKinematicFilter();
+			}
+			
+		}.execute((Void) null).get();
+		final String refsys = RobotControlProxy.getRefsysName();
+		final String tool = RobotControlProxy.getToolName();
 
 		if (getActivity() != null) {
 			new Handler(getActivity().getMainLooper()).post(new Runnable() {
 
 				public void run() {
 					mRobotNameLabel.setText(kin);
-					// mRefSysLabel.setText(refsys);
+					mRefSysLabel.setText(refsys);
+					mToolLabel.setText(tool);
 					mRootView.invalidate();
 				}
 			});
@@ -102,5 +130,63 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 	 * #driveIsReferencedChanged(java.lang.Boolean)
 	 */
 	public void driveIsReferencedChanged(Boolean _isRef) {
+	}
+
+	@Override
+	public void cartesianPositionChanged(int _compNo, String _compName, Number _value) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void jogToolChanged(String _jogTool) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void jogRefsysChanged(String _jogRefsys) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void pathVelocityChanged(float _velocityMms) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void axisPositionChanged(int axisNo, Number _value, String _axisName) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void selectedRefSysChanged(String _refsysName) {
+		final String refsys = _refsysName;
+		if (getActivity() != null) {
+			getActivity().runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					mRefSysLabel.setText(refsys);
+				}
+			});
+		}
+	}
+
+	@Override
+	public void selectedToolChanged(String _toolName) {
+		final String tool = _toolName;
+		if (getActivity() != null) {
+			getActivity().runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					mToolLabel.setText(tool);
+				}
+			});
+		}
 	}
 }

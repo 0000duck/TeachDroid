@@ -1,5 +1,6 @@
 package com.keba.teachdroid.app.fragments;
 
+import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor;
 import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener;
 import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.SafetyState;
@@ -26,18 +27,21 @@ public class RobotStateFragment extends Fragment implements KvtMainModeListener,
 	public RobotStateFragment() {
 		KvtPositionMonitor.addListener((KvtOverrideChangedListener) this);
 		KvtPositionMonitor.addListener((KvtPositionMonitorListener) this);
+		KvtDriveStateMonitor.addListener(this);
 		KvtMainModeAdministrator.addListener(this);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		mRootView = inflater.inflate(R.layout.fragment_robot_state, container, false);
-		ImageView img = (ImageView) mRootView.findViewById(R.id.powerIndicator);
-		if (img != null) {
+		TextView drv = (TextView) mRootView.findViewById(R.id.powerIndicator);
+		if (drv != null) {
 			Resources res = getResources();
 			int id = RobotControlProxy.drivesPower() ? R.drawable.power_on : R.drawable.power_off;
-			img.setImageDrawable(res.getDrawable(id));
-			img.invalidate();
+			String text = RobotControlProxy.drivesPower() ? "ON" : "OFF";
+			drv.setCompoundDrawablesWithIntrinsicBounds(res.getDrawable(id), null, null, null);
+			drv.setText(text);
+			drv.invalidate();
 		}
 		return mRootView;
 	}
@@ -62,21 +66,26 @@ public class RobotStateFragment extends Fragment implements KvtMainModeListener,
 
 				public void run() {
 					String mainModeString = null;
+					int drawableId = 0;
 					switch (mainMode) {
 					case 1:
 						mainModeString = "A";
+						drawableId = com.keba.teachdroid.app.R.drawable.ic_opmode_auto;
 						break;
 					case 2:
 						mainModeString = "T1";
+						drawableId = com.keba.teachdroid.app.R.drawable.ic_opmode_manual;
 						break;
 					case 4:
 						mainModeString = "AE";
+						drawableId = com.keba.teachdroid.app.R.drawable.ic_opmode_auto_extern;
 						break;
 					default:
 						mainModeString = "";
 						break;
 					}
-					((TextView) mRootView.findViewById(R.id.mainMode)).setText("Main Mode: " + mainModeString);
+					((TextView) mRootView.findViewById(R.id.mainMode)).setText(mainModeString);
+					((TextView) mRootView.findViewById(R.id.mainMode)).setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(drawableId), null, null, null);
 				}
 			});
 		}
@@ -99,7 +108,7 @@ public class RobotStateFragment extends Fragment implements KvtMainModeListener,
 			getActivity().runOnUiThread(new Runnable() {
 
 				public void run() {
-					((TextView) mRootView.findViewById(R.id.jogtool)).setText("JogTool:\n" + newTool);
+					((TextView) mRootView.findViewById(R.id.jogtool)).setText(newTool);
 				}
 			});
 		}
@@ -113,7 +122,7 @@ public class RobotStateFragment extends Fragment implements KvtMainModeListener,
 
 				public void run() {
 
-					((TextView) mRootView.findViewById(R.id.jogrefSys)).setText("JogRefsys:\n" + newRefsys);
+					((TextView) mRootView.findViewById(R.id.jogrefSys)).setText(newRefsys);
 				}
 			});
 		}
@@ -139,7 +148,7 @@ public class RobotStateFragment extends Fragment implements KvtMainModeListener,
 
 				public void run() {
 
-					((TextView) mRootView.findViewById(R.id.refSys)).setText("Refsys:\n" + newRefsys);
+					((TextView) mRootView.findViewById(R.id.refSys)).setText(newRefsys);
 				}
 			});
 		}
@@ -152,7 +161,7 @@ public class RobotStateFragment extends Fragment implements KvtMainModeListener,
 			getActivity().runOnUiThread(new Runnable() {
 
 				public void run() {
-					((TextView) mRootView.findViewById(R.id.tool)).setText("Tool:\n" + newTool);
+					((TextView) mRootView.findViewById(R.id.tool)).setText(newTool);
 				}
 			});
 		}
@@ -165,12 +174,14 @@ public class RobotStateFragment extends Fragment implements KvtMainModeListener,
 			getActivity().runOnUiThread(new Runnable() {
 
 				public void run() {
-					ImageView img = (ImageView) mRootView.findViewById(R.id.powerIndicator);
-					if (img != null) {
+					TextView drv = (TextView) mRootView.findViewById(R.id.powerIndicator);
+					if (drv != null) {
 						Resources res = getResources();
-						int id = power ? R.drawable.power_on : R.drawable.power_off;
-						img.setImageDrawable(res.getDrawable(id));
-						img.invalidate();
+						int id = RobotControlProxy.drivesPower() ? R.drawable.power_on : R.drawable.power_off;
+						String text = RobotControlProxy.drivesPower() ? "ON" : "OFF";
+						drv.setCompoundDrawablesWithIntrinsicBounds(res.getDrawable(id), null, null, null);
+						drv.setText(text);
+						drv.invalidate();
 					}
 				}
 			});

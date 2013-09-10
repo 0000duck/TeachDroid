@@ -37,7 +37,8 @@ public class NotificationThread extends Thread implements KvtAlarmUpdaterListene
 		Message msg = new Message(_msg);
 		DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
 		Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context).setSmallIcon(msg.getImageID()).setContentTitle(df.format(msg.getDate()).toString()).setContentText(_msg.getMessageText()).setSound(soundUri);
+		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context).setPriority(Notification.PRIORITY_HIGH).setSmallIcon(msg.getImageID()).setContentTitle(df.format(msg.getDate()).toString()).setContentText(_msg.getMessageText())
+				.setSound(soundUri);
 		// Creates an explicit intent for an Activity in your app
 		Intent resultIntent = new Intent(context, InfoActivity.class);
 
@@ -58,13 +59,13 @@ public class NotificationThread extends Thread implements KvtAlarmUpdaterListene
 		Notification notification = mBuilder.build();
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 		notification.flags |= Notification.FLAG_SHOW_LIGHTS;
-		notification.ledARGB=0xffffffff; //color, in this case, white
-		notification.ledOnMS=1000; //light on in milliseconds
-		notification.ledOffMS=4000; //light off in milliseconds
+		notification.ledARGB = 0xff0000ff; // color, in this case, red
+		notification.ledOnMS = 1000; // light on in milliseconds
+		notification.ledOffMS = 4000; // light off in milliseconds
 		notification.defaults |= Notification.DEFAULT_VIBRATE;
-		notification.number = msg.getImageID();
+		notification.number = notificationCount;
 
-		mNotificationManager.notify(msg.getID(), notification);
+		mNotificationManager.notify(msg.getClass().hashCode(), notification);
 		notificationCount++;
 	}
 

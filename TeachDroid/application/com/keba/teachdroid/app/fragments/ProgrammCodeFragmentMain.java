@@ -23,9 +23,9 @@ import com.keba.teachdroid.data.RobotControlProxy;
 
 public class ProgrammCodeFragmentMain extends Fragment implements KvtProgramStateListener, KvtOverrideChangedListener {
 
-	private TextView	mProgName, mProgMode;
-	private ImageView	mProgStateIcon;
-	private ProgressBar	mOverride;
+	private TextView mProgName, mProgMode;
+	private ImageView mProgStateIcon;
+	private ProgressBar mOverride;
 
 	public ProgrammCodeFragmentMain() {
 
@@ -40,13 +40,14 @@ public class ProgrammCodeFragmentMain extends Fragment implements KvtProgramStat
 
 		// label for the loaded program's name
 		mProgName = (TextView) rootView.findViewById(R.id.programNameLabel);
+		mProgName.setText(KvtProgramStateMonitor.getLoadedProgram());
 		// KvtProgram p = RobotControlProxy.getLoadedProgram();
 		// if (p != null)
 		// loadedProgramNameChanged(p.getName());
 
 		// label for the project name
 		mProgMode = (TextView) rootView.findViewById(R.id.programModeLabel);
-		ProgramMode m = RobotControlProxy.getProgramMode();
+		ProgramMode m = KvtProgramStateMonitor.getProgramMode();
 		if (m != null)
 			loadedProgramModeChanged(m);
 
@@ -56,6 +57,10 @@ public class ProgrammCodeFragmentMain extends Fragment implements KvtProgramStat
 		overrideChanged(ovr);
 
 		mProgStateIcon = (ImageView) rootView.findViewById(R.id.programStateIcon);
+		ProgramState s = KvtProgramStateMonitor.getProgramState();
+		if (s != null)
+			loadedProgramStateChanged(s);
+
 		if (mProgStateIcon != null) {
 			mProgStateIcon.setOnClickListener(new OnClickListener() {
 
@@ -64,6 +69,9 @@ public class ProgrammCodeFragmentMain extends Fragment implements KvtProgramStat
 				}
 			});
 		}
+
+		boolean b = KvtProgramStateMonitor.getNoProgramRunning();
+		isAnyProgramRunning(b);
 
 		return rootView;
 	}

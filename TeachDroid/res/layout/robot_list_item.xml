@@ -9,4 +9,4 @@
     android:paddingRight="16dp"
     android:textColor="#000"
     android:background="#fff"
-    android:maxHeight="?android:attr/textAppearanceListItemSmall"/>
+    android:maxHeight="7dp"/>
