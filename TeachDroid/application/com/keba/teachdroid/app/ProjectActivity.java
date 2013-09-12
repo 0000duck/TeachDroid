@@ -47,7 +47,7 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 	private Map<Integer, String>				programCodes		= new HashMap<Integer, String>();
 	private Map<Integer, String>				programInfos		= new HashMap<Integer, String>();
 
-	private transient List<KvtProject>			projects			= RobotControlProxy.getProjects();
+	private transient List<KvtProject>			projects			= KvtProjectAdministrator.getAllProjectsList();
 	private transient List<List<KvtProgram>>	programs			= new Vector<List<KvtProgram>>();
 
 	private int									selectedProject		= 0;

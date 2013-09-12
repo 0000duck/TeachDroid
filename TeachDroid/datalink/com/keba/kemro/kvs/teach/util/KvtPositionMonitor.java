@@ -27,6 +27,9 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 
 	private final String mCartPosNameVarnameStub = "_system.gRcSelectedRobotData.cartCompName[{0}]";
 	private final String mCartPosVarVarnameStub = "_system.gRcSelectedRobotData.worldPosValue[{0}]";
+	private final String mRefsysVarnameStub = "_system.gRcRefSysInstPaths[{0}]";
+	private final String mRefsysReadyVarnameStub = "_system.gRcRefSysReadyForCalculation[{0}]";
+	private final String mToolsVarnameStub = "_system.gRcTools[{0}].name";
 	private final String mCartVelVarname = "_system.gRcSelectedRobotData.cartPathVel";
 	private final String mSelToolName = "_system.gRcSelectedRobotData.selectedToolName";
 	private final String mSelRefsysVarname = "_system.gRcSelectedRobotData.selectedRefSysName";
@@ -40,6 +43,8 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 
 	private List<KStructVarWrapper> mCartPosVars = new Vector<KStructVarWrapper>();
 	private List<KStructVarWrapper> mCartNameVars = new Vector<KStructVarWrapper>();
+	private List<KStructVarWrapper> mRefsysVars = new Vector<KStructVarWrapper>();
+	private List<KStructVarWrapper> mToolVars = new Vector<KStructVarWrapper>();
 	private KStructVarWrapper mOverrideVar;
 	private KStructVarWrapper mCartVelVar;
 	private KStructVarWrapper mSelectedRefSysVar;
@@ -49,6 +54,8 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 
 	private List<Float> mCartPos = new Vector<Float>();
 	private List<Float> mAxisPos = new Vector<Float>();
+	private List<String> mTools = new Vector<String>();
+	private List<String> mRefsys = new Vector<String>();
 	private String mChosenRefsys;
 	private String mChosenTool;
 	protected DataModel mRefsysmodel;
@@ -329,6 +336,38 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 			mOvr = (Integer) wrp.readActualValue(null) / 10;
 			mVarGroup.add(wrp);
 		}
+
+		int i = 0;
+		String toolVar = MessageFormat.format(mToolsVarnameStub, i);
+		KStructVarWrapper wrapperTool = mDfl.variable.createKStructVarWrapper(toolVar);
+		while ((String) wrapperTool.readActualValue(null) != "") {
+			mToolVars.add(wrapperTool);
+			mVarGroup.add(wrapperTool);
+			mTools.add((String) wrapperTool.readActualValue(null));
+			i++;
+			toolVar = MessageFormat.format(mToolsVarnameStub, i);
+			wrapperTool = mDfl.variable.createKStructVarWrapper(toolVar);
+		}
+
+		i = 0;
+		String refsysVar = MessageFormat.format(mRefsysVarnameStub, i);
+		KStructVarWrapper wrapperRefsys = mDfl.variable.createKStructVarWrapper(refsysVar);
+		String readyVar = MessageFormat.format(mRefsysReadyVarnameStub, i);
+		KStructVarWrapper wrapperReady = mDfl.variable.createKStructVarWrapper(readyVar);
+		while ((String) wrapperRefsys.readActualValue(null) != "") {
+			if ((Boolean) wrapperReady.readActualValue(null)) {
+				mRefsysVars.add(wrapperRefsys);
+				mVarGroup.add(wrapperRefsys);
+				String actRefsys = ((String) wrapperRefsys.readActualValue(null));
+				int indexOfPoint = actRefsys.indexOf('.') + 1;
+				mRefsys.add(actRefsys.substring(indexOfPoint));
+			}
+			i++;
+			refsysVar = MessageFormat.format(mRefsysVarnameStub, i);
+			wrapperRefsys = mDfl.variable.createKStructVarWrapper(refsysVar);
+			readyVar = MessageFormat.format(mRefsysReadyVarnameStub, i);
+			wrapperReady = mDfl.variable.createKStructVarWrapper(readyVar);
+		}
 	}
 
 	/*
@@ -428,6 +467,14 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 
 	public static List<Float> getAxisPositions() {
 		return mInstance.mAxisPos;
+	}
+
+	public static List<String> getTools() {
+		return mInstance.mTools;
+	}
+
+	public static List<String> getRefSysList() {
+		return mInstance.mRefsys;
 	}
 
 	public static float getPathVelocity() {

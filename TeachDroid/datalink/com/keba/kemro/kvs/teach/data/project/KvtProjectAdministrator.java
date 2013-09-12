@@ -14,6 +14,7 @@
  *------------------------------------------------------------------------*/
 package com.keba.kemro.kvs.teach.data.project;
 
+import java.util.List;
 import java.util.Vector;
 
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
@@ -93,6 +94,22 @@ public class KvtProjectAdministrator {
 		if (m_projects != null) {
 			KvtProject[] returnList = new KvtProject[m_projects.size()];
 			m_projects.copyInto(returnList);
+			return returnList;
+		}
+		return null;
+
+	}
+	
+	/**
+	 * Liefert alle Projekte
+	 * 
+	 * @return Eine Liste <code>KProject</code>
+	 */
+	public static List<KvtProject> getAllProjectsList() {
+
+		if (m_projects != null) {
+			List<KvtProject> returnList = new Vector<KvtProject>();
+			returnList.addAll(m_projects);
 			return returnList;
 		}
 		return null;

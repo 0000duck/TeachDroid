@@ -24,17 +24,16 @@ public class ProjectListFragment extends Fragment implements Serializable, KvtPr
 	/**
 	 * 
 	 */
-	private static final long					serialVersionUID	= 94239349838371051L;
-	private transient View						mRootView;
-	private transient LayoutInflater			inflater;
-	private transient List<KvtProgram>			programs;
-	private int[]								iconIds				= { R.drawable.program_state_pause, R.drawable.program_state_stop,
-			R.drawable.program_state_run, R.drawable.program_state_pause, R.drawable.program_state_stop, R.drawable.program_state_run,
-			R.drawable.program_state_pause, R.drawable.program_state_stop, R.drawable.program_state_run };
+	private static final long serialVersionUID = 94239349838371051L;
+	private transient View mRootView;
+	private transient LayoutInflater inflater;
+	private transient List<KvtProgram> programs;
+	private int[] iconIds = { R.drawable.program_state_pause, R.drawable.program_state_stop, R.drawable.program_state_run, R.drawable.program_state_pause, R.drawable.program_state_stop, R.drawable.program_state_run, R.drawable.program_state_pause,
+			R.drawable.program_state_stop, R.drawable.program_state_run };
 	// private ProjectActivity mCallback;
-	private transient ArrayAdapter<KvtProject>	mProjectAdapter;
-	private List<String>						programStrings;
-	private ProgramListFragment	mProgramFragment;
+	private transient ArrayAdapter<KvtProject> mProjectAdapter;
+	private List<String> programStrings;
+	private ProgramListFragment mProgramFragment;
 
 	public ProjectListFragment() {
 		KvtProjectAdministrator.addProjectListener(this);
@@ -78,41 +77,39 @@ public class ProjectListFragment extends Fragment implements Serializable, KvtPr
 				TextView text = (TextView) row.findViewById(R.id.text);
 				text.setText(progs[position].getName());
 				int progState = progs[position].getProgramState();
-//				int drawableId = R.drawable.program_state_stop;
-				
+				// int drawableId = R.drawable.program_state_stop;
+
 				Resources res = getContext().getResources();
 				Drawable drw = null;
-				
-				
+
 				switch (progState) {
 				case KvtProgram.FINISHED:
-					drw= res.getDrawable(R.drawable.program_state_stop);
+					drw = res.getDrawable(R.drawable.program_state_stop);
 					break;
 				case KvtProgram.LOADED:
-					drw=null;
+					drw = null;
 					break;
 				case KvtProgram.NOT_USED:
-					drw= res.getDrawable(R.drawable.program_state_stop);
+					drw = res.getDrawable(R.drawable.program_state_stop);
 					break;
 				case KvtProgram.OPEN:
-					drw= res.getDrawable(R.drawable.program_state_pause);
+					drw = res.getDrawable(R.drawable.program_state_pause);
 					break;
 				case KvtProgram.RUNNING:
-					drw= res.getDrawable(R.drawable.program_state_run);
+					drw = res.getDrawable(R.drawable.program_state_run);
 					break;
 				case KvtProgram.STEPPING:
-					drw= res.getDrawable(R.drawable.program_state_pause);
+					drw = res.getDrawable(R.drawable.program_state_pause);
 					break;
 				case KvtProgram.STOPPED:
-					drw= res.getDrawable(R.drawable.program_state_pause);
+					drw = res.getDrawable(R.drawable.program_state_pause);
 					break;
 				case KvtProgram.WAITING:
-					drw= res.getDrawable(R.drawable.program_state_pause);
+					drw = res.getDrawable(R.drawable.program_state_pause);
 					break;
 
 				}
-				
-				
+
 				text.setCompoundDrawablesWithIntrinsicBounds(null, null, drw, null);
 
 				return row;
@@ -157,5 +154,19 @@ public class ProjectListFragment extends Fragment implements Serializable, KvtPr
 		KvtProject[] allprojs = KvtProjectAdministrator.getAllProjects();
 
 		int a = 0;
+		
+		final List<KvtProject> proj = KvtProjectAdministrator.getAllProjectsList();
+
+		if (getActivity() != null) {
+			getActivity().runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					mProjectAdapter.clear();
+					mProjectAdapter.addAll(proj);
+					mProjectAdapter.notifyDataSetChanged();
+				}
+			});
+		}
 	}
 }

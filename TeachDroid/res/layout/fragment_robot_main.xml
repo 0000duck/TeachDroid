@@ -12,7 +12,7 @@
         android:layout_below="@+id/mainMode"
         android:drawableLeft="@drawable/ic_refsys"
         android:gravity="center_vertical"
-        android:text="World"
+        android:text="@string/dummy_refsys"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <ImageView
@@ -23,6 +23,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
+        android:contentDescription="@string/title_robot"
         android:src="@drawable/robot_small" />
 
     <TextView
@@ -33,7 +34,7 @@
         android:layout_below="@+id/refsysLabel"
         android:drawableLeft="@drawable/ic_tool"
         android:gravity="center_vertical"
-        android:text="Tool"
+        android:text="@string/dummy_tool"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <CheckBox
@@ -44,7 +45,8 @@
         android:layout_below="@+id/toolLabel"
         android:clickable="false"
         android:text="@string/robotPower"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:gravity="center_vertical"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView
         android:id="@+id/robotNameLabel"
@@ -53,7 +55,7 @@
         android:layout_alignTop="@+id/robotImg"
         android:layout_marginLeft="30dp"
         android:layout_toRightOf="@+id/robotImg"
-        android:text="RobotName"
+        android:text="@string/title_robot"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
@@ -64,7 +66,7 @@
         android:layout_below="@+id/robotNameLabel"
         android:drawableLeft="@drawable/ic_opmode_auto"
         android:gravity="center_vertical"
-        android:text="A"
+        android:text="@string/dummy_mode"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>
