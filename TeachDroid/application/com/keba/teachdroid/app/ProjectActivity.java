@@ -23,16 +23,15 @@ import com.keba.kemro.kvs.teach.data.project.KvtProgram;
 import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtExecutionMonitor;
-import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
 import com.keba.kemro.kvs.teach.util.Log;
-import com.keba.teachdroid.app.fragments.InnerDetailFragment;
+import com.keba.teachdroid.app.fragments.ProgramListFragment;
 import com.keba.teachdroid.app.fragments.InnerListFragment;
-import com.keba.teachdroid.app.fragments.MasterFragment;
 import com.keba.teachdroid.app.fragments.ProgramCodeFragment;
 import com.keba.teachdroid.app.fragments.ProgramInfoFragment;
+import com.keba.teachdroid.app.fragments.ProjectListFragment;
 import com.keba.teachdroid.data.RobotControlProxy;
 
-public class ProjectActivity extends BaseActivity implements InnerListFragment.SelectionCallback, InnerDetailFragment.SelectionCallback {
+public class ProjectActivity extends BaseActivity implements InnerListFragment.SelectionCallback, ProgramListFragment.SelectionCallback {
 
 	/**
 	 * 
@@ -91,7 +90,7 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 
 
 		// late-load the project list
-		KvtSystemCommunicator.getTcDfl().directory.refreshProjects();
+		// KvtSystemCommunicator.getTcDfl().directory.refreshProjects();
 
 		for (KvtProject proj : projects) {
 			programs.add(Arrays.asList(proj.getPrograms()));
@@ -243,11 +242,13 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 
 	}
 
+	@Override
 	public void onProjectSelected(int id) {
 		setSelectedProject(id);
-		((MasterFragment) mSectionsPagerAdapter.getItem(0)).detailSelected(id);
+		((ProjectListFragment) mSectionsPagerAdapter.getItem(0)).detailSelected(id);
 	}
 
+	@Override
 	public void onProgramSelected(int id) {
 
 		setSelectedProgram(id);
@@ -280,7 +281,7 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 
 			if (mFragments == null) {
 				Bundle args = new Bundle();
-				mFragments = new Fragment[] { new MasterFragment(), new ProgramCodeFragment(), new ProgramInfoFragment() };
+				mFragments = new Fragment[] { new ProjectListFragment(), new ProgramCodeFragment(), new ProgramInfoFragment() };
 				args.putSerializable("connector", ProjectActivity.this);
 				mFragments[0].setArguments(args);
 				mFragments[1].setArguments(args);

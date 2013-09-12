@@ -11,7 +11,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.keba.teachdroid.app.fragments.MasterFragment;
+import com.keba.teachdroid.app.fragments.ProjectListFragment;
 import com.keba.teachdroid.app.fragments.ProgramCodeFragment;
 import com.keba.teachdroid.app.fragments.ProgramInfoFragment;
 import com.keba.teachdroid.app.fragments.RobotDetailInfoFragment;
