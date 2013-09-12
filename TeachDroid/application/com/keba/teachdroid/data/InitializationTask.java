@@ -3,6 +3,7 @@
  */
 package com.keba.teachdroid.data;
 
+import android.content.Context;
 import android.os.AsyncTask;
 
 import com.keba.kemro.kvs.teach.controller.KvtTraceUpdater;
@@ -17,6 +18,7 @@ import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
 import com.keba.kemro.kvs.teach.util.KvtProgramStateMonitor;
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
 import com.keba.kemro.serviceclient.alarm.KMessageService;
+import com.keba.teachdroid.app.AlarmUpdaterThread;
 
 /**
  * A task which is responsible for initializing all data-loading classes to the
@@ -35,7 +37,13 @@ import com.keba.kemro.serviceclient.alarm.KMessageService;
  */
 public class InitializationTask extends AsyncTask<String, Object, Boolean> {
 
-	private final InitializationListener	mListener;
+	private final InitializationListener mListener;
+	private Context context;
+
+	public InitializationTask(InitializationListener _listener, Context _context) {
+		mListener = _listener;
+		context = _context;
+	}
 
 	/**
 	 * @param _listener
@@ -67,6 +75,7 @@ public class InitializationTask extends AsyncTask<String, Object, Boolean> {
 		KMessageService.connect(host, 5000);
 
 		KvtTraceUpdater.connect(host);
+		new AlarmUpdaterThread(context).start();
 		RobotControlProxy.startup();
 
 		// fake progress bar :-)

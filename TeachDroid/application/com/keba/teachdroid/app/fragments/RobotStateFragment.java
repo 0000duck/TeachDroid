@@ -34,15 +34,15 @@ public class RobotStateFragment extends Fragment implements KvtMainModeListener,
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		mRootView = inflater.inflate(R.layout.fragment_robot_state, container, false);
-		TextView drv = (TextView) mRootView.findViewById(R.id.powerIndicator);
-		if (drv != null) {
-			Resources res = getResources();
-			int id = RobotControlProxy.drivesPower() ? R.drawable.power_on : R.drawable.power_off;
-			String text = RobotControlProxy.drivesPower() ? "ON" : "OFF";
-			drv.setCompoundDrawablesWithIntrinsicBounds(res.getDrawable(id), null, null, null);
-			drv.setText(text);
-			drv.invalidate();
-		}
+		
+		mainModeChanged(KvtMainModeAdministrator.getMainMode());
+		drivePowerChanged(KvtDriveStateMonitor.getDrivesPower());
+		overrideChanged(KvtPositionMonitor.getOverride());
+		selectedRefSysChanged(KvtPositionMonitor.getChosenRefSys());
+		selectedToolChanged(KvtPositionMonitor.getChosenTool());
+		jogRefsysChanged(KvtPositionMonitor.getJogRefSys());
+		jogToolChanged(KvtPositionMonitor.getJogTool());
+		
 		return mRootView;
 	}
 
@@ -177,8 +177,8 @@ public class RobotStateFragment extends Fragment implements KvtMainModeListener,
 					TextView drv = (TextView) mRootView.findViewById(R.id.powerIndicator);
 					if (drv != null) {
 						Resources res = getResources();
-						int id = RobotControlProxy.drivesPower() ? R.drawable.power_on : R.drawable.power_off;
-						String text = RobotControlProxy.drivesPower() ? "ON" : "OFF";
+						int id = KvtDriveStateMonitor.getDrivesPower() ? R.drawable.power_on : R.drawable.power_off;
+						String text = KvtDriveStateMonitor.getDrivesPower() ? "ON" : "OFF";
 						drv.setCompoundDrawablesWithIntrinsicBounds(res.getDrawable(id), null, null, null);
 						drv.setText(text);
 						drv.invalidate();

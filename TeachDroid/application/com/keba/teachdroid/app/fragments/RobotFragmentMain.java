@@ -14,13 +14,16 @@ import android.widget.TextView;
 
 import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor;
 import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener;
+import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator;
+import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.SafetyState;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
+import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.KvtMainModeListener;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener;
 import com.keba.kemro.kvs.teach.util.KvtMultiKinematikAdministrator;
 import com.keba.teachdroid.app.R;
 import com.keba.teachdroid.data.RobotControlProxy;
 
-public class RobotFragmentMain extends Fragment implements KvtDriveStateListener, KvtPositionMonitorListener {
+public class RobotFragmentMain extends Fragment implements KvtDriveStateListener, KvtPositionMonitorListener, KvtMainModeListener {
 
 	TextView mRobotNameLabel;
 	TextView mRefSysLabel;
@@ -31,6 +34,7 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 	public RobotFragmentMain() {
 		KvtDriveStateMonitor.addListener(this);
 		KvtPositionMonitor.addListener((KvtPositionMonitorListener) this);
+		KvtMainModeAdministrator.addListener(this);
 	}
 
 	@Override
@@ -42,8 +46,7 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 		mRefSysLabel = (TextView) mRootView.findViewById(R.id.refsysLabel);
 		mToolLabel = (TextView) mRootView.findViewById(R.id.toolLabel);
 		cb = (CheckBox) mRootView.findViewById(R.id.robotPower);
-		cb.setClickable(false);
-		cb.setChecked(RobotControlProxy.drivesPower());
+		mainModeChanged(KvtMainModeAdministrator.getMainMode());
 
 		try {
 			updateUI();
@@ -63,7 +66,8 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 	 * 
 	 */
 	private void updateUI() throws InterruptedException, ExecutionException {
-		
+		cb.setClickable(false);
+		cb.setChecked(KvtDriveStateMonitor.getDrivesPower());
 		//readKinematicFilter() needs a network connection! -> AsyncTask!!!		
 		final String kin = new AsyncTask<Void, Void, String>() {
 
@@ -73,8 +77,8 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 			}
 			
 		}.execute((Void) null).get();
-		final String refsys = RobotControlProxy.getRefsysName();
-		final String tool = RobotControlProxy.getToolName();
+		final String refsys = KvtPositionMonitor.getChosenRefSys();
+		final String tool = KvtPositionMonitor.getChosenTool();
 
 		if (getActivity() != null) {
 			new Handler(getActivity().getMainLooper()).post(new Runnable() {
@@ -87,6 +91,45 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 				}
 			});
 		}
+	}
+	
+	@Override
+	public void mainModeChanged(int _newMainMode) {
+		final int mainMode = _newMainMode;
+		if (getActivity() != null) {
+			getActivity().runOnUiThread(new Runnable() {
+
+				public void run() {
+					String mainModeString = null;
+					int drawableId = 0;
+					switch (mainMode) {
+					case 1:
+						mainModeString = "A";
+						drawableId = com.keba.teachdroid.app.R.drawable.ic_opmode_auto;
+						break;
+					case 2:
+						mainModeString = "T1";
+						drawableId = com.keba.teachdroid.app.R.drawable.ic_opmode_manual;
+						break;
+					case 4:
+						mainModeString = "AE";
+						drawableId = com.keba.teachdroid.app.R.drawable.ic_opmode_auto_extern;
+						break;
+					default:
+						mainModeString = "";
+						break;
+					}
+					((TextView) mRootView.findViewById(R.id.mainMode)).setText(mainModeString);
+					((TextView) mRootView.findViewById(R.id.mainMode)).setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(drawableId), null, null, null);
+				}
+			});
+		}
+	}
+	
+	@Override
+	public void safetyStateChanged(SafetyState _state) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	/*
@@ -189,4 +232,6 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 			});
 		}
 	}
+
+	
 }

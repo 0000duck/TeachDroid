@@ -1,10 +1,14 @@
 package com.keba.teachdroid.app.fragments;
 
 import java.text.DecimalFormat;
-import java.text.ParseException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+import java.util.concurrent.ExecutionException;
 
+import android.app.Activity;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -12,16 +16,76 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener;
+import com.keba.teachdroid.app.CustomPosition;
 import com.keba.teachdroid.app.R;
 
 public class RobotCartesianFragment extends Fragment implements KvtPositionMonitorListener {
+
+	private class CartesianHolder {
+		TextView mName;
+		TextView mValue;
+		TextView mUnit;
+	}
+
+	protected class CartesianArrayAdapter extends ArrayAdapter<CustomPosition> {
+
+		private int mLayoutResourceId;
+		private Context mContext;
+		private List<CustomPosition> mData;
+
+		/**
+		 * @param _activity
+		 * @param _layoutId
+		 */
+		public CartesianArrayAdapter(Context _context, int _layoutId, List<CustomPosition> _objects) {
+			super(_context, _layoutId, _objects);
+			mLayoutResourceId = _layoutId;
+			mContext = _context;
+			mData = _objects;
+		}
+
+		@Override
+		public View getView(int _position, View _convertView, ViewGroup _parent) {
+			View row = _convertView;
+			CartesianHolder holder = null;
+
+			if (row == null) {
+				LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
+				row = inflater.inflate(mLayoutResourceId, _parent, false);
+
+				holder = new CartesianHolder();
+				holder.mName = (TextView) row.findViewById(R.id.nameText);
+				holder.mValue = (TextView) row.findViewById(R.id.valueText);
+				holder.mUnit = (TextView) row.findViewById(R.id.unitText);
+				row.setTag(holder);
+			} else {
+				holder = (CartesianHolder) row.getTag();
+			}
+
+			if (_position >= 0 && _position < mData.size()) {
+				CustomPosition line = mData.get(_position);
+
+				holder.mName.setText(line.getName() + ": ");
+				DecimalFormat df = new DecimalFormat("##0.00");
+				String formatted = df.format(line.getValue());
+				holder.mValue.setText(formatted);// String.format("%04.2f",
+													// line.getValue()));
+				holder.mUnit.setText(line.getUnit());
+			}
+			return row;
+		}
+	}
+
 	private transient View mRootView;
 	private transient ListView list;
-	private transient ArrayAdapter<String> mAdapter;
-	private transient List<String> cartList;
+	private transient CartesianArrayAdapter mAdapter;
+	private transient List<CustomPosition> cartList;
+	private final String[] axisNames = { "X", "Y", "Z", "A", "B", "C" };
+	private Object mLck = new Object();
 
 	public RobotCartesianFragment() {
 		KvtPositionMonitor.addListener((KvtPositionMonitorListener) this);
@@ -31,26 +95,46 @@ public class RobotCartesianFragment extends Fragment implements KvtPositionMonit
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		mRootView = inflater.inflate(R.layout.fragment_robot_cartesian, container, false);
 		list = (ListView) mRootView.findViewById(R.id.cartList);
-		mAdapter = new ArrayAdapter<String>(getActivity(), R.layout.default_list_item);
-		cartList = new Vector<String>();
-		cartList.add("X: 0.0 mm");
-		cartList.add("Y: 0.0 mm");
-		cartList.add("Z: 0.0 mm");
-		cartList.add("A: 0.0 deg");
-		cartList.add("B: 0.0 deg");
-		cartList.add("C: 0.0 deg");
-		mAdapter.addAll(cartList);
+		
+		getPositions();
+
+		mAdapter = new CartesianArrayAdapter(getActivity(), R.layout.position_row_layout, cartList);
+
 		list.setAdapter(mAdapter);
 		return mRootView;
 	}
 
-	public void cartesianPositionChanged(int _compNo, String _compName, Number _value) {
-		cartList.remove(_compNo);
-		if (_compNo < 3) {
-			cartList.add(_compNo, _compName + ": " + _value + " mm");
-		} else {
-			cartList.add(_compNo, _compName + ": " + _value + " deg");
+	private void getPositions() {
+		cartList = new Vector<CustomPosition>();
+		List<Float> positions = null;
+		try {
+			positions = new AsyncTask<Void, Void, List<Float>>() {
+
+				@Override
+				protected List<Float> doInBackground(Void... params) {
+					return KvtPositionMonitor.getCartesianPositions();
+				}
+			}.execute((Void) null).get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
 		}
+
+		if (positions != null) {
+
+			for (int i = 0; i < positions.size(); i++) {
+				if (i < 3) {
+					cartList.add(new CustomPosition("mm", axisNames[i], positions.get(i)));
+				} else {
+					cartList.add(new CustomPosition("deg", axisNames[i], positions.get(i)));
+				}
+			}
+		}
+	}
+
+	public void cartesianPositionChanged(int _compNo, String _compName, Number _value) {
+		getPositions();
 		if (getActivity() != null) {
 			getActivity().runOnUiThread(new Runnable() {
 
@@ -65,17 +149,6 @@ public class RobotCartesianFragment extends Fragment implements KvtPositionMonit
 	}
 
 	public void pathVelocityChanged(float _velocityMms) {
-		// final float vel = _velocityMms;
-		// final TextView t1 = (TextView)
-		// mRootView.findViewById(R.id.textView1);
-		// if (getActivity() != null) {
-		// getActivity().runOnUiThread(new Runnable() {
-		//
-		// public void run() {
-		// t1.setText("actual path velocity: " + vel + "mm/s");
-		// }
-		// });
-		// }
 	}
 
 	public void axisPositionChanged(int axisNo, Number _value, String _axisName) {

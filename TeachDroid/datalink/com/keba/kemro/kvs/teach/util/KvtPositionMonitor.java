@@ -36,11 +36,9 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	private final String mOverrideVarname = "_system.gRcData.override";
 
 	private List<KStructVarWrapper> mAxisPositionVars = new Vector<KStructVarWrapper>();
-	private List<Number> mAxisPositionOldValue = new Vector<Number>();
 	private List<KStructVarWrapper> mNameVars = new Vector<KStructVarWrapper>();
 
 	private List<KStructVarWrapper> mCartPosVars = new Vector<KStructVarWrapper>();
-	private List<Number> mCartPosOldValue = new Vector<Number>();
 	private List<KStructVarWrapper> mCartNameVars = new Vector<KStructVarWrapper>();
 	private KStructVarWrapper mOverrideVar;
 	private KStructVarWrapper mCartVelVar;
@@ -49,11 +47,14 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	private KStructVarWrapper mChosenToolVar;
 	private KStructVarWrapper mSelectedToolVar;
 
+	private List<Float> mCartPos = new Vector<Float>();
+	private List<Float> mAxisPos = new Vector<Float>();
 	private String mChosenRefsys;
 	private String mChosenTool;
 	protected DataModel mRefsysmodel;
 	protected DataModel mToolmodel;
-	private float mOldOvr;
+	private int mOvr;
+	private float mCartVel;
 	private String mSelectedTool;
 	private String mSelectedRefsys;
 
@@ -80,13 +81,12 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	public void changed(KStructVarWrapper _variable) {
 		int index = mAxisPositionVars.indexOf(_variable);
 		if (index >= 0) {
-			if (!mAxisPositionVars.get(index).readActualValue(null).equals(mAxisPositionOldValue.get(index))) {
-				String name = mNameVars.get(index).readActualValue(null).toString();
-				for (KvtPositionMonitorListener l : mListeners)
-					l.axisPositionChanged(index, (Number) _variable.readActualValue(null), name);
-				mAxisPositionOldValue.remove(index);
-				mAxisPositionOldValue.add(index, (Number) mAxisPositionVars.get(index).readActualValue(null));
-			}
+			String name = mNameVars.get(index).readActualValue(null).toString();
+			mAxisPos.remove(index);
+			mAxisPos.add(index, (Float) mAxisPositionVars.get(index).readActualValue(null));
+			for (KvtPositionMonitorListener l : mListeners)
+				l.axisPositionChanged(index, (Number) _variable.readActualValue(null), name);
+
 			// Log.d("KvtPositionMonitor", "Axis " + (index + 1) + " [" + name +
 			// "] has position " + _variable.getActualValue());
 			return;
@@ -95,36 +95,32 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 		index = mCartPosVars.indexOf(_variable);
 		if (index >= 0) {
 			String name = mCartNameVars.get(index).readActualValue(null).toString();
-			if (!mCartPosVars.get(index).readActualValue(null).equals(mCartPosOldValue.get(index))) {
-				for (KvtPositionMonitorListener l : mListeners)
-					l.cartesianPositionChanged(index, name, (Number) _variable.readActualValue(null));
-				mCartPosOldValue.remove(index);
-				mCartPosOldValue.add(index, (Number) mCartPosVars.get(index).readActualValue(null));
-			}
+			mCartPos.remove(index);
+			mCartPos.add(index, (Float) mCartPosVars.get(index).readActualValue(null));
+			for (KvtPositionMonitorListener l : mListeners)
+				l.cartesianPositionChanged(index, name, (Number) _variable.readActualValue(null));
+
 			// Log.d("KvtPositionMonitor", "Component " + name + ": " +
 			// _variable.getActualValue());
 			return;
 		}
 
 		if (_variable.equals(mOverrideVar)) {
-			float ovt = ((Number) _variable.readActualValue(null)).floatValue();
-			if (ovt != mOldOvr) {
-				mOldOvr = ovt;
-				for (KvtOverrideChangedListener l : mOverrideListeners)
-					l.overrideChanged(ovt / 10);
-			}
-		}
+			int ovt = ((Number) _variable.readActualValue(null)).intValue();
+			mOvr = ovt / 10;
+			for (KvtOverrideChangedListener l : mOverrideListeners)
+				l.overrideChanged(mOvr);
 
-		else if (_variable.equals(mCartVelVar)) {
-			if (!_variable.readActualValue(null).equals(mCartVelVar.readActualValue(null)))
-				for (KvtPositionMonitorListener l : mListeners)
-					l.pathVelocityChanged(((Number) _variable.readActualValue(null)).floatValue());
+		} else if (_variable.equals(mCartVelVar)) {
+			mCartVel = (Float) _variable.readActualValue(null);
+			for (KvtPositionMonitorListener l : mListeners)
+				l.pathVelocityChanged(mCartVel);
 
 		} else if (_variable.equals(mSelectedRefSysVar)) {
 			Object v = _variable.readActualValue(null);
 			if (mSelectedRefsys == null)
 				mSelectedRefsys = new String();
-			if (v != null && v instanceof String && !mSelectedRefsys.equals(v)) {
+			if (v != null && v instanceof String) {
 				mSelectedRefsys = (String) v;
 				for (KvtPositionMonitorListener l : mListeners)
 					l.selectedRefSysChanged(mSelectedRefsys);
@@ -152,7 +148,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 			Object v = _variable.getActualValue();
 			if (mChosenTool == null)
 				mChosenTool = new String();
-			if (v != null && v instanceof String && !mChosenTool.equals(v)) {
+			if (v != null && v instanceof String) {
 				mChosenTool = (String) v;
 				for (KvtPositionMonitorListener l : mListeners)
 					l.jogToolChanged(mChosenTool);
@@ -259,7 +255,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 			KStructVarWrapper w2 = mDfl.variable.createKStructVarWrapper(posVar);
 			if (w2 != null) {
 				mCartPosVars.add(w2);
-				mCartPosOldValue.add(0);
+				mCartPos.add((Float) w2.readActualValue(null));
 				mVarGroup.add(w2);
 			} else {
 				System.err.println("Variable " + posVar + " not created!");
@@ -268,8 +264,10 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 		}
 
 		mCartVelVar = mDfl.variable.createKStructVarWrapper(mCartVelVarname);
-		if (mCartVelVar != null)
+		if (mCartVelVar != null) {
 			mVarGroup.add(mCartVelVar);
+			mCartVel = (Float) mCartVelVar.readActualValue(null);
+		}
 
 		mChosenRefSysVar = mDfl.variable.createKStructVarWrapper(mChosenRefsysVarname);
 		if (mChosenRefSysVar != null) {
@@ -309,7 +307,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 			KStructVarWrapper wrpP = mDfl.variable.createKStructVarWrapper(posVar);
 			if (wrpP != null) {
 				mAxisPositionVars.add(wrpP);
-				mAxisPositionOldValue.add(0);
+				mAxisPos.add((Float) wrpP.readActualValue(null));
 				mVarGroup.add(wrpP);
 			}
 
@@ -328,6 +326,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 		KStructVarWrapper wrp = mDfl.variable.createKStructVarWrapper(mOverrideVarname);
 		if (wrp != null) {
 			mOverrideVar = wrp;
+			mOvr = (Integer) wrp.readActualValue(null) / 10;
 			mVarGroup.add(wrp);
 		}
 	}
@@ -421,6 +420,22 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 		 *            The name of the new tool
 		 */
 		void selectedToolChanged(String _toolName);
+	}
+
+	public static List<Float> getCartesianPositions() {
+		return mInstance.mCartPos;
+	}
+
+	public static List<Float> getAxisPositions() {
+		return mInstance.mAxisPos;
+	}
+
+	public static float getPathVelocity() {
+		return mInstance.mCartVel;
+	}
+
+	public static int getOverride() {
+		return mInstance.mOvr;
 	}
 
 	public static String getChosenRefSys() {

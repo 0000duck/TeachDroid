@@ -2,9 +2,11 @@ package com.keba.teachdroid.app.fragments;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -18,9 +20,16 @@ import android.widget.TextView;
 
 import com.keba.kemro.kvs.teach.controller.KvtTraceUpdater;
 import com.keba.kemro.kvs.teach.controller.KvtTraceUpdater.KvtTraceUpdateListener;
+import com.keba.teachdroid.app.AlarmUpdaterThread;
+import com.keba.teachdroid.app.Message;
 import com.keba.teachdroid.app.R;
+import com.keba.teachdroid.app.AlarmUpdaterThread.AlarmUpdaterListener;
 
-public class TraceInfoFragment extends Fragment implements KvtTraceUpdateListener {
+public class TraceInfoFragment extends Fragment implements AlarmUpdaterListener/* KvtTraceUpdateListener */{
+
+	public TraceInfoFragment() {
+		AlarmUpdaterThread.addListener(this);
+	}
 
 	/**
 	 * @author ltz
@@ -28,7 +37,7 @@ public class TraceInfoFragment extends Fragment implements KvtTraceUpdateListene
 	 */
 	public class TraceRowHolder {
 
-		public TextView	txtTitle;
+		public TextView txtTitle;
 
 	}
 
@@ -38,9 +47,9 @@ public class TraceInfoFragment extends Fragment implements KvtTraceUpdateListene
 	 */
 	public class TraceLogRowAdapter extends ArrayAdapter<String> {
 
-		private int				mLayoutResourceId;
-		private Context			mContext;
-		private List<String>	mData;
+		private int mLayoutResourceId;
+		private Context mContext;
+		private List<String> mData;
 
 		/**
 		 * @param _context
@@ -81,10 +90,10 @@ public class TraceInfoFragment extends Fragment implements KvtTraceUpdateListene
 
 	}
 
-	private ListView			list;
+	private ListView list;
 	// private InfoActivity callback;
-	private TraceLogRowAdapter	mAdapter;
-	private LinkedList<String>	mTraceLines	= new LinkedList<String>();
+	private TraceLogRowAdapter mAdapter;
+	private List<String> mTraceLines = new LinkedList<String>();
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -97,12 +106,34 @@ public class TraceInfoFragment extends Fragment implements KvtTraceUpdateListene
 		// List<String> traces = callback.getTraceList();
 		// setAdapter(traces);
 
-		KvtTraceUpdater.setLoadMode(KvtTraceUpdater.MODE_HISTORY);
-		KvtTraceUpdater.addListener(this);
-
+		// KvtTraceUpdater.setLoadMode(KvtTraceUpdater.MODE_HISTORY);
+		// KvtTraceUpdater.addListener(this);
 
 		// mAdapter = new ArrayAdapter<String>(getActivity(),
 		// R.layout.fragment_trace_row_layout, mTraceLines);
+		mTraceLines = AlarmUpdaterThread.getTracedLines();
+		List<String> tmplist = null;
+		try {
+			tmplist = new AsyncTask<Void, Void, List<String>>() {
+
+				@Override
+				protected List<String> doInBackground(Void... params) {
+					return AlarmUpdaterThread.getTracedLines();
+				}
+
+			}.execute((Void) null).get();
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (ExecutionException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		if (tmplist != null) {
+			mTraceLines.addAll(tmplist);
+		}
+
 		mAdapter = new TraceLogRowAdapter(getActivity(), R.layout.fragment_trace_row_layout, mTraceLines);
 
 		list.setAdapter(mAdapter);
@@ -117,21 +148,51 @@ public class TraceInfoFragment extends Fragment implements KvtTraceUpdateListene
 	 * com.keba.kemro.kvs.teach.controller.KvtTraceUpdater.KvtTraceUpdateListener
 	 * #lineReceived(java.lang.String)
 	 */
-	public void lineReceived(final String _line) {
+	// public void lineReceived(final String _line) {
+	//
+	// if (getActivity() == null)
+	// return;
+	//
+	// // need to run on the main looper thread, otherwise an exception will be
+	// // hurled in your face
+	// Handler refresh = new Handler(Looper.getMainLooper());
+	// refresh.post(new Runnable() {
+	// public void run() {
+	// mTraceLines.offerLast(_line);
+	// mAdapter.notifyDataSetChanged();
+	// list.invalidate();
+	// }
+	// });
+	//
+	// }
 
-		if (getActivity() == null)
-			return;
+	@Override
+	public void queueChanged() {
+		// TODO Auto-generated method stub
 
-		// need to run on the main looper thread, otherwise an exception will be
-		// hurled in your face
-		Handler refresh = new Handler(Looper.getMainLooper());
-		refresh.post(new Runnable() {
-			public void run() {
-				mTraceLines.offerLast(_line);
-				mAdapter.notifyDataSetChanged();
-				list.invalidate();
-			}
-		});
+	}
 
+	@Override
+	public void historyChanged() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void traceChanged(String _line) {
+//		final String line = _line;
+//		if (getActivity() != null) {
+//
+//			getActivity().runOnUiThread(new Runnable() {
+//
+//				@Override
+//				public void run() {
+//					mTraceLines.add(line);
+//					mAdapter.clear();
+//					mAdapter.addAll(mTraceLines);
+//					list.invalidate();
+//				}
+//			});
+//		}
 	}
 }

@@ -3,7 +3,7 @@
  */
 package com.keba.teachdroid;
 
-import com.keba.teachdroid.app.NotificationThread;
+import com.keba.teachdroid.app.AlarmUpdaterThread;
 
 import android.app.Application;
 import android.content.Context;
@@ -20,8 +20,8 @@ public class TeachdroidApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		TeachdroidApplication.context = getApplicationContext();
-		mNotificationThread = new NotificationThread(context);
-		mNotificationThread.start();
+//		mNotificationThread = new AlarmUpdaterThread(context);
+//		mNotificationThread.start();
 	}
 
 	public static Context getAppContext() {

@@ -30,7 +30,7 @@ public class KvtTraceUpdater implements Runnable {
 	public static final int							MODE_HISTORY	= 0;
 	public static final int							MODE_FROMNOW	= 1;
 
-	private static int								mLoadMode		= MODE_HISTORY;
+	private static int								mLoadMode		= MODE_FROMNOW;
 
 	private static Vector<KvtTraceUpdateListener>	mListeners		= new Vector<KvtTraceUpdateListener>();
 

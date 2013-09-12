@@ -30,8 +30,7 @@ import com.keba.kemro.teach.dfl.value.KVariableGroupListener;
  * @author ltz
  * @since 04.07.2013
  */
-public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener,
-		KVariableGroupListener {
+public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener, KVariableGroupListener {
 
 	/**
 	 * @author ltz
@@ -69,20 +68,20 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener,
 
 	}
 
-	private final String						mDrivePowerVarname		= "_system.gRcDataRobot[{0}].drivesOn";
-	private final String						mDriveIsReadyVarname	= "_system.gRcDataRobot[{0}].isReady";
-	private final String						mDriveIsRefVarname		= "_system.gRcDataRobot[{0}].isReferenced";
-	private final String						mDriveSwitchOnVarname	= "_system.RcHtControl.simuKeys.drivesOn";
+	private final String mDrivePowerVarname = "_system.gRcDataRobot[{0}].drivesOn";
+	private final String mDriveIsReadyVarname = "_system.gRcDataRobot[{0}].isReady";
+	private final String mDriveIsRefVarname = "_system.gRcDataRobot[{0}].isReferenced";
+	private final String mDriveSwitchOnVarname = "_system.RcHtControl.simuKeys.drivesOn";
 
-	private KStructVarWrapper					mDrivesPowerVar, mDriveIsReadyVar, mDriveIsRefVar;
+	private KStructVarWrapper mDrivesPowerVar, mDriveIsReadyVar, mDriveIsRefVar;
+	private boolean mDrivesPower, mDriveIsReady, mDriveIsRef;
 
-	private KTcDfl								mDfl;
-	private KVariableGroup						mVarGroup;
-	private KStructVarWrapper					mDrivesSwitchOnVar;
-	private static List<KvtDriveStateListener>	mListeners				= new Vector<KvtDriveStateListener>();
+	private KTcDfl mDfl;
+	private KVariableGroup mVarGroup;
+	private KStructVarWrapper mDrivesSwitchOnVar;
+	private static List<KvtDriveStateListener> mListeners = new Vector<KvtDriveStateListener>();
 
-	private static KvtDriveStateMonitor			mInstance;
-
+	private static KvtDriveStateMonitor mInstance;
 
 	/**
 	 * Initializes the KvtDriveStateMonitor by taking note of
@@ -92,7 +91,19 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener,
 		mInstance = new KvtDriveStateMonitor();
 		KvtSystemCommunicator.addConnectionListener(mInstance);
 	}
+	
+	public static boolean getDrivesPower(){
+		return mInstance.mDrivesPower;
+	}
+	
+	public static boolean getDrivesReady(){
+		return mInstance.mDriveIsReady;
+	}
 
+	public static boolean getDrivesRef(){
+		return mInstance.mDriveIsRef;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -101,19 +112,22 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener,
 	 * .kemro.teach.dfl.value.KStructVarWrapper)
 	 */
 	public void changed(KStructVarWrapper _variable) {
-		if (_variable.equals(mDrivesPowerVar))
+		if (_variable.equals(mDrivesPowerVar)) {
+			mDrivesPower = (Boolean) _variable.readActualValue(null);
 			for (KvtDriveStateListener l : mListeners) {
-				l.drivePowerChanged((Boolean) _variable.readActualValue(null));
+				l.drivePowerChanged(mDrivesPower);
 			}
-
-		else if (_variable.equals(mDriveIsReadyVar))
+		} else if (_variable.equals(mDriveIsReadyVar)) {
+			mDriveIsReady = (Boolean) _variable.readActualValue(null);
 			for (KvtDriveStateListener l : mListeners) {
-				l.driveIsReadyChanged((Boolean) _variable.readActualValue(null));
+				l.driveIsReadyChanged(mDriveIsReady);
 			}
-		else if (_variable.equals(mDriveIsRefVar))
+		} else if (_variable.equals(mDriveIsRefVar)) {
+			mDriveIsRef = (Boolean) _variable.readActualValue(null);
 			for (KvtDriveStateListener l : mListeners) {
-				l.driveIsReferencedChanged((Boolean) _variable.readActualValue(null));
+				l.driveIsReferencedChanged(mDriveIsRef);
 			}
+		}
 	}
 
 	/*
@@ -165,15 +179,23 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener,
 
 		String str = MessageFormat.format(mDriveIsReadyVarname, kin);
 		mDriveIsReadyVar = mDfl.variable.createKStructVarWrapper(str);
-		mVarGroup.add(mDriveIsReadyVar);
+		if (mDriveIsReadyVar != null) {
+			mVarGroup.add(mDriveIsReadyVar);
+			mDriveIsReady = (Boolean) mDriveIsReadyVar.readActualValue(null);
+		}
 
 		String str2 = MessageFormat.format(mDriveIsRefVarname, kin);
 		mDriveIsRefVar = mDfl.variable.createKStructVarWrapper(str2);
-		mVarGroup.add(mDriveIsRefVar);
-
+		if (mDriveIsRefVar != null) {
+			mVarGroup.add(mDriveIsRefVar);
+			mDriveIsRef = (Boolean) mDriveIsRefVar.readActualValue(null);
+		}
 		String str3 = MessageFormat.format(mDrivePowerVarname, kin);
 		mDrivesPowerVar = mDfl.variable.createKStructVarWrapper(str3);
-		mVarGroup.add(mDrivesPowerVar);
+		if (mDrivesPowerVar != null) {
+			mVarGroup.add(mDrivesPowerVar);
+			mDrivesPower = (Boolean) mDrivesPowerVar.readActualValue(null);
+		}
 
 		mDrivesSwitchOnVar = mDfl.variable.createKStructVarWrapper(mDriveSwitchOnVarname);
 

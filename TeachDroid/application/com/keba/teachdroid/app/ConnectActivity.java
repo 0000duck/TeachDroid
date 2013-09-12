@@ -41,7 +41,7 @@ public class ConnectActivity extends Activity implements InitializationListener,
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (RobotControlProxy.isConnected() /*|| trueDEBUG*/) {
+		if (RobotControlProxy.isConnected() /* || trueDEBUG */) {
 			Intent intent = new Intent(this, MainActivity.class);
 			startActivity(intent);
 		}
@@ -172,7 +172,7 @@ public class ConnectActivity extends Activity implements InitializationListener,
 		// it in the meantime
 		// String host = PreferenceManager.getInstance().getHostname();
 		mStartTime = System.currentTimeMillis();
-		InitializationTask itask = new InitializationTask(this);
+		InitializationTask itask = new InitializationTask(this, getBaseContext());
 		itask.execute(_host);
 
 	}
@@ -227,7 +227,7 @@ public class ConnectActivity extends Activity implements InitializationListener,
 		runOnUiThread(new Runnable() {
 			public void run() {
 				long duration = System.currentTimeMillis() - mStartTime;
-				Toast.makeText(getBaseContext(),"Connecting took me " + duration / 1000 + " seconds", Toast.LENGTH_SHORT).show();
+				Toast.makeText(getBaseContext(), "Connecting took me " + duration / 1000 + " seconds", Toast.LENGTH_SHORT).show();
 				m_dlg.dismiss();
 				Toast.makeText(getBaseContext(), "Connection established", Toast.LENGTH_SHORT).show();
 				Intent intent = new Intent(ConnectActivity.this, MainActivity.class);

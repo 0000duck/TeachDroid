@@ -8,38 +8,31 @@
         android:id="@+id/refsysLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/robotNameLabel"
-        android:layout_below="@+id/robotNameLabel"
-        android:text="World"
+        android:layout_alignLeft="@+id/mainMode"
+        android:layout_below="@+id/mainMode"
         android:drawableLeft="@drawable/ic_refsys"
+        android:gravity="center_vertical"
+        android:text="World"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <ImageView
         android:id="@+id/robotImg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="10dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
         android:src="@drawable/robot_small" />
-
-    <TextView
-        android:id="@+id/robotNameLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/robotImg"
-        android:text="RobotName"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
         android:id="@+id/toolLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/robotPower"
-        android:layout_below="@+id/refsysLabel"        
+        android:layout_below="@+id/refsysLabel"
         android:drawableLeft="@drawable/ic_tool"
+        android:gravity="center_vertical"
         android:text="Tool"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
@@ -52,5 +45,26 @@
         android:clickable="false"
         android:text="@string/robotPower"
         android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/robotNameLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/robotImg"
+        android:layout_marginLeft="30dp"
+        android:layout_toRightOf="@+id/robotImg"
+        android:text="RobotName"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/mainMode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/robotNameLabel"
+        android:layout_below="@+id/robotNameLabel"
+        android:drawableLeft="@drawable/ic_opmode_auto"
+        android:gravity="center_vertical"
+        android:text="A"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>

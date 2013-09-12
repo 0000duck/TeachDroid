@@ -70,9 +70,6 @@ public class MainActivity extends BaseActivity /*
 				onShowInfos(v);
 			}
 		});
-		
-		
-		
 	}
 	
 	
