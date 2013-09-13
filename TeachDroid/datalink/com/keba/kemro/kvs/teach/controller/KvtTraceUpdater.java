@@ -191,6 +191,7 @@ public class KvtTraceUpdater implements Runnable {
 	 * @see java.lang.Runnable#run()
 	 */
 
+	@Override
 	public synchronized void run() {
 
 		InputStream netStream = null;
