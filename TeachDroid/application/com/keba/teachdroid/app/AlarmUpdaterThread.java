@@ -56,7 +56,11 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 	private static List<AlarmUpdaterListener> mListeners;
 
 	private Context context;
-	private int notificationCount = 0;
+	private int infoNotificationCount = 1;
+	private int alarmNotificationCount = 1;
+	private int errorNotificationCount = 1;
+
+	private NotificationCompat.Builder mBuilder;
 
 	public AlarmUpdaterThread(Context _context) {
 		super("Notifications");
@@ -65,6 +69,9 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 		KvtTraceUpdater.addListener(this);
 		tracedLines = new Vector<String>();
 		mListeners = new Vector<AlarmUpdaterListener>();
+
+		Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+		mBuilder = new NotificationCompat.Builder(context).setPriority(Notification.PRIORITY_HIGH).setSound(soundUri);
 	}
 
 	public static List<Message> getMessageQueue() {
@@ -80,7 +87,7 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 		}
 		return list;
 	}
-	
+
 	public static List<KMessage> getKMessageQueue() {
 		List<KMessage> list = new LinkedList<KMessage>();
 		String filter = "RC";
@@ -160,7 +167,7 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 		synchronized (mMsgBufferLock) {
 			// remove message from queue
 			List<KMessage> q = mMessageQueue.get(_bufferName);
-			if (q != null){
+			if (q != null) {
 				q.remove(_msg);
 				for (AlarmUpdaterListener l : mListeners) {
 					l.queueChanged();
@@ -206,9 +213,21 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 	private void sendNotification(KMessage _msg) {
 		Message msg = new Message(_msg);
 		DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss", Locale.getDefault());
-		Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context).setPriority(Notification.PRIORITY_HIGH).setSmallIcon(msg.getImageID()).setContentTitle(df.format(msg.getDate()).toString()).setContentText(_msg.getMessageText())
-				.setSound(soundUri);
+		switch (_msg.m_ClassId) {
+		case 256: // Info message
+			mBuilder.setNumber(infoNotificationCount++);
+			break;
+		case 128: // Alarm message
+			mBuilder.setNumber(alarmNotificationCount++);
+			break;
+		case 64: // Error
+			mBuilder.setNumber(errorNotificationCount++);
+			break;
+		default:
+			break;
+		}
+		
+		mBuilder.setSmallIcon(msg.getImageID()).setContentTitle(df.format(msg.getDate()).toString()).setContentText(_msg.getMessageText());
 		// Creates an explicit intent for an Activity in your app
 		Intent resultIntent = new Intent(context, InfoActivity.class);
 
@@ -233,10 +252,8 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 		notification.ledOnMS = 1000; // light on in milliseconds
 		notification.ledOffMS = 4000; // light off in milliseconds
 		notification.defaults |= Notification.DEFAULT_VIBRATE;
-		notification.number = notificationCount;
 
-		mNotificationManager.notify(msg.getID(), notification);
-		notificationCount++;
+		mNotificationManager.notify(msg.getImageID(), notification);
 	}
 
 	public static synchronized void addListener(AlarmUpdaterListener _listener) {
