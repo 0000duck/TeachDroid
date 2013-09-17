@@ -22,23 +22,23 @@ import com.keba.kemro.teach.dfl.value.KVariableGroupListener;
  */
 public class KvtMainModeAdministrator implements KMultikinematicListener, KVariableGroupListener, KvtTeachviewConnectionListener {
 
-	private final Object m_dlfLock = new Object();
-	private int m_actualMainMode = -1;
-	private int mSafetyState = -1;
+	private final Object						m_dlfLock			= new Object();
+	private int									m_actualMainMode	= -1;
+	private int									mSafetyState		= -1;
 
-	private static KVariableGroup mVarGroup;
-	private static KStructVarWrapper mMainModeVar;
-	private static boolean changed = false;
+	private static KVariableGroup				mVarGroup;
+	private static KStructVarWrapper			mMainModeVar;
+	private static boolean						changed				= false;
 
-	private static KStructVarWrapper mSafetyStateVar;
-	private static KvtMainModeAdministrator instance;
-	private static Vector<KvtMainModeListener> m_listeners;
+	private static KStructVarWrapper			mSafetyStateVar;
+	private static KvtMainModeAdministrator		instance;
+	private static Vector<KvtMainModeListener>	m_listeners;
 
 	public static enum SafetyState {
 		eIconSafetyOK, eIconSafetyNOK, // obsolete (deprecated use detailed info
 										// icons instead)
 		eIconSafetyUnknown, eIconSafety2EStopInt, eIconSafety2EStopExt, eIconSafety2EStopBoth, eIconSafetyEStop, eIconSafetySafetyDoor, eIconSafetyEnableSwitch, eIconSafetyPowerRelease;
-		private static SafetyState[] allValues = values();
+		private static SafetyState[]	allValues	= values();
 
 		public static SafetyState fromOrdinal(int n) {
 			return allValues[n];
@@ -56,6 +56,7 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 	 * @see com.keba.kemro.kvs.teach.util.KvtTeachviewConnectionListener#
 	 * teachviewConnected()
 	 */
+	@Override
 	public void teachviewConnected() {
 		synchronized (m_dlfLock) {
 			KTcDfl dfl = KvtSystemCommunicator.getTcDfl();
@@ -77,6 +78,7 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 	 * @see com.keba.kemro.kvs.teach.util.KvtTeachviewConnectionListener#
 	 * teachviewDisconnected()
 	 */
+	@Override
 	public void teachviewDisconnected() {
 		KTcDfl dfl = KvtSystemCommunicator.getTcDfl();
 		if (dfl != null) {
@@ -95,6 +97,7 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 	 * com.keba.kemro.teach.dfl.value.KVariableGroupListener#changed(com.keba
 	 * .kemro.teach.dfl.value.KStructVarWrapper)
 	 */
+	@Override
 	public void changed(KStructVarWrapper _variable) {
 		if (_variable.equals(mMainModeVar)) {
 			Number mode = (Number) _variable.readActualValue(null);
@@ -127,6 +130,7 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 	 * com.keba.kemro.teach.dfl.value.KVariableGroupListener#allActualValuesUpdated
 	 * ()
 	 */
+	@Override
 	public void allActualValuesUpdated() {
 		changed(mMainModeVar);
 		changed(mSafetyStateVar);
@@ -139,6 +143,7 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 	 * com.keba.kemro.teach.dfl.structural.KMultikinematicListener#kinematikChanged
 	 * ()
 	 */
+	@Override
 	public void kinematikChanged() {
 		createVariable();
 	}
@@ -156,7 +161,8 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 					mMainModeVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcData.selectedMainMode");
 
 					if (mMainModeVar == null) { // try the gRcData-path
-						mMainModeVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcDataRobot[" + kin + "].selectedMainMode");
+						mMainModeVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcDataRobot[" + kin
+								+ "].selectedMainMode");
 					}
 
 					mSafetyStateVar = dfl.variable.createKStructVarWrapper(KvtRcAdministrator.RCDATA_PREFIX + "gRcData.userIcon[4]");
@@ -200,7 +206,9 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 	}
 
 	public static int getMainMode() {
-		return instance.m_actualMainMode;
+		if (instance != null)
+			return instance.m_actualMainMode;
+		return -1;
 	}
 
 	public static KvtMainModeAdministrator init() {

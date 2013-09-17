@@ -111,7 +111,7 @@ public class OverviewFragment extends Fragment implements KvtDriveStateListener,
 		sw.setClickable(false);
 
 		// power button
-		Button b = (Button) mRootView.findViewById(R.id.button2);
+		Button b = (Button) mRootView.findViewById(R.id.startProgramBtn);
 		if (b != null)
 			b.setOnClickListener(new OnClickListener() {
 

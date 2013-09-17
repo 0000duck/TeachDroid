@@ -434,7 +434,7 @@ public class RobotControlProxy {
 			Log.d(ROBOT_CONTROL_LOGTAG, "Program " + _prg.getName() + "'s state is " + _prg.getProgramStateString());
 
 			if (_prg.getProgramState() == KvtProgram.LOADED) {
-				KvtExecutionMonitor.getTextForProgram(_prg);
+				KvtExecutionMonitor.getProgramSourceCode(_prg);
 			}
 
 			notifyObservers();

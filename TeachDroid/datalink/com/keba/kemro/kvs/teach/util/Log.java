@@ -11,7 +11,7 @@ import java.util.Locale;
  */
 public class Log {
 	private enum LogLevel {
-		eDebug, eInfo, eWarning, eError
+		eVerbose, eDebug, eInfo, eWarning, eError
 	};
 
 	private static String	mTagFilter	= null;
@@ -89,5 +89,18 @@ public class Log {
 
 	private static boolean applyTagFilter(String _logtag) {
 		return mTagFilter == null || (mTagFilter != null && _logtag.contains(mTagFilter));
+	}
+
+	/**
+	 * @param _string
+	 * @param _string2
+	 */
+	public static void v(String _logtag, String _msg) {
+		if (mLogLevel.compareTo(LogLevel.eVerbose) <= 0 && applyTagFilter(_logtag)) {
+			if (isAndroid) {
+				android.util.Log.v(_logtag, _msg);
+			} else
+				System.out.println("#VERBOSE# " + _logtag + "  --  " + _msg);
+		}
 	}
 }

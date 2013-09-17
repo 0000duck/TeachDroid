@@ -33,7 +33,7 @@
         android:text="Drives Power State" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/startProgramBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/powerStateIcon"
@@ -45,7 +45,7 @@
         android:id="@+id/powerStateIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button2"
+        android:layout_above="@+id/startProgramBtn"
         android:layout_alignRight="@+id/overrideBar"
         android:layout_marginRight="10dp"
         android:src="@drawable/power_off" />

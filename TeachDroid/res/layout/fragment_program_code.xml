@@ -7,8 +7,15 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="0.9"
+        android:layout_weight="0.45"
         android:background="@color/pc_background" >
+
+        <TextView
+            android:id="@+id/pcTextfield"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PC:"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
 
     </FrameLayout>
 
@@ -17,10 +24,40 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="0.1"
+        android:enabled="true"
         android:fontFamily="monospace"
         android:isScrollContainer="true"
         android:text="@string/program_code_dummy"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="13sp" />
+        android:textSize="15sp" />
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.45"
+        android:orientation="vertical" >
+
+        <ImageButton
+            android:id="@+id/startProgramBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/program_state_run"
+            android:text="Button" />
+
+        <ImageButton
+            android:id="@+id/stopProgramBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/program_state_pause"
+            android:text="Button" />
+
+        <ImageButton
+            android:id="@+id/changeExecModeBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/execution_mode_cont"
+            android:text="Button" />
+        
+    </LinearLayout>
 
 </LinearLayout>

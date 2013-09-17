@@ -56,6 +56,7 @@ public class KvtProjectAdministrator {
 		m_projects = new Vector<KvtProject>();
 		listener = new KProjectListener();
 		KvtSystemCommunicator.addConnectionListener(new KvtTeachviewConnectionListener() {
+			@Override
 			public void teachviewConnected() {
 				dfl = KvtSystemCommunicator.getTcDfl();
 				synchronized (dfl.getLockObject()) {
@@ -71,6 +72,7 @@ public class KvtProjectAdministrator {
 				}
 			}
 
+			@Override
 			public void teachviewDisconnected() {
 				// synchronized (dfl.getLockObject()) {
 				dfl.directory.removeDirectoryAdminListener(listener);
@@ -250,15 +252,16 @@ public class KvtProjectAdministrator {
 	 * @param prg
 	 *            Das Program das gestartet werden soll.
 	 */
-	public static void startProgram(KvtProgram prg) {
+	public static boolean startProgram(KvtProgram prg) {
 		if (prg != null) {
 			if (prg.getStructProgram() != null) {
 				KTcDfl d = dfl;
 				if (d != null) {
-					d.execution.startProgram(prg.getStructProgram(), true, true);
+					return d.execution.startProgram(prg.getStructProgram(), true, true);
 				}
 			}
 		}
+		return false;
 	}
 
 	/**
@@ -429,6 +432,7 @@ public class KvtProjectAdministrator {
 	}
 
 	private static class KProjectListener implements KDirectoryAdministratorListener, KExecAdministratorListener, KStructAdministratorListener {
+		@Override
 		public Vector<KvtProject> directoryProjectsChanged() {
 			KTcDfl d = dfl;
 			Vector<KvtProject> tmp = new Vector<KvtProject>();
@@ -456,6 +460,7 @@ public class KvtProjectAdministrator {
 			return tmp;
 		}
 
+		@Override
 		public void nodeInserted(KStructNode parent, KStructNode node) {
 			if (0 < m_projects.size()) {
 				if (node instanceof KStructProject) {
@@ -485,6 +490,7 @@ public class KvtProjectAdministrator {
 			}
 		}
 
+		@Override
 		public void nodeRemoved(KStructNode parent, KStructNode node) {
 			if (0 < m_projects.size()) {
 				String prjDirEntryPath = null;
@@ -536,6 +542,7 @@ public class KvtProjectAdministrator {
 			}
 		}
 
+		@Override
 		public void treeChanged(KStructNode parent) {
 			if (m_projects.size() == 0) {
 				return;
@@ -560,6 +567,7 @@ public class KvtProjectAdministrator {
 		 * @param toInsert
 		 *            Description of the Parameter
 		 */
+		@Override
 		public void execUnitsRemovedAdded(Vector toRemove, Vector toInsert) {
 			if (0 < m_projects.size()) {
 				// check toRemove-Vector
@@ -631,6 +639,7 @@ public class KvtProjectAdministrator {
 		/**
 		 * Description of the Method
 		 */
+		@Override
 		public void updateState() {
 			for (int i = 0; i < m_projects.size(); i++) {
 				KvtProject prj = (KvtProject) m_projects.elementAt(i);

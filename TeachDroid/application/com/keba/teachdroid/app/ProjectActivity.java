@@ -24,12 +24,11 @@ import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtExecutionMonitor;
 import com.keba.kemro.kvs.teach.util.Log;
-import com.keba.teachdroid.app.fragments.ProgramListFragment;
 import com.keba.teachdroid.app.fragments.InnerListFragment;
 import com.keba.teachdroid.app.fragments.ProgramCodeFragment;
 import com.keba.teachdroid.app.fragments.ProgramInfoFragment;
+import com.keba.teachdroid.app.fragments.ProgramListFragment;
 import com.keba.teachdroid.app.fragments.ProjectListFragment;
-import com.keba.teachdroid.data.RobotControlProxy;
 
 public class ProjectActivity extends BaseActivity implements InnerListFragment.SelectionCallback, ProgramListFragment.SelectionCallback {
 
@@ -88,11 +87,11 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 		mViewPager.setOffscreenPageLimit(3);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 
-
 		// late-load the project list
 		// KvtSystemCommunicator.getTcDfl().directory.refreshProjects();
 
 		for (KvtProject proj : projects) {
+			// if (!proj.isSystemProject())
 			programs.add(Arrays.asList(proj.getPrograms()));
 		}
 		// dummy content building
@@ -109,7 +108,7 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 	}
 
 	public List<KvtProgram> getPrograms() {
-		return programs.get(selectedProject);
+		return programs.get(selectedProgram);
 	}
 
 	public String getProgramCode() {
@@ -146,71 +145,87 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 	public void setSelectedProgram(int selectedProgram) {
 		this.selectedProgram = selectedProgram;
 		// programCodes.clear();
-		final KvtProgram prog = getPrograms().get(selectedProgram);
+		KvtProject sel = getProjects().get(selectedProject);
+		// final KvtProgram prog = getPrograms().get(selectedProgram);
+		final KvtProgram prog = sel.getProgram(selectedProgram);
 
 		// int i = 0;
 		// for (final KvtProgram prog : getPrograms()) {
 		final StringBuffer programCode = new StringBuffer();
-		programCode.append("Program: " + prog.getName() + "\n");
+		// programCode.append("Program: " + prog.getName() + "\n");
 
 		// String code = null;
-		String progCode = programCodes.get(Integer.valueOf(selectedProgram));
-		if (progCode == null) {
+		String progCode = null;// programCodes.get(Integer.valueOf(selectedProgram));
+		if (progCode == null /* || prog.getProgramState() <= KvtProgram.OPEN */) {
 
 			// IMPORTANT: we need to spawn an asynctask here, because
 			// getTextForProgram() will internally
 			// use a network connection, which causes a
 			// NetworkOnMainthread-Exception if invoked on UI-Thread!
 
-
-
+			final ProgressDialog pd = new ProgressDialog(this);
+			pd.setTitle("Please wait");
+			pd.setMessage("Loading...");
 			try {
 				progCode = new AsyncTask<Void, Integer, String>() {
 
-					// @Override
-					// protected void onPreExecute() {
-					// super.onPreExecute();
-					// m_dlg = new ProgressDialog(ProjectActivity.this,
-					// ProgressDialog.STYLE_SPINNER);
-					// m_dlg.setTitle("Loading...");
-					// m_dlg.setCancelable(true);
-					// m_dlg.setCanceledOnTouchOutside(false);
-					// m_dlg.setMessage("Loading Program: " +
-					// getPrograms().get(ProjectActivity.this.selectedProgram).toString());
-					// m_dlg.setIndeterminate(true);
-					// m_dlg.show();
-					// while (!m_dlg.isShowing())
-					// try {
-					// Thread.sleep(10);
-					// } catch (InterruptedException e) {
-					// e.printStackTrace();
-					// }
-					// }
+					@Override
+					protected void onPostExecute(String _result) {
+						if (pd != null) {
+							pd.dismiss();
+						}
+					}
+
+					@Override
+					protected void onPreExecute() {
+						pd.setCancelable(false);
+						pd.setIndeterminate(true);
+						pd.show();
+					}
 
 					@Override
 					protected String doInBackground(Void... _params) {
 
-
 						KvtProject parent = prog.getParent();
 						boolean isBuilt = true;
+						boolean startSuccessful = false;
 						if (parent != null) {
+							// first try to build
 							if (parent.getProjectState() <= KvtProject.NOT_BUILDED) {
 								isBuilt = KvtProjectAdministrator.build(parent);
 								Log.d("ProjectActivity", "building project \"" + parent.getName() + "\" was "
 										+ (isBuilt ? "successful" : "not successful"));
 							}
+
+							// try to load project
+							while (parent.getProjectState() < KvtProject.SUCCESSFULLY_LOADED) {
+								KvtProjectAdministrator.loadProject(parent);
+								try {
+									Thread.sleep(100);
+								} catch (InterruptedException e) {
+									Log.v("ProjectActivity", e.toString());
+								}
+							}
+
+							// then try to load program
+							startSuccessful = KvtProjectAdministrator.startProgram(prog);
+							while (prog.getProgramState() < KvtProgram.STOPPED) {
+								try {
+									Thread.sleep(100);
+								} catch (InterruptedException e) {
+									Log.v("ProjectActivity", e.toString());
+								}
+							}
 						} else
 							throw new IllegalStateException("Parent project of program \"" + prog.getName() + "\" could not be obtained!");
-						if (isBuilt)
-							return KvtExecutionMonitor.getTextForProgram(prog);
-						return null;
+						if (isBuilt /* && startSuccessful */)
+							return KvtExecutionMonitor.getProgramSourceCode(prog);
+						else {
+							Log.e(getClass().toString(), "Starting " + prog + " not successful, is it loaded?");
+							return null;
+						}
 					}
 
-					// @Override
-					// protected void onPostExecute(String result) {
-					// super.onPostExecute(result);
-					// m_dlg.dismiss();
-					// }
 				}.execute((Void) null).get();// .get();
 
 			} catch (InterruptedException e) {
@@ -225,7 +240,7 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 			programCodes.put(Integer.valueOf(selectedProgram), programCode.toString());
 
 			((ProgramCodeFragment) mSectionsPagerAdapter.getItem(1)).setProgramCode();
-
+			((ProgramCodeFragment) mSectionsPagerAdapter.getItem(1)).setProgram(prog);
 		}
 
 		StringBuffer programInfo = new StringBuffer();

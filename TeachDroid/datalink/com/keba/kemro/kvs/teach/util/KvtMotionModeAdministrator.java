@@ -33,9 +33,10 @@ public class KvtMotionModeAdministrator implements KMultikinematicListener, KVar
 	public static String							STEP_STR			= "STEP";
 	public static String							MOTION_STR			= "MSTP";
 
-	private static final int						MODE_STEP			= 2;
-	private static final int						MODE_MOTION_STEP	= 3;
-	private static final int						MODE_CONT			= 1;
+	public static final int							MODE_STEP			= 2;
+	public static final int							MODE_MOTION_STEP	= 3;
+	public static final int							MODE_CONT			= 1;
+
 	public static String getMainFlowState(KExecUnitRoutine execRoutine) {
 		// if (execRoutine != null) {
 		// if (execRoutine.isMainFlowStepping()) {
@@ -107,6 +108,7 @@ public class KvtMotionModeAdministrator implements KMultikinematicListener, KVar
 		KvtSystemCommunicator.addConnectionListener(this);
 	}
 
+	@Override
 	public void teachviewConnected() {
 		synchronized (this) {
 			KTcDfl dfl = KvtSystemCommunicator.getTcDfl();
@@ -121,7 +123,7 @@ public class KvtMotionModeAdministrator implements KMultikinematicListener, KVar
 					dfl.structure.addMultikinematikListener(this);
 					// new Thread(new Runnable() {
 					// public void run() {
-							kinematikChanged();
+					kinematikChanged();
 					// }
 					// },
 					// "KvtMotionModeAdministrator.kinematicChanged()").start();
@@ -132,6 +134,7 @@ public class KvtMotionModeAdministrator implements KMultikinematicListener, KVar
 		}
 	}
 
+	@Override
 	public void teachviewDisconnected() {
 		KTcDfl dfl = KvtSystemCommunicator.getTcDfl();
 		if (dfl != null) {
@@ -146,6 +149,7 @@ public class KvtMotionModeAdministrator implements KMultikinematicListener, KVar
 		}
 	}
 
+	@Override
 	public void kinematikChanged() {
 		createVariable();
 	}
@@ -172,6 +176,7 @@ public class KvtMotionModeAdministrator implements KMultikinematicListener, KVar
 		}
 	}
 
+	@Override
 	public void allActualValuesUpdated() {
 		if (changed) {
 			for (int i = 0; i < m_listener.size(); i++) {
@@ -181,6 +186,7 @@ public class KvtMotionModeAdministrator implements KMultikinematicListener, KVar
 		changed = false;
 	}
 
+	@Override
 	public void changed(KStructVarWrapper variable) {
 		if (progModeVar == variable) {
 			Number n = (Number) progModeVar.getActualValue();
@@ -202,6 +208,31 @@ public class KvtMotionModeAdministrator implements KMultikinematicListener, KVar
 			}
 			changed = true;
 		}
+	}
+
+	/**
+	 * 
+	 */
+	public static boolean toggleMotionMode() {
+		String varName = "_system.rchtcontrol.simuKeys.step";
+		KTcDfl d = KvtSystemCommunicator.getTcDfl();
+		boolean success = false;
+		if (d != null) {
+			KStructVarWrapper wrp = d.variable.createKStructVarWrapper(varName);
+			if (wrp != null) {
+				// toggle true
+				success &= wrp.setActualValue(Boolean.TRUE);
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					Log.v(KvtMotionModeAdministrator.class.toString(), "toggleMotionMode(): " + e.toString());
+				}
+				success &= wrp.setActualValue(Boolean.FALSE);
+			}
+		} else
+			Log.e(KvtMotionModeAdministrator.class.toString(), "DFL was null!");
+		return success;
+
 	}
 
 }

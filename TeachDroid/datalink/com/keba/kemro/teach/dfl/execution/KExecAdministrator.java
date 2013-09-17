@@ -18,6 +18,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import com.keba.kemro.kvs.teach.util.Log;
 import com.keba.kemro.teach.dfl.KTcDfl;
 import com.keba.kemro.teach.dfl.structural.KStructNode;
 import com.keba.kemro.teach.dfl.structural.KStructProgram;
@@ -114,6 +115,7 @@ public class KExecAdministrator {
 		pollThread.start();
 
 		dfl.client.addConnectionListener(new TcConnectionListener() {
+			@Override
 			public void connectionStateChanged(boolean isConnected) {
 				if (isConnected) {
 				} else {
@@ -512,7 +514,9 @@ public class KExecAdministrator {
 				KExecAdministratorListener l = (KExecAdministratorListener) m_listenerList.elementAt(i);
 				l.updateState();
 			} catch (Exception e) {
-				KDflLogger.error(KExecAdministrator.class, "fireUpdateState", e);
+				// KDflLogger.error(KExecAdministrator.class, "fireUpdateState",
+				// e);
+				Log.e(getClass().toString(), "fireUpdateState: " + e.getMessage());
 			}
 		}
 		Thread.currentThread().setPriority(priority);

@@ -1,37 +1,36 @@
 package com.keba.teachdroid.app.fragments;
 
-import com.keba.kemro.kvs.teach.data.project.KvtProject;
-import com.keba.teachdroid.app.ProjectActivity;
-import com.keba.teachdroid.app.R;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Adapter;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
 
 public class InnerListFragment extends ListFragment {
 	/**
 	 * The fragment's current callback object, which is notified of list item
 	 * clicks.
 	 */
-	private SelectionCallback mCallbacks = sDummyCallbacks;
+	private SelectionCallback			mCallbacks		= sDummyCallbacks;
 
-	private ArrayAdapter<String> mAdapter;
+	// private ProjectArrayAdapter mAdapter;
+	private transient LayoutInflater	mInflater;
 
 	/**
 	 * A dummy implementation of the {@link SelectionCallback} interface that
 	 * does nothing. Used only when this fragment is not attached to an
 	 * activity.
 	 */
-	private static SelectionCallback sDummyCallbacks = new SelectionCallback() {
+	private static SelectionCallback	sDummyCallbacks	= new SelectionCallback() {
 
-		public void onProjectSelected(int id) {
-		}
-	};
+															@Override
+															public void onProjectSelected(int id) {
+															}
+														};
 
 	/**
 	 * A callback interface that all activities containing this fragment must
@@ -52,17 +51,32 @@ public class InnerListFragment extends ListFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mAdapter = new ArrayAdapter<String>(getActivity(), R.layout.default_list_item);
-		for (KvtProject p : ((ProjectActivity) getActivity()).getProjects()) {
-			mAdapter.add(p.toString());
-		}
-		setListAdapter(mAdapter);
+		// mAdapter = new ArrayAdapter<String>(getActivity(),
+		// R.layout.default_list_item);
+		// for (KvtProject p : ((ProjectActivity) getActivity()).getProjects())
+		// {
+		// mAdapter.add(p.toString());
+		// }
+		// setListAdapter(mAdapter);
+
+
 	}
+
+	// @Override
+	// public View onCreateView(LayoutInflater inflater, ViewGroup container,
+	// Bundle savedInstanceState) {
+	// mInflater = inflater;
+	// List<KvtProject> projs = ((ProjectActivity) getActivity()).getProjects();
+	// setListAdapter(new ProjectArrayAdapter(getActivity(),
+	// R.layout.simple_text_list_item, projs));
+	// return super.onCreateView(inflater, container, savedInstanceState);
+	// }
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
 	}
 
 	@Override
