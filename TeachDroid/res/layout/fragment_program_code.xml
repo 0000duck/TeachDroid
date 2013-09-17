@@ -20,13 +20,15 @@
     </FrameLayout>
 
     <TextView
-        android:id="@+id/programCode"
+        android:id="@+id/programCodeTextView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="0.1"
         android:enabled="true"
         android:fontFamily="monospace"
         android:isScrollContainer="true"
+        android:lineSpacingExtra="10sp"
+        android:lineSpacingMultiplier="1"
         android:text="@string/program_code_dummy"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="15sp" />
@@ -57,6 +59,14 @@
             android:layout_height="wrap_content"
             android:src="@drawable/execution_mode_cont"
             android:text="Button" />
+
+        <ImageButton
+            android:id="@+id/teachBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/teach_icon"
+            android:text="Button"
+            android:visibility="invisible" />
         
     </LinearLayout>
 

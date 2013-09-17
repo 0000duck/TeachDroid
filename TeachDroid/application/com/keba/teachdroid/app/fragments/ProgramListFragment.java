@@ -89,8 +89,15 @@ public class ProgramListFragment extends ListFragment implements KvtProjectAdmin
 				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
-						if (canClose)
-							KvtExecutionMonitor.closeProgram(_prg);
+						if (canClose) {
+							new Thread(new Runnable() {
+								@Override
+								public void run() {
+									KvtExecutionMonitor.closeProgram(_prg);
+								}
+							}).start();
+
+						}
 
 						else
 							mCallbacks.onProgramSelected(_index);

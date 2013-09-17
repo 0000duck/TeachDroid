@@ -19,6 +19,9 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
+import com.keba.kemro.kvs.teach.util.Log;
+import com.keba.kemro.teach.dfl.KTcDfl;
 import com.keba.kemro.teach.dfl.structural.KStructGlobal;
 import com.keba.kemro.teach.dfl.structural.KStructNode;
 import com.keba.kemro.teach.dfl.structural.KStructNodeVector;
@@ -26,13 +29,16 @@ import com.keba.kemro.teach.dfl.structural.KStructProgram;
 import com.keba.kemro.teach.dfl.structural.KStructProject;
 import com.keba.kemro.teach.dfl.structural.routine.KStructRoutine;
 import com.keba.kemro.teach.dfl.structural.var.KStructVar;
+import com.keba.kemro.teach.dfl.value.KMapTarget;
+import com.keba.kemro.teach.dfl.value.KMapTargetInternal;
+import com.keba.kemro.teach.dfl.value.KStructVarWrapper;
 
 /**
  * This class administers the consecutive numbering of variables with a certain
  * name prefix.
  */
 public class KvtVarManager {
-	private static final Hashtable varLists = new Hashtable();
+	private static final Hashtable	varLists	= new Hashtable();
 
 	/**
 	 * Adds a new variable to the variable list with the given prefix.
@@ -57,80 +63,77 @@ public class KvtVarManager {
 	 *            variable whose value shall be stored
 	 * @return true on success
 	 */
-	// public static boolean writeBackValue(KvtAbstractController cont,
-	// KStructVarWrapper var, KStructProject prj) {
-	// return writeBackValue(cont, var, prj, true);
-	// }
-	//
-	// public static boolean writeBackValue(KvtAbstractController cont,
-	// KStructVarWrapper var, KStructProject prj, boolean includeMapTarget) {
-	// // only for user variables the value should be saved
-	// boolean result = false;
-	// if (var != null) {
-	// result = writeBackValuePrivate(cont, var, prj);
-	// }
-	// KTcDfl d = KvtSystemCommunicator.getTcDfl();
-	// if (includeMapTarget && (d != null)) {
-	// String v = var.getRootPathString();
-	// int i = v.lastIndexOf(".");
-	// if (i > 0) {
-	// var = d.variable.createKStructVarWrapper(v.substring(0, i));
-	// }
-	// if (var != null) {
-	// KMapTarget target = var.readMapTarget();
-	// if (target instanceof KMapTargetInternal) {
-	// KStructVarWrapper wrapper =
-	// d.variable.createKStructVarWrapper(((KMapTargetInternal)
-	// target).getVariableComponentPath());
-	// if (wrapper != null) {
-	// result = writeBackValuePrivate(cont, wrapper, prj) && result;
-	// }
-	// }
-	// }
-	// }
-	// return result;
-	// }
+	public static boolean writeBackValue(KStructVarWrapper var, KStructProject prj) {
+		return writeBackValue(var, prj, true);
+	}
 
-	// private static boolean writeBackValuePrivate(KvtAbstractController cont,
-	// KStructVarWrapper var, KStructProject prj) {
-	// if (var.isUserVar()) {
-	// if (var.isDeclaredInUserProgram()) {
-	// if (!var.writeBackInitValue()) {
-	// KTcDfl d = KvtSystemCommunicator.getTcDfl();
-	// if (d != null) {
-	// d.error.checkIncCompilerError();
-	// }
-	// if (KvtErrMsgAdministrator.projectChangedErrorActive()) {
-	// KvtProject p = (prj != null) ?
-	// KvtProjectAdministrator.getProject(prj.getKey()) : null;
-	// new KvtProjectChangedErrorDialog(cont, p);
-	// return false;
-	// }
-	//
-	// KvtErrMsgAdministrator.showError(KvtErrMsgAdministrator.ERR_TITLE,
-	// KvtErrMsgAdministrator.WRITE_BACK_INIT_VALUES_ERR_MSG, prj);
-	// return false;
-	// }
-	// } else if (var.isSaveVar()) {
-	// if (!var.writeBackSaveValue()) {
-	// KTcDfl d = KvtSystemCommunicator.getTcDfl();
-	// if (d != null) {
-	// d.error.checkIncCompilerError();
-	// }
-	// if (KvtErrMsgAdministrator.projectChangedErrorActive()) {
-	// new KvtProjectChangedErrorDialog(cont,
-	// KvtProjectAdministrator.getProject(prj.getKey()));
-	// return false;
-	// }
-	//
-	// KvtErrMsgAdministrator.showError(KvtErrMsgAdministrator.ERR_TITLE,
-	// KvtErrMsgAdministrator.WRITE_BACK_SAVE_VALUES_ERR_MSG, prj);
-	// return false;
-	// }
-	// }
-	// }
-	// return true;
-	// }
+	public static boolean writeBackValue(KStructVarWrapper var, KStructProject prj, boolean includeMapTarget) {
+		// only for user variables the value should be saved
+		boolean result = false;
+		if (var != null) {
+			result = writeBackValuePrivate(var, prj);
+		}
+		KTcDfl d = KvtSystemCommunicator.getTcDfl();
+		if (includeMapTarget && (d != null)) {
+			String v = var.getRootPathString();
+			int i = v.lastIndexOf(".");
+			if (i > 0) {
+				var = d.variable.createKStructVarWrapper(v.substring(0, i));
+			}
+			if (var != null) {
+				KMapTarget target = var.readMapTarget();
+				if (target instanceof KMapTargetInternal) {
+					KStructVarWrapper wrapper = d.variable.createKStructVarWrapper(((KMapTargetInternal) target).getVariableComponentPath());
+					if (wrapper != null) {
+						result = writeBackValuePrivate(wrapper, prj) && result;
+					}
+				}
+			}
+		}
+		return result;
+	}
+
+	private static boolean writeBackValuePrivate(KStructVarWrapper var, KStructProject prj) {
+		if (var.isUserVar()) {
+			if (var.isDeclaredInUserProgram()) {
+				if (!var.writeBackInitValue()) {
+					KTcDfl d = KvtSystemCommunicator.getTcDfl();
+					if (d != null) {
+						d.error.checkIncCompilerError();
+					}
+					// if (KvtErrMsgAdministrator.projectChangedErrorActive()) {
+					// KvtProject p = (prj != null) ?
+					// KvtProjectAdministrator.getProject(prj.getKey()) : null;
+					// new KvtProjectChangedErrorDialog(cont, p);
+					// return false;
+					// }
+					//
+					// KvtErrMsgAdministrator.showError(KvtErrMsgAdministrator.ERR_TITLE,
+					// KvtErrMsgAdministrator.WRITE_BACK_INIT_VALUES_ERR_MSG,
+					// prj);
+					return false;
+				}
+			} else if (var.isSaveVar()) {
+				if (!var.writeBackSaveValue()) {
+					KTcDfl d = KvtSystemCommunicator.getTcDfl();
+					if (d != null) {
+						d.error.checkIncCompilerError();
+					}
+					// if (KvtErrMsgAdministrator.projectChangedErrorActive()) {
+					// new KvtProjectChangedErrorDialog(cont,
+					// KvtProjectAdministrator.getProject(prj.getKey()));
+					// return false;
+					// }
+					//
+					// KvtErrMsgAdministrator.showError(KvtErrMsgAdministrator.ERR_TITLE,
+					// KvtErrMsgAdministrator.WRITE_BACK_SAVE_VALUES_ERR_MSG,
+					// prj);
+					return false;
+				}
+			}
+		}
+		return true;
+	}
 
 	/**
 	 * Removes the given variable.
@@ -283,46 +286,49 @@ public class KvtVarManager {
 		return j;
 	}
 
-	// /**
-	// * teach variable, write back values, open teach ok dialog for a short
-	// time
-	// *
-	// * @param wrap
-	// * variable that should be teached
-	// * @param additionalParameter
-	// * caller KStructVarWrapper variable or program name and project
-	// * name
-	// * @param desc
-	// * description for the success dialog
-	// * @param dropAhead
-	// * drops the ahead execution
-	// * @return true if successfully teach
-	// */
-	// public static boolean teach(KvtAbstractController cont, KStructVarWrapper
-	// wrap, Object[] additionalParameter, String desc, boolean dropAhead) {
-	// KStructVar var = wrap.getKStructVar();
-	// if ((var == null) && (wrap.isArrayField())) {
-	// var = wrap.getRootVariable();
-	// }
-	// KStructProject prj = var.getKStructProject();
-	// boolean result = false;
-	// if (additionalParameter != null) {
-	// result = wrap.teachVariable(additionalParameter);
-	// } else {
-	// result = wrap.teachVariable();
-	// }
-	// if (result) {
-	// if (dropAhead) {
-	// KvtProgramControllerFactory.getProgramController().dropAheadExecution();
-	// }
-	// KvtVarManager.writeBackValue(cont, wrap, prj);
-	// new CloseThread(cont, desc);
-	// } else {
-	// KvtErrMsgAdministrator.showError(KvtErrMsgAdministrator.ERR_TITLE,
-	// KvtErrMsgAdministrator.TEACH_ERR_MSG, prj);
-	// }
-	// return result;
-	// }
+	public static boolean teach(KStructVarWrapper _teachVar, Object[] _optParameters) {
+		return teach(_teachVar, _optParameters, null, false);
+	}
+
+	/**
+	 * teach variable, write back values, open teach ok dialog for a short time
+	 * 
+	 * @param wrap
+	 *            variable that should be taught
+	 * @param additionalParameter
+	 *            caller KStructVarWrapper variable or program name and project
+	 *            name
+	 * @param desc
+	 *            description for the success dialog
+	 * @param dropAhead
+	 *            drops the ahead execution
+	 * @return true if successfully teach
+	 */
+	public static boolean teach(KStructVarWrapper wrap, Object[] additionalParameter, String desc, boolean dropAhead) {
+		KStructVar var = wrap.getKStructVar();
+		if ((var == null) && (wrap.isArrayField())) {
+			var = wrap.getRootVariable();
+		}
+		KStructProject prj = var.getKStructProject();
+		boolean result = false;
+		if (additionalParameter != null) {
+			result = wrap.teachVariable(additionalParameter);
+		} else {
+			result = wrap.teachVariable();
+		}
+		if (result) {
+			if (dropAhead) {
+				// KvtProgramControllerFactory.getProgramController().dropAheadExecution();
+			}
+			KvtVarManager.writeBackValue(wrap, prj);
+			// new CloseThread(cont, desc);
+		} else {
+			// KvtErrMsgAdministrator.showError(KvtErrMsgAdministrator.ERR_TITLE,
+			// KvtErrMsgAdministrator.TEACH_ERR_MSG, prj);
+			Log.e("KvtVarManager", "Teaching variable FAILED");
+		}
+		return result;
+	}
 
 	/**
 	 * dialog displayed on teach command

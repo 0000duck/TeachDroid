@@ -131,4 +131,18 @@ public class Message {
 	public Date getDate() {
 		return mDate;
 	}
+
+	/**
+	 * @return
+	 */
+	public boolean isAlarm() {
+		return getMessageType(mRawData) == MessageTypes.ALARM;
+	}
+
+	/**
+	 * @return
+	 */
+	public boolean isWarning() {
+		return getMessageType(mRawData) == MessageTypes.WARNING;
+	}
 }

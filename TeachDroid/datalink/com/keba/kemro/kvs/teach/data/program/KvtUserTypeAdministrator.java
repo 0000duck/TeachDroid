@@ -463,7 +463,7 @@ public class KvtUserTypeAdministrator {
 	}
 
 	/**
-	 * @param t
+	 * @param codeTextView
 	 * @param scope
 	 * @return true if no variable should be created by the user for those types
 	 */

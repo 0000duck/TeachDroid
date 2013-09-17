@@ -9,11 +9,13 @@ import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
 import android.app.ProgressDialog;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.ArrayAdapter;
@@ -24,13 +26,15 @@ import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtExecutionMonitor;
 import com.keba.kemro.kvs.teach.util.Log;
+import com.keba.teachdroid.app.AlarmUpdaterThread.AlarmUpdaterListener;
 import com.keba.teachdroid.app.fragments.InnerListFragment;
 import com.keba.teachdroid.app.fragments.ProgramCodeFragment;
 import com.keba.teachdroid.app.fragments.ProgramInfoFragment;
 import com.keba.teachdroid.app.fragments.ProgramListFragment;
 import com.keba.teachdroid.app.fragments.ProjectListFragment;
 
-public class ProjectActivity extends BaseActivity implements InnerListFragment.SelectionCallback, ProgramListFragment.SelectionCallback {
+public class ProjectActivity extends BaseActivity implements InnerListFragment.SelectionCallback, ProgramListFragment.SelectionCallback,
+		AlarmUpdaterListener {
 
 	/**
 	 * 
@@ -51,6 +55,10 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 
 	private int									selectedProject		= 0;
 	private int									selectedProgram		= 0;
+
+	public ProjectActivity() {
+		AlarmUpdaterThread.addListener(this);
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -324,6 +332,75 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 				return "NOT_DEFINED_" + position;
 			}
 		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.teachdroid.app.AlarmUpdaterThread.AlarmUpdaterListener#queueChanged
+	 * ()
+	 */
+	@Override
+	public void queueChanged() {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				if (getResources() != null) {
+					List<Message> list = null;
+					try {
+						list = new AsyncTask<Void, Void, List<Message>>() {
+
+							@Override
+							protected List<Message> doInBackground(Void... params) {
+								return AlarmUpdaterThread.getMessageQueue();
+							}
+						}.execute((Void) null).get();
+					} catch (InterruptedException e) {
+						Log.v(ProjectActivity.class.toString(), e.getMessage());
+					} catch (ExecutionException e) {
+						Log.i(ProjectActivity.class.toString(), e.getMessage());
+					}
+
+					int c = getResources().getColor(R.color.program_main_blue);
+					if (list != null && !list.isEmpty()) {
+						Message m = list.get(list.size() - 1);
+						if (m.isAlarm()) {
+							c = Color.RED;
+						} else if (m.isWarning())
+							c = Color.YELLOW;
+					}
+					PagerTitleStrip strip = (PagerTitleStrip) findViewById(R.id.pager_title_strip);
+					if (strip != null) {
+						strip.setBackgroundColor(c);
+						strip.invalidate();
+					}
+				}
+			}
+		});
+
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.keba.teachdroid.app.AlarmUpdaterThread.AlarmUpdaterListener#
+	 * historyChanged()
+	 */
+	@Override
+	public void historyChanged() {
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.keba.teachdroid.app.AlarmUpdaterThread.AlarmUpdaterListener#traceChanged
+	 * (java.lang.String)
+	 */
+	@Override
+	public void traceChanged(String _line) {
 	}
 
 }
