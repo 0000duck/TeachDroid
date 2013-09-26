@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.TextView.BufferType;
 
 import com.keba.kemro.kvs.teach.data.program.KvtVarManager;
@@ -43,39 +44,41 @@ import com.keba.kemro.teach.dfl.value.KStructVarWrapper;
 import com.keba.teachdroid.app.ProjectActivity;
 import com.keba.teachdroid.app.R;
 
-public class ProgramCodeFragment extends Fragment implements Serializable, KvtExecutionListener, KvtProjectAdministratorListener,
-		KvtMotionModeListener {
+public class ProgramCodeFragment extends Fragment implements Serializable, KvtExecutionListener, KvtProjectAdministratorListener, KvtMotionModeListener {
 
 	/**
 	 * 
 	 */
-	private static final long	serialVersionUID	= -7012715919241719807L;
-	private static final String	STRING_PTP			= "PTP";
-	private static final String	STRING_LIN			= "LIN";
-	private transient View		mRootView;
-	ProjectActivity				callback;
-	transient TextView			codeTextView, pcTextfield;
-	private KvtProgram			mProgram;
-	private ImageButton			mStart;
-	private ImageButton			mStop;
-	private ImageButton			mExecModeBtn;
-	private ImageButton			mTeachBtn;
-	private final int			mLineOffset			= 2;
-	private SpannableString		mCodeLines;
-	private String				mRawCode;
-	private BackgroundColorSpan	mMainflowSpanObj;
-	private BackgroundColorSpan	mSelectionSpanObj;
-	private Context				mContext;
-	protected String			mCurrentSelVarname;
+	private static final long serialVersionUID = -7012715919241719807L;
+	private static final String STRING_PTP = "PTP";
+	private static final String STRING_LIN = "LIN";
+	private transient View mRootView;
+	ProjectActivity callback;
+	transient TextView codeTextView, pcTextfield;
+	private KvtProgram mProgram;
+	private ImageButton mStart;
+	private ImageButton mStop;
+	private ImageButton mExecModeBtn;
+	private ImageButton mTeachBtn;
+	private final int mLineOffset = 2;
+	private SpannableString mCodeLines;
+	private String mRawCode;
+	private BackgroundColorSpan mMainflowSpanObj;
+	private BackgroundColorSpan mSelectionSpanObj;
+	private Context mContext;
+	protected String mCurrentSelVarname;
+	private boolean mTeachResult = false;
 
 	public ProgramCodeFragment() {
 		KvtExecutionMonitor.addListener(this);
 		KvtProjectAdministrator.addProjectListener(this);
+		KvtMotionModeAdministrator.addListener(ProgramCodeFragment.this);
+
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
-				KvtMotionModeAdministrator.addListener(ProgramCodeFragment.this);
+//				KvtMotionModeAdministrator.addListener(ProgramCodeFragment.this);
 			}
 		}).start();
 
@@ -156,13 +159,13 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 			public boolean onTouch(View _v, MotionEvent _event) {
 				float y = _event.getY();
 				float lineHeight = codeTextView.getLineHeight();
-				int numLines = codeTextView.getLineCount();
+				int numLines = codeTextView.getLineCount() - 1;
 
 				if (y > numLines * lineHeight) { // outside textarea
 					return false;
 				}
 
-				double lineIndex = Math.round(y / lineHeight);
+				double lineIndex = Math.floor(y / lineHeight);
 
 				Log.v("TouchEvent", "y: " + y + " lineheight: " + lineHeight + " line: " + lineIndex);
 
@@ -188,12 +191,23 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 
 			@Override
 			public void run() {
-				String p1= "testproj";
-				String p2= "foreverloop";
-				boolean result = KvtVarManager.teach(_wrp, new Object[] { p1, p2 });
+				String p1 = mProgram.getParent().toString();
+				String p2 = mProgram.toString();
+				mTeachResult = KvtVarManager.teach(_wrp, new Object[] { p1, p2 });
+				if (mTeachResult) {
+					new Handler(Looper.getMainLooper()).post(new Runnable() {
 
+						@Override
+						public void run() {
+							Toast.makeText(getActivity(), "Position successfully taught", Toast.LENGTH_SHORT).show();
+						}
+					});
+					mTeachResult = false;
+				}
 			}
 		}).start();
+
+		
 	}
 
 	/**

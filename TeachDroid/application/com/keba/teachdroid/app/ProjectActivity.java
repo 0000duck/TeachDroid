@@ -33,28 +33,27 @@ import com.keba.teachdroid.app.fragments.ProgramInfoFragment;
 import com.keba.teachdroid.app.fragments.ProgramListFragment;
 import com.keba.teachdroid.app.fragments.ProjectListFragment;
 
-public class ProjectActivity extends BaseActivity implements InnerListFragment.SelectionCallback, ProgramListFragment.SelectionCallback,
-		AlarmUpdaterListener {
+public class ProjectActivity extends BaseActivity implements InnerListFragment.SelectionCallback, ProgramListFragment.SelectionCallback, AlarmUpdaterListener {
 
 	/**
 	 * 
 	 */
-	private static final long					serialVersionUID	= -1859827857696981188L;
-	private transient ViewPager					mViewPager;
-	private transient SectionsPagerAdapter		mSectionsPagerAdapter;
-	private transient ProgressDialog			m_dlg;
+	private static final long serialVersionUID = -1859827857696981188L;
+	private transient ViewPager mViewPager;
+	private transient SectionsPagerAdapter mSectionsPagerAdapter;
+	private transient ProgressDialog m_dlg;
 
 	// dummy contents for the Pages!
 	// String[] projects = { "Project1", "Project2", "Project3" };
 	// Vector<String[]> programs = new Vector<String[]>();
-	private Map<Integer, String>				programCodes		= new HashMap<Integer, String>();
-	private Map<Integer, String>				programInfos		= new HashMap<Integer, String>();
+	private Map<Integer, String> programCodes = new HashMap<Integer, String>();
+	private Map<Integer, String> programInfos = new HashMap<Integer, String>();
 
-	private transient List<KvtProject>			projects			= KvtProjectAdministrator.getAllProjectsList();
-	private transient List<List<KvtProgram>>	programs			= new Vector<List<KvtProgram>>();
+	private transient List<KvtProject> projects = KvtProjectAdministrator.getAllProjectsList();
+	private transient List<List<KvtProgram>> programs = new Vector<List<KvtProgram>>();
 
-	private int									selectedProject		= 0;
-	private int									selectedProgram		= 0;
+	private int selectedProject = 0;
+	private int selectedProgram = 0;
 
 	public ProjectActivity() {
 		AlarmUpdaterThread.addListener(this);
@@ -201,8 +200,7 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 							// first try to build
 							if (parent.getProjectState() <= KvtProject.NOT_BUILDED) {
 								isBuilt = KvtProjectAdministrator.build(parent);
-								Log.d("ProjectActivity", "building project \"" + parent.getName() + "\" was "
-										+ (isBuilt ? "successful" : "not successful"));
+								Log.d("ProjectActivity", "building project \"" + parent.getName() + "\" was " + (isBuilt ? "successful" : "not successful"));
 							}
 
 							// try to load project
@@ -261,7 +259,7 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 
 		((ProgramInfoFragment) mSectionsPagerAdapter.getItem(2)).setProgramInfo();
 
-		mViewPager.setCurrentItem(1);
+		mViewPager.setCurrentItem(1, true);
 
 	}
 
@@ -288,8 +286,8 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 		/**
 		 * 
 		 */
-		private static final long	serialVersionUID	= 4669970919454414915L;
-		private Fragment[]			mFragments;
+		private static final long serialVersionUID = 4669970919454414915L;
+		private Fragment[] mFragments;
 
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);

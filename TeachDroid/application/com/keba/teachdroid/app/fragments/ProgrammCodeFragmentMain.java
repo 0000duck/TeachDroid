@@ -8,16 +8,22 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.keba.kemro.kvs.teach.data.project.KvtProgram;
+import com.keba.kemro.kvs.teach.data.project.KvtProject;
+import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
+import com.keba.kemro.kvs.teach.util.KvtExecutionMonitor;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtOverrideChangedListener;
 import com.keba.kemro.kvs.teach.util.KvtProgramStateMonitor;
 import com.keba.kemro.kvs.teach.util.KvtProgramStateMonitor.KvtProgramStateListener;
 import com.keba.kemro.kvs.teach.util.KvtProgramStateMonitor.ProgramMode;
 import com.keba.kemro.kvs.teach.util.KvtProgramStateMonitor.ProgramState;
+import com.keba.kemro.kvs.teach.util.Log;
 import com.keba.teachdroid.app.R;
 import com.keba.teachdroid.data.RobotControlProxy;
 
@@ -26,6 +32,7 @@ public class ProgrammCodeFragmentMain extends Fragment implements KvtProgramStat
 	private TextView mProgName, mProgMode;
 	private ImageView mProgStateIcon;
 	private ProgressBar mOverride;
+	private LinearLayout mProgStateLayout;
 
 	public ProgrammCodeFragmentMain() {
 
@@ -61,14 +68,31 @@ public class ProgrammCodeFragmentMain extends Fragment implements KvtProgramStat
 		if (s != null)
 			loadedProgramStateChanged(s);
 
-		if (mProgStateIcon != null) {
-			mProgStateIcon.setOnClickListener(new OnClickListener() {
+		mProgStateLayout = (LinearLayout) rootView.findViewById(R.id.programStateLayout);
+		mProgStateLayout.setOnClickListener(new OnClickListener() {
 
-				public void onClick(View _v) {
-					Toast.makeText(getActivity(), "play button clicked", Toast.LENGTH_SHORT).show();
+			public void onClick(View _v) {
+				String loadedProgram = KvtProgramStateMonitor.getLoadedProgram();
+				if (!loadedProgram.equals("-")) {
+					String proj = loadedProgram.substring(0, KvtProgramStateMonitor.getLoadedProgram().indexOf('.'));
+					KvtProject project = KvtProjectAdministrator.getProject(proj);
+					String prog = loadedProgram.substring(KvtProgramStateMonitor.getLoadedProgram().indexOf('.') + 1);
+					KvtProgram program = project.getProgram(prog);
+
+					switch (KvtProgramStateMonitor.getProgramState()) {
+					case eProgStateStopped:
+						KvtExecutionMonitor.startProgram(program);
+						break;
+					case eProgStateInterrupted:
+						KvtExecutionMonitor.startProgram(program);
+						break;
+					default:
+						Toast.makeText(getActivity(), "No program loaded", Toast.LENGTH_SHORT).show();
+						break;
+					}
 				}
-			});
-		}
+			}
+		});
 
 		boolean b = KvtProgramStateMonitor.getNoProgramRunning();
 		isAnyProgramRunning(b);

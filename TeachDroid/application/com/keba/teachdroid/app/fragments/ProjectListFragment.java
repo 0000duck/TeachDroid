@@ -200,8 +200,9 @@ public class ProjectListFragment extends Fragment implements Serializable, KvtPr
 				public void run() {
 					if (mProgramFragment != null) {
 						mProgramFragment.setListAdapter(new ProgramListAdapter(mContext, R.layout.simple_text_list_item, progs, progs));
-						((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
-								.replace(R.id.fragment_inner_detail, mProgramFragment).commit();
+						
+//						((FragmentActivity) mContext).getSupportFragmentManager().beginTransaction()
+//								.replace(R.id.fragment_inner_detail, mProgramFragment).commitAllowingStateLoss();
 					}
 				}
 			});

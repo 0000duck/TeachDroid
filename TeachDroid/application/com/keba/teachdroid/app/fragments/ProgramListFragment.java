@@ -1,10 +1,13 @@
 package com.keba.teachdroid.app.fragments;
 
+import java.lang.reflect.Field;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.View;
@@ -23,19 +26,19 @@ public class ProgramListFragment extends ListFragment implements KvtProjectAdmin
 	 * The fragment's current callback object, which is notified of list item
 	 * clicks.
 	 */
-	private SelectionCallback			mCallbacks		= sDummyCallbacks;
+	private SelectionCallback mCallbacks = sDummyCallbacks;
 
 	/**
 	 * A dummy implementation of the {@link SelectionCallback} interface that
 	 * does nothing. Used only when this fragment is not attached to an
 	 * activity.
 	 */
-	private static SelectionCallback	sDummyCallbacks	= new SelectionCallback() {
+	private static SelectionCallback sDummyCallbacks = new SelectionCallback() {
 
-															@Override
-															public void onProgramSelected(int id) {
-															}
-														};
+		@Override
+		public void onProgramSelected(int id) {
+		}
+	};
 
 	/**
 	 * A callback interface that all activities containing this fragment must
@@ -85,31 +88,30 @@ public class ProgramListFragment extends ListFragment implements KvtProjectAdmin
 		alertDialogBuilder.setTitle(action + " program?");
 
 		// set dialog message
-		alertDialogBuilder.setMessage("Do you really want to " + action + " \"" + _prg.getName() + "\"?").setCancelable(false)
-				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int id) {
-						if (canClose) {
-							new Thread(new Runnable() {
-								@Override
-								public void run() {
-									KvtExecutionMonitor.closeProgram(_prg);
-								}
-							}).start();
-
+		alertDialogBuilder.setMessage("Do you really want to " + action + " \"" + _prg.getName() + "\"?").setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				if (canClose) {
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							KvtExecutionMonitor.closeProgram(_prg);
 						}
+					}).start();
 
-						else
-							mCallbacks.onProgramSelected(_index);
-					}
-				}).setNegativeButton("No", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int id) {
-						// if this button is clicked, just close
-						// the dialog box and do nothing
-						dialog.cancel();
-					}
-				});
+				}
+
+				else
+					mCallbacks.onProgramSelected(_index);
+			}
+		}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int id) {
+				// if this button is clicked, just close
+				// the dialog box and do nothing
+				dialog.cancel();
+			}
+		});
 
 		// create alert dialog
 		AlertDialog alertDialog = alertDialogBuilder.create();
@@ -136,6 +138,20 @@ public class ProgramListFragment extends ListFragment implements KvtProjectAdmin
 
 		// Reset the active callbacks interface to the dummy implementation.
 		mCallbacks = sDummyCallbacks;
+
+		// workaround for problem with nested fragments!!! taken from here:
+		// http://stackoverflow.com/a/15656428/2741812
+		try {
+			Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+			childFragmentManager.setAccessible(true);
+			childFragmentManager.set(this, null);
+
+		} catch (NoSuchFieldException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+
 	}
 
 	@Override
