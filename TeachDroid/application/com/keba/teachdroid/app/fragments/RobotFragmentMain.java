@@ -46,6 +46,7 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 		mRefSysLabel = (TextView) mRootView.findViewById(R.id.refsysLabel);
 		mToolLabel = (TextView) mRootView.findViewById(R.id.toolLabel);
 		cb = (CheckBox) mRootView.findViewById(R.id.robotPower);
+		
 		mainModeChanged(KvtMainModeAdministrator.getMainMode());
 
 		try {
@@ -67,6 +68,7 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 	 */
 	private void updateUI() throws InterruptedException, ExecutionException {
 		cb.setClickable(false);
+		cb.setFocusable(false);
 		cb.setChecked(KvtDriveStateMonitor.getDrivesPower());
 		//readKinematicFilter() needs a network connection! -> AsyncTask!!!		
 		final String kin = new AsyncTask<Void, Void, String>() {

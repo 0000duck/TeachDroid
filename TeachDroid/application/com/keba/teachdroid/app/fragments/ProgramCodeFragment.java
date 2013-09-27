@@ -72,13 +72,12 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 	public ProgramCodeFragment() {
 		KvtExecutionMonitor.addListener(this);
 		KvtProjectAdministrator.addProjectListener(this);
-		KvtMotionModeAdministrator.addListener(ProgramCodeFragment.this);
 
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
-//				KvtMotionModeAdministrator.addListener(ProgramCodeFragment.this);
+				KvtMotionModeAdministrator.addListener(ProgramCodeFragment.this);
 			}
 		}).start();
 
@@ -127,6 +126,7 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 
 				@Override
 				public void onClick(View _v) {
+					Log.d("Button","MotionMode change!");
 					new Thread(new Runnable() {
 
 						@Override

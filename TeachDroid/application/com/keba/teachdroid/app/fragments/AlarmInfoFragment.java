@@ -20,16 +20,20 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.keba.kemro.kvs.teach.controller.KvtAlarmUpdater;
 import com.keba.kemro.kvs.teach.controller.KvtAlarmUpdater.KvtAlarmUpdaterListener;
@@ -235,6 +239,7 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 	//
 	private static final long serialVersionUID = -1436151971908046236L;
 	private ListView mList;
+	private Button mConfirmButton;
 	// // private MessageUpdateListener mMsgUpdaterListener;
 	private List<Message> mMessages = new LinkedList<Message>();
 	private MessageArrayAdapter mAdapter;
@@ -305,6 +310,7 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View mRootView = inflater.inflate(R.layout.fragment_alarm_info, container, false);
 		mList = (ListView) mRootView.findViewById(R.id.alarmList);
+		mConfirmButton = (Button) mRootView.findViewById(R.id.confirmAll);
 
 		List<Message> list = null;
 		try {
@@ -386,13 +392,35 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 			}
 
 		});
+
+		mConfirmButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				if (mMessages != null && !mMessages.isEmpty()) {
+					new Thread(new Runnable() {
+
+						@Override
+						public void run() {
+							for (Message m : mMessages) {
+								KMessage toConfirm = findInQueue(m);
+								toConfirm.quitMessage();
+							}
+						}
+					}).start();
+
+				} else {
+					Toast.makeText(getActivity(), "No messages to confirm", Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
 		return mRootView;
 	}
 
 	private KMessage findInQueue(Message _m) {
 		int hash = _m.getID();
 		List<KMessage> curBuffer = AlarmUpdaterThread.getKMessageQueue();
-		
+
 		for (KMessage msg : curBuffer) {
 			if (msg.hashCode() == hash)
 				return msg;

@@ -4,11 +4,18 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <Button
+        android:id="@+id/confirmAll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/confirm_all" />
+    
     <ListView
         android:id="@+id/alarmList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:dividerHeight="0dp" >
+        android:dividerHeight="0dp" 
+        android:divider="@null">
     </ListView>
 
 </LinearLayout>

@@ -52,8 +52,10 @@
     <string name="drawer_close">Close navigation drawer</string>
     <string name="dialog_confirm_message_title">Confirm Message?</string>
     <string name="dialog_confirm_message_text">Do you really want to confirm the selected message?</string>
+    <string name="confirm_all">Confirm All</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
+    <string name="emptyMessages">No current alarms</string>
     <string-array name="navigation_array">
         <item>Projects</item>
         <item>Positions</item>

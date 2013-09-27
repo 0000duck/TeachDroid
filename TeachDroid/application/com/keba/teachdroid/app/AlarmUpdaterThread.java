@@ -38,6 +38,8 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 		public void traceChanged(String _line);
 	}
 
+	private static final String rcBuffer = "RC_Motion_Info";
+
 	/**
 	 * This list is populated as messages are reported. all past messages are
 	 * stored there, they are never deleted
@@ -61,6 +63,7 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 	private int errorNotificationCount = 1;
 
 	private NotificationCompat.Builder mBuilder;
+	private NotificationManager mNotificationManager;
 
 	public AlarmUpdaterThread(Context _context) {
 		super("Notifications");
@@ -72,6 +75,7 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 
 		Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 		mBuilder = new NotificationCompat.Builder(context).setPriority(Notification.PRIORITY_HIGH).setSound(soundUri);
+		mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 	}
 
 	public static List<Message> getMessageQueue() {
@@ -180,6 +184,9 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 			} else
 				mLastMessage = null;
 		}
+		if (mMessageQueue.get(rcBuffer).isEmpty()) {
+			mNotificationManager.cancelAll();
+		}
 	}
 
 	public void messageChanged(String _bufferName, KMessage _msg) {
@@ -226,7 +233,7 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 		default:
 			break;
 		}
-		
+
 		mBuilder.setSmallIcon(msg.getImageID()).setContentTitle(df.format(msg.getDate()).toString()).setContentText(_msg.getMessageText());
 		// Creates an explicit intent for an Activity in your app
 		Intent resultIntent = new Intent(context, InfoActivity.class);
@@ -243,7 +250,6 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 		stackBuilder.addNextIntent(resultIntent);
 		PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 		mBuilder.setContentIntent(resultPendingIntent);
-		NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
 		Notification notification = mBuilder.build();
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
@@ -254,6 +260,7 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 		notification.defaults |= Notification.DEFAULT_VIBRATE;
 
 		mNotificationManager.notify(msg.getImageID(), notification);
+
 	}
 
 	public static synchronized void addListener(AlarmUpdaterListener _listener) {

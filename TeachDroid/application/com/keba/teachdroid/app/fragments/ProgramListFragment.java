@@ -98,7 +98,6 @@ public class ProgramListFragment extends ListFragment implements KvtProjectAdmin
 							KvtExecutionMonitor.closeProgram(_prg);
 						}
 					}).start();
-
 				}
 
 				else

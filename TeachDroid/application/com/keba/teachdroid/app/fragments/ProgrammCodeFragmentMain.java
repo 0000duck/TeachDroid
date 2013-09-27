@@ -2,11 +2,13 @@ package com.keba.teachdroid.app.fragments;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -47,7 +49,8 @@ public class ProgrammCodeFragmentMain extends Fragment implements KvtProgramStat
 
 		// label for the loaded program's name
 		mProgName = (TextView) rootView.findViewById(R.id.programNameLabel);
-		mProgName.setText(KvtProgramStateMonitor.getLoadedProgram());
+		String program = !KvtProgramStateMonitor.getLoadedProgram().equals("-") ? KvtProgramStateMonitor.getLoadedProgram() : "No program loaded";
+		mProgName.setText(program);
 		// KvtProgram p = RobotControlProxy.getLoadedProgram();
 		// if (p != null)
 		// loadedProgramNameChanged(p.getName());
@@ -63,12 +66,13 @@ public class ProgrammCodeFragmentMain extends Fragment implements KvtProgramStat
 		int ovr = RobotControlProxy.getOverride();
 		overrideChanged(ovr);
 
+		mProgStateLayout = (LinearLayout) rootView.findViewById(R.id.programStateLayout);
+
 		mProgStateIcon = (ImageView) rootView.findViewById(R.id.programStateIcon);
 		ProgramState s = KvtProgramStateMonitor.getProgramState();
 		if (s != null)
 			loadedProgramStateChanged(s);
 
-		mProgStateLayout = (LinearLayout) rootView.findViewById(R.id.programStateLayout);
 		mProgStateLayout.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View _v) {
@@ -87,9 +91,17 @@ public class ProgrammCodeFragmentMain extends Fragment implements KvtProgramStat
 						KvtExecutionMonitor.startProgram(program);
 						break;
 					default:
-						Toast.makeText(getActivity(), "No program loaded", Toast.LENGTH_SHORT).show();
+						Log.d("Program State", "unknown program state");
 						break;
 					}
+				} else {
+					new Handler(Looper.getMainLooper()).post(new Runnable() {
+
+						@Override
+						public void run() {
+							Toast.makeText(getActivity(), "No program loaded", Toast.LENGTH_SHORT).show();
+						}
+					});
 				}
 			}
 		});
@@ -113,7 +125,8 @@ public class ProgrammCodeFragmentMain extends Fragment implements KvtProgramStat
 		new Handler(getActivity().getMainLooper()).post(new Runnable() {
 
 			public void run() {
-				mProgName.setText(_programName);
+				String program = _programName.equals("-") ? _programName : "No program loaded";
+				mProgName.setText(program);
 			}
 		});
 

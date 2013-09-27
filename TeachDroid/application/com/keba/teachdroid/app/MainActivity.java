@@ -1,5 +1,7 @@
 package com.keba.teachdroid.app;
 
+import com.keba.kemro.kvs.teach.data.project.KvtProject;
+import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor;
 
 import android.content.Intent;
@@ -8,6 +10,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor;
 
@@ -60,7 +63,7 @@ public class MainActivity extends BaseActivity /*
 
 			public void onClick(View v) {
 				onShowPositions(v);
-//				KvtDriveStateMonitor.toggleDrivesPower();
+				// KvtDriveStateMonitor.toggleDrivesPower();
 			}
 		});
 
@@ -71,12 +74,21 @@ public class MainActivity extends BaseActivity /*
 			}
 		});
 	}
-	
-	
 
 	public void onShowProjects(View _v) {
-		Intent projectsActivity = new Intent(this, ProjectActivity.class);
-		startActivity(projectsActivity);
+		if (KvtProjectAdministrator.getGlobalProject().getProjectState() == KvtProject.SUCCESSFULLY_LOADED) {
+			Intent projectsActivity = new Intent(this, ProjectActivity.class);
+			startActivity(projectsActivity);
+		} else {
+			runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					Toast.makeText(MainActivity.this, "Projects still loading", Toast.LENGTH_SHORT).show();
+				}
+			});
+		}
+
 	}
 
 	public void onShowPositions(View _v) {

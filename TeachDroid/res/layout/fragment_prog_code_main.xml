@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/program_main_blue"
-    
     android:orientation="vertical" >
 
     <LinearLayout
@@ -11,26 +10,26 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:orientation="horizontal" >
+        android:orientation="horizontal" 
+        android:focusable="false">
 
         <ImageView
             android:id="@+id/programStateIcon"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="0.1"
-            android:src="@drawable/program_state_run_small" />
-        
+            android:contentDescription="@string/progLabel"
+            android:src="@drawable/program_state_run_small"/>
+
         <TextView
             android:id="@+id/programNameLabel"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginTop="7dp"
-            android:text="Large Text"
+            android:layout_marginLeft="5dp"
             android:layout_weight="0.9"
+            android:text="@string/progLabel"
             android:textAppearance="?android:attr/textAppearanceLarge" />
-
-        
-
     </LinearLayout>
 
     <ProgressBar
@@ -38,9 +37,9 @@
         style="@style/tallerBarStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginBottom="4dp"
         android:indeterminate="false"
         android:max="100" />
 
@@ -48,9 +47,9 @@
         android:id="@+id/programModeLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Small Text"
-        android:layout_marginLeft="10dp"
         android:layout_marginBottom="8dp"
+        android:layout_marginLeft="10dp"
+        android:text="@string/dummy_mode"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </LinearLayout>
