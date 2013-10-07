@@ -23,8 +23,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.TextView.BufferType;
+import android.widget.Toast;
 
 import com.keba.kemro.kvs.teach.data.program.KvtVarManager;
 import com.keba.kemro.kvs.teach.data.project.KvtProgram;
@@ -44,30 +44,31 @@ import com.keba.kemro.teach.dfl.value.KStructVarWrapper;
 import com.keba.teachdroid.app.ProjectActivity;
 import com.keba.teachdroid.app.R;
 
-public class ProgramCodeFragment extends Fragment implements Serializable, KvtExecutionListener, KvtProjectAdministratorListener, KvtMotionModeListener {
+public class ProgramCodeFragment extends Fragment implements Serializable, KvtExecutionListener, KvtProjectAdministratorListener,
+		KvtMotionModeListener {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -7012715919241719807L;
-	private static final String STRING_PTP = "PTP";
-	private static final String STRING_LIN = "LIN";
-	private transient View mRootView;
-	ProjectActivity callback;
-	transient TextView codeTextView, pcTextfield;
-	private KvtProgram mProgram;
-	private ImageButton mStart;
-	private ImageButton mStop;
-	private ImageButton mExecModeBtn;
-	private ImageButton mTeachBtn;
-	private final int mLineOffset = 2;
-	private SpannableString mCodeLines;
-	private String mRawCode;
-	private BackgroundColorSpan mMainflowSpanObj;
-	private BackgroundColorSpan mSelectionSpanObj;
-	private Context mContext;
-	protected String mCurrentSelVarname;
-	private boolean mTeachResult = false;
+	private static final long	serialVersionUID	= -7012715919241719807L;
+	private static final String	STRING_PTP			= "PTP";
+	private static final String	STRING_LIN			= "LIN";
+	private transient View		mRootView;
+	ProjectActivity				callback;
+	transient TextView			codeTextView, pcTextfield;
+	private KvtProgram			mProgram;
+	private ImageButton			mStart;
+	private ImageButton			mStop;
+	private ImageButton			mExecModeBtn;
+	private ImageButton			mTeachBtn;
+	private final int			mLineOffset			= 2;
+	private SpannableString		mCodeLines;
+	private String				mRawCode;
+	private BackgroundColorSpan	mMainflowSpanObj;
+	private BackgroundColorSpan	mSelectionSpanObj;
+	private Context				mContext;
+	protected String			mCurrentSelVarname;
+	private boolean				mTeachResult		= false;
 
 	public ProgramCodeFragment() {
 		KvtExecutionMonitor.addListener(this);
@@ -126,7 +127,7 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 
 				@Override
 				public void onClick(View _v) {
-					Log.d("Button","MotionMode change!");
+					Log.d("Button", "MotionMode change!");
 					new Thread(new Runnable() {
 
 						@Override
@@ -199,7 +200,7 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 
 						@Override
 						public void run() {
-							Toast.makeText(getActivity(), "Position successfully taught", Toast.LENGTH_SHORT).show();
+							Toast.makeText(getActivity(), "Position \"" + _wrp.getKey() + " \" successfully taught", Toast.LENGTH_SHORT).show();
 						}
 					});
 					mTeachResult = false;
@@ -207,7 +208,6 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 			}
 		}).start();
 
-		
 	}
 
 	/**
@@ -443,6 +443,38 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 		});
 	}
 
+	private KStructVarWrapper browseScope(KStructNode _scope, String _varname) {
+		try {
+			if (_scope.getClass().getField("variables") != null) {
+				KStructNodeVector progVars;
+
+				progVars = (KStructNodeVector) _scope.getClass().getField("variables").get(_scope);
+				int numVars = progVars.getChildCount();
+
+				for (int i = 0; i < numVars; i++) {
+					KStructNode n = progVars.getChild(i);
+					if (n.getKey().equalsIgnoreCase(_varname)) {
+						String path = n.getPath();
+						KTcDfl dfl = KvtSystemCommunicator.getTcDfl();
+						if (dfl != null) {
+							KStructVarWrapper wrp = dfl.variable.createKStructVarWrapper(path);
+							return wrp;
+						}
+					}
+
+				}
+
+			}
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	private KStructVarWrapper browseForVarname(String _varname) {
 		KStructVarWrapper res = null;
 
@@ -451,22 +483,19 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 
 				@Override
 				protected KStructVarWrapper doInBackground(String... _params) {
-					KStructNodeVector progVars = mProgram.getStructProgram().variables;
-					int numVars = progVars.getChildCount();
+					// try program scope
+					KStructVarWrapper wrp = browseScope(mProgram.getStructProgram(), _params[0]);
 
-					for (int i = 0; i < numVars; i++) {
-						KStructNode n = progVars.getChild(i);
-						if (n.getKey().equalsIgnoreCase(_params[0])) {
-							String path = n.getPath();
-							KTcDfl dfl = KvtSystemCommunicator.getTcDfl();
-							if (dfl != null) {
-								KStructVarWrapper wrp = dfl.variable.createKStructVarWrapper(path);
-								return wrp;
-							}
-						}
-
+					// try project scope, if failed
+					if (wrp == null) {
+						wrp = browseScope(mProgram.getParent().getStructProject(), _params[0]);
 					}
-					return null;
+
+					// try global scope, if failed
+					if (wrp == null) {
+						wrp = browseScope(KvtProjectAdministrator.getGlobalProject().getStructProject(), _params[0]);
+					}
+					return wrp;
 
 				}
 			}.execute(_varname).get();
