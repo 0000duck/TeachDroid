@@ -8,12 +8,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.view.KeyEvent;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.keba.teachdroid.app.fragments.ProjectListFragment;
-import com.keba.teachdroid.app.fragments.ProgramCodeFragment;
-import com.keba.teachdroid.app.fragments.ProgramInfoFragment;
 import com.keba.teachdroid.app.fragments.RobotDetailInfoFragment;
 import com.keba.teachdroid.app.fragments.RobotOverviewFragment;
 import com.keba.teachdroid.app.fragments.RobotRefsysToolFragment;
@@ -63,6 +61,14 @@ public class RobotActivity extends BaseActivity {
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 	}
 
+	@Override
+	public boolean onKeyDown(int _code, KeyEvent _evt) {
+		if (mViewPager.getCurrentItem() != 0 && KeyEvent.KEYCODE_BACK == _code) {
+			mViewPager.setCurrentItem(0, true);
+			return true;
+		}
+		return super.onKeyDown(_code, _evt);
+	}
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
 	 * one of the sections/tabs/pages.

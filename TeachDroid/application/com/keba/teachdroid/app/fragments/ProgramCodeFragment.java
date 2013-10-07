@@ -53,6 +53,7 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 	private static final long	serialVersionUID	= -7012715919241719807L;
 	private static final String	STRING_PTP			= "PTP";
 	private static final String	STRING_LIN			= "LIN";
+	private static final String	STRING_CIRC			= "CIRC";
 	private transient View		mRootView;
 	ProjectActivity				callback;
 	transient TextView			codeTextView, pcTextfield;
@@ -68,7 +69,6 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 	private BackgroundColorSpan	mSelectionSpanObj;
 	private Context				mContext;
 	protected String			mCurrentSelVarname;
-	private boolean				mTeachResult		= false;
 
 	public ProgramCodeFragment() {
 		KvtExecutionMonitor.addListener(this);
@@ -178,6 +178,7 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 			}
 		});
 
+
 		mMainflowSpanObj = new BackgroundColorSpan(mContext.getResources().getColor(android.R.color.holo_blue_light));
 
 		pcTextfield = (TextView) mRootView.findViewById(R.id.pcTextfield);
@@ -194,8 +195,8 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 			public void run() {
 				String p1 = mProgram.getParent().toString();
 				String p2 = mProgram.toString();
-				mTeachResult = KvtVarManager.teach(_wrp, new Object[] { p1, p2 });
-				if (mTeachResult) {
+				boolean teachResult = KvtVarManager.teach(_wrp, new Object[] { p1, p2 });
+				if (teachResult) {
 					new Handler(Looper.getMainLooper()).post(new Runnable() {
 
 						@Override
@@ -203,7 +204,7 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 							Toast.makeText(getActivity(), "Position \"" + _wrp.getKey() + " \" successfully taught", Toast.LENGTH_SHORT).show();
 						}
 					});
-					mTeachResult = false;
+					teachResult = false;
 				}
 			}
 		}).start();
@@ -220,7 +221,7 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 		String[] lines = mCodeLines.toString().split("\n");
 		String line = lines[_line];
 
-		if (line.toUpperCase().contains(STRING_PTP) || line.toUpperCase().contains(STRING_LIN)) {
+		if (line.toUpperCase().contains(STRING_PTP) || line.toUpperCase().contains(STRING_LIN) || line.toUpperCase().contains(STRING_CIRC)) {
 			// do something
 			int startix = line.indexOf("(");
 			int endix = line.indexOf(")");

@@ -18,6 +18,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.view.KeyEvent;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -108,6 +109,16 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 		// programs.add(programs1);
 		// programs.add(programs2);
 		// programs.add(programs3);
+
+	}
+
+	@Override
+	public boolean onKeyDown(int _code, KeyEvent _evt) {
+		if (mViewPager.getCurrentItem() != 0 && KeyEvent.KEYCODE_BACK == _code) {
+			resetView();
+			return true;
+		}
+		return super.onKeyDown(_code, _evt);
 	}
 
 	public List<KvtProject> getProjects() {
@@ -261,6 +272,10 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 
 		mViewPager.setCurrentItem(1, true);
 
+	}
+
+	public void resetView() {
+		mViewPager.setCurrentItem(0, true);
 	}
 
 	@Override

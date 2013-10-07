@@ -6,19 +6,13 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.Vector;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.view.KeyEvent;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -94,6 +88,16 @@ public class InfoActivity extends BaseActivity implements Serializable, Observer
 
 	}
 
+	@Override
+	public boolean onKeyDown(int _code, KeyEvent _evt) {
+		if (mViewPager.getCurrentItem() != 0 && KeyEvent.KEYCODE_BACK == _code) {
+			mViewPager.setCurrentItem(0, true);
+			return true;
+		}
+		return super.onKeyDown(_code, _evt);
+	}
+
+	@Override
 	public void update(Observable _observable, Object _data) {
 //		NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this).setSmallIcon(R.drawable.logo).setContentTitle("My notification").setContentText("Hello World!");
 //		// Creates an explicit intent for an Activity in your app
@@ -197,6 +201,7 @@ public class InfoActivity extends BaseActivity implements Serializable, Observer
 	 * com.keba.kemro.kvs.teach.controller.KvtTraceUpdater.KvtTraceUpdateListener
 	 * #lineReceived(java.lang.String)
 	 */
+	@Override
 	public synchronized void lineReceived(String _line) {
 		mTrace.add(_line);
 		System.out.println(_line);
