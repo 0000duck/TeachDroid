@@ -24,7 +24,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:contentDescription="@string/title_robot"
-        android:src="@drawable/robot_small" />
+        android:src="@drawable/robot_deact" />
 
     <TextView
         android:id="@+id/toolLabel"
@@ -68,5 +68,17 @@
         android:gravity="center_vertical"
         android:text="@string/dummy_mode"
         android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/robotImg"
+        android:layout_below="@+id/robotImg"
+        android:layout_marginLeft="20dp"
+        android:textStyle="italic"
+        android:text="touch to toggle power"
+        android:textSize="10sp"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
 </RelativeLayout>

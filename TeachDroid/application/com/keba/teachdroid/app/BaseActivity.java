@@ -2,11 +2,8 @@ package com.keba.teachdroid.app;
 
 import java.io.Serializable;
 
-import com.keba.teachdroid.app.ProjectActivity;
-
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
@@ -43,14 +40,14 @@ public abstract class BaseActivity extends FragmentActivity implements Serializa
 	protected void switchActivity(int position) {
 		Intent intent = null;
 		switch (position) {
-		case 0:
+		case 1:
 			if (!(this instanceof ProjectActivity)) {
 				intent = new Intent(getBaseContext(), ProjectActivity.class);
 			} else {
 				mDrawerLayout.closeDrawers();
 			}
 			break;
-		case 1:
+		case 0:
 			if (!(this instanceof RobotActivity)) {
 				intent = new Intent(getBaseContext(), RobotActivity.class);
 			} else {
@@ -79,12 +76,14 @@ public abstract class BaseActivity extends FragmentActivity implements Serializa
 			super(activity, drawerLayout, drawerImageRes, openDrawerContentDescRes, closeDrawerContentDescRes);
 		}
 
+		@Override
 		public void onDrawerClosed(View view) {
 			getActionBar().setTitle(mTitle);
 			invalidateOptionsMenu(); // creates call to
 										// onPrepareOptionsMenu()
 		}
 
+		@Override
 		public void onDrawerOpened(View drawerView) {
 			getActionBar().setTitle(mDrawerTitle);
 			invalidateOptionsMenu(); // creates call to
@@ -103,6 +102,7 @@ public abstract class BaseActivity extends FragmentActivity implements Serializa
 			super();
 		}
 
+		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			mDrawerList.setItemChecked(position, true);
 			switchActivity(position);

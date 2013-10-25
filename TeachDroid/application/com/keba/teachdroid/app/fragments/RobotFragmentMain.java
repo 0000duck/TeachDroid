@@ -2,34 +2,43 @@ package com.keba.teachdroid.app.fragments;
 
 import java.util.concurrent.ExecutionException;
 
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor;
 import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener;
 import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator;
-import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.SafetyState;
-import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
 import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.KvtMainModeListener;
-import com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener;
+import com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.SafetyState;
 import com.keba.kemro.kvs.teach.util.KvtMultiKinematikAdministrator;
+import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
+import com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener;
+import com.keba.teachdroid.app.MainActivity;
 import com.keba.teachdroid.app.R;
-import com.keba.teachdroid.data.RobotControlProxy;
 
-public class RobotFragmentMain extends Fragment implements KvtDriveStateListener, KvtPositionMonitorListener, KvtMainModeListener {
+public class RobotFragmentMain extends Fragment implements KvtDriveStateListener, KvtPositionMonitorListener, KvtMainModeListener, Touchable {
 
-	TextView mRobotNameLabel;
-	TextView mRefSysLabel;
-	TextView mToolLabel;
-	CheckBox cb;
-	View mRootView;
+	TextView			mRobotNameLabel;
+	TextView			mRefSysLabel;
+	TextView			mToolLabel;
+	CheckBox			cb;
+	View				mRootView;
+	private ImageView	mRobotImage;
 
 	public RobotFragmentMain() {
 		KvtDriveStateMonitor.addListener(this);
@@ -46,7 +55,7 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 		mRefSysLabel = (TextView) mRootView.findViewById(R.id.refsysLabel);
 		mToolLabel = (TextView) mRootView.findViewById(R.id.toolLabel);
 		cb = (CheckBox) mRootView.findViewById(R.id.robotPower);
-		
+		mRobotImage = (ImageView) mRootView.findViewById(R.id.robotImg);
 		mainModeChanged(KvtMainModeAdministrator.getMainMode());
 
 		try {
@@ -62,22 +71,27 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 	}
 
 	/**
-	 * @throws ExecutionException 
-	 * @throws InterruptedException 
+	 * @throws ExecutionException
+	 * @throws InterruptedException
 	 * 
 	 */
 	private void updateUI() throws InterruptedException, ExecutionException {
 		cb.setClickable(false);
 		cb.setFocusable(false);
 		cb.setChecked(KvtDriveStateMonitor.getDrivesPower());
-		//readKinematicFilter() needs a network connection! -> AsyncTask!!!		
+		if (KvtDriveStateMonitor.getDrivesPower()) {
+			mRobotImage.setImageResource(R.drawable.robot);
+		} else {
+			mRobotImage.setImageResource(R.drawable.robot_deact);
+		}
+		// readKinematicFilter() needs a network connection! -> AsyncTask!!!
 		final String kin = new AsyncTask<Void, Void, String>() {
 
 			@Override
 			protected String doInBackground(Void... params) {
 				return KvtMultiKinematikAdministrator.readKinematicFilter();
 			}
-			
+
 		}.execute((Void) null).get();
 		final String refsys = KvtPositionMonitor.getChosenRefSys();
 		final String tool = KvtPositionMonitor.getChosenTool();
@@ -85,6 +99,7 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 		if (getActivity() != null) {
 			new Handler(getActivity().getMainLooper()).post(new Runnable() {
 
+				@Override
 				public void run() {
 					mRobotNameLabel.setText(kin);
 					mRefSysLabel.setText(refsys);
@@ -94,13 +109,14 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 			});
 		}
 	}
-	
+
 	@Override
 	public void mainModeChanged(int _newMainMode) {
 		final int mainMode = _newMainMode;
 		if (getActivity() != null) {
 			getActivity().runOnUiThread(new Runnable() {
 
+				@Override
 				public void run() {
 					String mainModeString = null;
 					int drawableId = 0;
@@ -122,16 +138,17 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 						break;
 					}
 					((TextView) mRootView.findViewById(R.id.mainMode)).setText(mainModeString);
-					((TextView) mRootView.findViewById(R.id.mainMode)).setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(drawableId), null, null, null);
+					((TextView) mRootView.findViewById(R.id.mainMode)).setCompoundDrawablesWithIntrinsicBounds(
+							getResources().getDrawable(drawableId), null, null, null);
 				}
 			});
 		}
 	}
-	
+
 	@Override
 	public void safetyStateChanged(SafetyState _state) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	/*
@@ -141,6 +158,7 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 	 * com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener
 	 * #drivePowerChanged(boolean)
 	 */
+	@Override
 	public void drivePowerChanged(final boolean _hasPower) {
 		// need a handler task to execute UI modifications
 		if (getActivity() == null)
@@ -148,10 +166,18 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 		Handler h = new Handler(getActivity().getMainLooper());
 		h.post(new Runnable() {
 
+			@Override
 			public void run() {
 				if (cb != null) {
 					cb.setChecked(_hasPower);
 				}
+
+				if (_hasPower) {
+					mRobotImage.setImageResource(R.drawable.robot);
+				} else {
+					mRobotImage.setImageResource(R.drawable.robot_deact);
+				}
+				mRobotImage.invalidate();
 			}
 		});
 
@@ -164,6 +190,7 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 	 * com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener
 	 * #driveIsReadyChanged(java.lang.Boolean)
 	 */
+	@Override
 	public void driveIsReadyChanged(Boolean _isReady) {
 	}
 
@@ -174,6 +201,7 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 	 * com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener
 	 * #driveIsReferencedChanged(java.lang.Boolean)
 	 */
+	@Override
 	public void driveIsReferencedChanged(Boolean _isRef) {
 	}
 
@@ -235,5 +263,40 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 		}
 	}
 
-	
+	private Bitmap toGrayscale(Bitmap bmpOriginal) {
+		int width, height;
+		height = bmpOriginal.getHeight();
+		width = bmpOriginal.getWidth();
+
+		Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+		Canvas c = new Canvas(bmpGrayscale);
+		Paint paint = new Paint();
+		ColorMatrix cm = new ColorMatrix();
+		cm.setSaturation(0);
+		ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
+		paint.setColorFilter(f);
+		c.drawBitmap(bmpOriginal, 0, 0, paint);
+		return bmpGrayscale;
+	}
+
+	/**
+	 * @param _event
+	 */
+	@Override
+	public void handleTouch(MotionEvent _event) {
+		float x = _event.getX();
+		float y = _event.getY();
+		Rect rect = new Rect();
+		System.out.println("X: " + x + " Y: " + y);
+		mRobotImage.getHitRect(rect);
+		int a = 0;
+		if (rect.contains((int) x, (int) y)) {
+			a = 1;
+			KvtDriveStateMonitor.toggleDrivesPower();
+		} else {
+			a = 2;
+			((MainActivity) getActivity()).onShowPositions();
+		}
+
+	}
 }

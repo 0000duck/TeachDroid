@@ -67,6 +67,7 @@ public class RobotControlProxy {
 			mDataListener = new RobotControlDataListener();
 			mDataListener.addObserver(new Observer() {
 
+				@Override
 				public void update(Observable _observable, Object _data) {
 					// Log.d(ROBOT_CONTROL_LOGTAG, _observable + " updated!");
 				}
@@ -284,6 +285,7 @@ public class RobotControlProxy {
 
 				new Thread(new Runnable() {
 
+					@Override
 					public void run() {
 						lMsg.quitMessage();
 					}
@@ -351,6 +353,7 @@ public class RobotControlProxy {
 		private String mJogTool = KvtPositionMonitor.getJogTool();
 		private String mJogRefsys = KvtPositionMonitor.getJogRefSys();
 
+		@Override
 		public void teachviewConnected() {
 			mConnected = true;
 			mDfl = KvtSystemCommunicator.getTcDfl();
@@ -365,6 +368,7 @@ public class RobotControlProxy {
 		 * @see com.keba.kemro.kvs.teach.util.KvtTeachviewConnectionListener#
 		 * teachviewDisconnected()
 		 */
+		@Override
 		public void teachviewDisconnected() {
 			mConnected = false;
 			mDfl = null;
@@ -382,6 +386,7 @@ public class RobotControlProxy {
 		 * @see com.keba.kemro.kvs.teach.util.KvtMotionModeAdministrator.
 		 * KvtMotionModeListener#motionModeChanged()
 		 */
+		@Override
 		public void motionModeChanged(int _newProgmode) {
 			Log.d(ROBOT_CONTROL_LOGTAG, "Motion mode changed to " + _newProgmode);
 			notifyObservers();
@@ -393,6 +398,7 @@ public class RobotControlProxy {
 		 * @see com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.
 		 * KvtMainModeListener #mainModeChanged(int)
 		 */
+		@Override
 		public void mainModeChanged(int _newMainMode) {
 			if (_newMainMode != mCurrentMainMode) {
 				Log.d(ROBOT_CONTROL_LOGTAG, "New Mainmode: " + _newMainMode);
@@ -410,7 +416,9 @@ public class RobotControlProxy {
 		 * #
 		 * projectStateChanged(com.keba.kemro.kvs.teach.data.project.KvtProject)
 		 */
+		@Override
 		public void projectStateChanged(KvtProject _prj) {
+
 			Log.d(ROBOT_CONTROL_LOGTAG, "Project " + _prj.getName() + "'s state is " + _prj.getProjectStateString());
 			if (_prj.isSystemProject())
 				return;
@@ -430,6 +438,7 @@ public class RobotControlProxy {
 		 * #
 		 * programStateChanged(com.keba.kemro.kvs.teach.data.project.KvtProgram)
 		 */
+		@Override
 		public void programStateChanged(KvtProgram _prg) {
 			Log.d(ROBOT_CONTROL_LOGTAG, "Program " + _prg.getName() + "'s state is " + _prg.getProgramStateString());
 
@@ -447,6 +456,7 @@ public class RobotControlProxy {
 		 * com.keba.kemro.kvs.teach.data.project.KvtProjectAdministratorListener
 		 * #projectListChanged()
 		 */
+		@Override
 		public synchronized void projectListChanged() {
 			Log.d(ROBOT_CONTROL_LOGTAG, "Project list hast changed!");
 			notifyObservers();
@@ -469,6 +479,7 @@ public class RobotControlProxy {
 		 * @see com.keba.kemro.kvs.teach.controller.KvtAlarmUpdater.
 		 * KvtAlarmUpdaterListener #messageUpdated(int, java.lang.Object)
 		 */
+		@Override
 		public void messageUpdated(int _lastMessageType, Object _lastMessage) {
 			// do nothing
 		}
@@ -480,6 +491,7 @@ public class RobotControlProxy {
 		 * KvtAlarmUpdaterListener #messageAdded(java.lang.String,
 		 * com.keba.kemro.serviceclient.alarm.KMessage)
 		 */
+		@Override
 		public void messageAdded(String _bufferName, KMessage _msg) {
 
 			// add to unmodifiable history queue
@@ -523,6 +535,7 @@ public class RobotControlProxy {
 		 * KvtAlarmUpdaterListener #messageRemoved(java.lang.String,
 		 * com.keba.kemro.serviceclient.alarm.KMessage)
 		 */
+		@Override
 		public void messageRemoved(String _bufferName, KMessage _msg) {
 			synchronized (mMsgBufferLock) {
 				// remove message from queue
@@ -546,6 +559,7 @@ public class RobotControlProxy {
 		 * KvtAlarmUpdaterListener #messageChanged(java.lang.String,
 		 * com.keba.kemro.serviceclient.alarm.KMessage)
 		 */
+		@Override
 		public void messageChanged(String _bufferName, KMessage _msg) {
 			messageRemoved(_bufferName, _msg); // first remove the message...
 			synchronized (mMsgBufferLock) {
@@ -569,6 +583,7 @@ public class RobotControlProxy {
 		 * KvtPositionMonitorListener
 		 * #cartesianPositionChanged(java.lang.String, java.lang.Number)
 		 */
+		@Override
 		public void cartesianPositionChanged(int _cartNo, String _compName, Number _value) {
 			Log.d("KvtPositionMonitor", "Component " + _compName + ": " + _value);
 			notifyObservers();
@@ -581,6 +596,7 @@ public class RobotControlProxy {
 		 * KvtPositionMonitorListener #axisPositionChanged(int,
 		 * java.lang.Number, java.lang.String)
 		 */
+		@Override
 		public void axisPositionChanged(int _axisNo, Number _value, String _axisName) {
 			Log.d("KvtPositionMonitor", "Axis " + (_axisNo + 1) + " [" + _axisNo + "] has position " + _value);
 			notifyObservers();
@@ -605,6 +621,7 @@ public class RobotControlProxy {
 		 * com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener
 		 * #drivePowerChanged(boolean)
 		 */
+		@Override
 		public void drivePowerChanged(boolean _hasPower) {
 			mHasPower = _hasPower;
 			notifyObservers();
@@ -618,6 +635,7 @@ public class RobotControlProxy {
 		 * com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener
 		 * #driveIsReadyChanged(java.lang.Boolean)
 		 */
+		@Override
 		public void driveIsReadyChanged(Boolean _ready) {
 			mDrivesReady = _ready;
 			notifyObservers();
@@ -630,6 +648,7 @@ public class RobotControlProxy {
 		 * com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener
 		 * #driveIsReferencedChanged(java.lang.Boolean)
 		 */
+		@Override
 		public void driveIsReferencedChanged(Boolean _isRef) {
 			mDrivesRerenced = _isRef;
 			notifyObservers();
@@ -641,6 +660,7 @@ public class RobotControlProxy {
 		 * @see com.keba.kemro.kvs.teach.util.KvtProgramStateMonitor.
 		 * KvtProgramStateListener#programNameChanged(java.lang.String)
 		 */
+		@Override
 		public void loadedProgramNameChanged(String _programName) {
 			mLoadedProgram = _programName;
 
@@ -654,6 +674,7 @@ public class RobotControlProxy {
 		 * #programModeChanged(com.keba.kemro.kvs.teach.util
 		 * .KvtProgramStateMonitor.ProgramMode)
 		 */
+		@Override
 		public void loadedProgramModeChanged(ProgramMode _newMode) {
 			mProgMode = _newMode;
 			notifyObservers();
@@ -667,6 +688,7 @@ public class RobotControlProxy {
 		 * #programStateChanged(com.keba.kemro.kvs.teach.util
 		 * .KvtProgramStateMonitor.ProgramState)
 		 */
+		@Override
 		public void loadedProgramStateChanged(ProgramState _newState) {
 			mProgState = _newState;
 			notifyObservers();
@@ -678,6 +700,7 @@ public class RobotControlProxy {
 		 * @see com.keba.kemro.kvs.teach.util.KvtProgramStateMonitor.
 		 * KvtProgramStateListener#isProgramRunning(boolean)
 		 */
+		@Override
 		public void isAnyProgramRunning(boolean _isAnyRunning) {
 			mIsAnyProgRunning = _isAnyRunning;
 			notifyObservers();
@@ -689,6 +712,7 @@ public class RobotControlProxy {
 		 * @see com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.
 		 * KvtMainModeListener#chosenToolChanged(java.lang.String)
 		 */
+		@Override
 		public void selectedToolChanged(String _toolName) {
 			mToolName = _toolName;
 			notifyObservers();
@@ -700,6 +724,7 @@ public class RobotControlProxy {
 		 * @see com.keba.kemro.kvs.teach.util.KvtMainModeAdministrator.
 		 * KvtMainModeListener#chosenRefSysChanged(java.lang.String)
 		 */
+		@Override
 		public void selectedRefSysChanged(String _refsysName) {
 			mChosenRefsys = _refsysName;
 			notifyObservers();
@@ -712,6 +737,7 @@ public class RobotControlProxy {
 		 * KvtMainModeListener#safetyStateChanged(com.keba.kemro.kvs.teach.util.
 		 * KvtMainModeAdministrator.SafetyState)
 		 */
+		@Override
 		public void safetyStateChanged(SafetyState _state) {
 			mSafetyState = _state;
 			notifyObservers();
@@ -734,6 +760,7 @@ public class RobotControlProxy {
 		 * @see com.keba.kemro.kvs.teach.util.KvtPositionMonitor.
 		 * KvtPositionMonitorListener#pathVelocityChanged(float)
 		 */
+		@Override
 		public void pathVelocityChanged(float _velocityMms) {
 			setPathVelocity(_velocityMms);
 			setChanged();
@@ -746,6 +773,7 @@ public class RobotControlProxy {
 		 * @see com.keba.kemro.kvs.teach.controller.KvtTraceUpdater.
 		 * KvtTraceUpdateListener#lineReceived(java.lang.String)
 		 */
+		@Override
 		public void lineReceived(String _line) {
 		}
 
@@ -755,6 +783,7 @@ public class RobotControlProxy {
 		 * @see com.keba.kemro.kvs.teach.util.KvtPositionMonitor.
 		 * KvtPositionMonitorListener#jogToolChanged(java.lang.String)
 		 */
+		@Override
 		public void jogToolChanged(String _jogTool) {
 			setJogTool(_jogTool);
 			notifyObservers();
@@ -766,6 +795,7 @@ public class RobotControlProxy {
 		 * @see com.keba.kemro.kvs.teach.util.KvtPositionMonitor.
 		 * KvtPositionMonitorListener#jogRefsysChanged(java.lang.String)
 		 */
+		@Override
 		public void jogRefsysChanged(String _jogRefsys) {
 			mJogRefsys = _jogRefsys;
 			notifyObservers();

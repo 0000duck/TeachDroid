@@ -112,6 +112,11 @@ public class Message {
 		return mMessageText;
 	}
 
+	/**
+	 * The {@link Object#hashCode()} of the corresponding {@link KMessage}
+	 * 
+	 * @return
+	 */
 	public int getID() {
 		return mId;
 	};

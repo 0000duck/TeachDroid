@@ -1,16 +1,13 @@
 package com.keba.teachdroid.app.fragments;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,28 +15,28 @@ import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.keba.kemro.kvs.teach.util.Log;
+import com.keba.kemro.serviceclient.alarm.KMessage;
 import com.keba.teachdroid.app.AlarmUpdaterThread;
+import com.keba.teachdroid.app.AlarmUpdaterThread.AlarmUpdaterListener;
 import com.keba.teachdroid.app.InfoActivity;
 import com.keba.teachdroid.app.Message;
-import com.keba.teachdroid.app.MessageAdapter;
 import com.keba.teachdroid.app.R;
-import com.keba.teachdroid.app.AlarmUpdaterThread.AlarmUpdaterListener;
-import com.keba.teachdroid.data.RobotControlProxy;
 
 public class InfoAlarmFragmentMain extends Fragment implements AlarmUpdaterListener {
 	
 	final private List<Message> lastSix = new Vector<Message>();
-	private MessageArrayAdapter adp;
+	private MessageArrayAdapter mMessageArrayAdapter;
+	private ListView	mMessageListView;
 
 	public InfoAlarmFragmentMain() {
 		AlarmUpdaterThread.addListener(this);
@@ -107,11 +104,67 @@ public class InfoAlarmFragmentMain extends Fragment implements AlarmUpdaterListe
 
 		View rootView = inflater.inflate(R.layout.fragment_load_info_main, container, false);
 
-		ListView listview = (ListView) rootView.findViewById(R.id.actualMessages);
+		mMessageListView = (ListView) rootView.findViewById(R.id.actualMessages);
 		TextView textview = (TextView)rootView.findViewById(R.id.empty_list_item);
-		listview.setEmptyView(textview);
+		mMessageListView.setEmptyView(textview);
 		
-		adp = new MessageArrayAdapter(getActivity(), R.layout.fragment_alarm_row_layout_overview, lastSix);
+		mMessageListView.setLongClickable(true);
+		mMessageListView.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> _parent, View _view, final int _pos, long __id) {
+				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+
+				// set title
+				alertDialogBuilder.setTitle(getString(R.string.dialog_confirm_message_title));
+
+				// set dialog message
+				alertDialogBuilder.setMessage(getString(R.string.dialog_confirm_message_text)).setCancelable(false)
+						.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
+								Message m = mMessageArrayAdapter.getItem(_pos);
+
+								boolean success = false;
+								if (m != null) {
+									try {
+										success = new AsyncTask<Message, Integer, Boolean>() {
+
+											@Override
+											protected Boolean doInBackground(Message... _params) {
+												KMessage toConfirm = findInQueue(_params[0]);
+
+												return toConfirm != null ? toConfirm.quitMessage() : false;
+											}
+										}.execute(m).get();
+									} catch (InterruptedException e) {
+										e.printStackTrace();
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+
+								}
+								Log.i("AlarmInfoFragment", "confirming was " + (success ? "successful" : "unsuccessful"));
+							}
+						}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
+								// if this button is clicked, just close
+								// the dialog box and do nothing
+								dialog.cancel();
+							}
+						});
+
+				// create alert dialog
+				AlertDialog alertDialog = alertDialogBuilder.create();
+
+				// show it
+				alertDialog.show();
+
+				return false;
+			}
+		});
+		mMessageArrayAdapter = new MessageArrayAdapter(getActivity(), R.layout.fragment_alarm_row_layout_overview, lastSix);
 
 		// RobotControlProxy.addObserver(new Observer() {
 		//
@@ -120,7 +173,7 @@ public class InfoAlarmFragmentMain extends Fragment implements AlarmUpdaterListe
 		// }
 		// });
 
-		listview.setAdapter(adp);
+		mMessageListView.setAdapter(mMessageArrayAdapter);
 		try {
 			loadSixMessages();
 		} catch (InterruptedException e) {
@@ -131,7 +184,7 @@ public class InfoAlarmFragmentMain extends Fragment implements AlarmUpdaterListe
 			e.printStackTrace();
 		}
 
-		listview.setOnItemClickListener(new OnItemClickListener() {
+		mMessageListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -159,6 +212,7 @@ public class InfoAlarmFragmentMain extends Fragment implements AlarmUpdaterListe
 
 			new Handler(getActivity().getMainLooper()).post(new Runnable() {
 
+				@Override
 				public void run() {
 					lastSix.clear();
 					if (tmp2.size() > 6){
@@ -167,7 +221,7 @@ public class InfoAlarmFragmentMain extends Fragment implements AlarmUpdaterListe
 						lastSix.addAll(tmp2);
 					}
 					
-					adp.notifyDataSetChanged();
+					mMessageArrayAdapter.notifyDataSetChanged();
 				}
 			});
 
@@ -199,4 +253,16 @@ public class InfoAlarmFragmentMain extends Fragment implements AlarmUpdaterListe
 
 	}
 
+	private KMessage findInQueue(Message _m) {
+		int hash = _m.getID();
+		List<KMessage> curBuffer = AlarmUpdaterThread.getKMessageQueue();
+
+		for (KMessage msg : curBuffer) {
+			if (msg.hashCode() == hash)
+				return msg;
+		}
+
+		return null;
+
+	}
 }

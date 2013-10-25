@@ -26,7 +26,7 @@
     <string name="default_robot_name">ArtarmTX60L</string>
     <string name="title_project_list">Projects</string>
     <string name="title_project_detail">Project Detail</string>
-    <string name="title_section_connect">Connection</string>
+    <string name="title_section_connect">TeachDroid</string>
     <string name="title_section_overview">Overview</string>
     <string name="title_section_programs">Programs</string>
     <string name="title_section_projects">Projects</string>
@@ -57,8 +57,8 @@
     <string name="cancel">Cancel</string>
     <string name="emptyMessages">No current alarms</string>
     <string-array name="navigation_array">
-        <item>Projects</item>
         <item>Positions</item>
+        <item>Projects</item>        
         <item>Information</item>
     </string-array>
   

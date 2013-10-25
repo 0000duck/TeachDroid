@@ -1,14 +1,19 @@
 package com.keba.teachdroid.app.fragments;
 
-
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 
+import com.keba.kemro.kvs.teach.data.project.KvtProject;
+import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 
 public class InnerListFragment extends ListFragment {
 	/**
@@ -59,7 +64,6 @@ public class InnerListFragment extends ListFragment {
 		// }
 		// setListAdapter(mAdapter);
 
-
 	}
 
 	// @Override
@@ -76,6 +80,61 @@ public class InnerListFragment extends ListFragment {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		getListView().setOnItemLongClickListener(new OnItemLongClickListener() {
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> _arg0, View _arg1, int _pos, long _id) {
+				KvtProject proj = (KvtProject) getListAdapter().getItem(_pos);
+				displayCloseDialog(proj, _pos);
+				return true;
+			}
+		});
+	}
+
+	protected void displayCloseDialog(final KvtProject _proj, final int _index) {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+
+		final boolean canClose = _proj.getProjectState() >= KvtProject.SUCCESSFULLY_LOADED;
+
+		String action = canClose ? "close" : "open";
+
+		// set title
+		alertDialogBuilder.setTitle(action + " project?");
+
+		// set dialog message
+		alertDialogBuilder.setMessage("Do you really want to " + action + " \"" + _proj.getName() + "\"?").setCancelable(false)
+				.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						if (canClose) {
+							new Thread(new Runnable() {
+								@Override
+								public void run() {
+									// KvtExecutionMonitor.closeProgram(_proj);
+									KvtProjectAdministrator.unloadProject(_proj);
+									KvtProjectAdministrator.destroy(_proj);
+								}
+							}).start();
+						}
+
+						else {
+							InnerListFragment.this.mCallbacks.onProjectSelected(_index);
+						}
+					}
+				}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						// if this button is clicked, just close
+						// the dialog box and do nothing
+						dialog.cancel();
+					}
+				});
+
+		// create alert dialog
+		AlertDialog alertDialog = alertDialogBuilder.create();
+
+		// show it
+		alertDialog.show();
 
 	}
 

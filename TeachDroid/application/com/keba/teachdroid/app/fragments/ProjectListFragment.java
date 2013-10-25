@@ -139,6 +139,7 @@ public class ProjectListFragment extends Fragment implements Serializable, KvtPr
 		mProjectAdapter = new ProjectArrayAdapter(mContext, R.layout.simple_text_list_item, plist);
 		projectListFragment.setListAdapter(mProjectAdapter);
 
+
 		return mRootView;
 	}
 
