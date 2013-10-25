@@ -10,13 +10,13 @@
     android:showDividers="middle" >
 
     <FrameLayout
-        android:id="@+id/fragment_robot_cartesian"
+        android:id="@+id/fragment_robot_detail_axis"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1" />
     
     <FrameLayout
-        android:id="@+id/fragment_robot_axis"
+        android:id="@+id/fragment_robot_detail_cartesian"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1" />
