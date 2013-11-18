@@ -56,10 +56,14 @@
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
     <string name="emptyMessages">No current alarms</string>
+
     <string-array name="navigation_array">
         <item>Positions</item>
-        <item>Projects</item>        
+        <item>Projects</item>
         <item>Information</item>
     </string-array>
-  
+
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+
 </resources>

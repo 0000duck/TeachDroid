@@ -49,9 +49,11 @@ public class ConnectActivity extends Activity implements InitializationListener,
 
 		KvtSystemCommunicator.addConnectionListener(new KvtTeachviewConnectionListener() {
 
+			@Override
 			public void teachviewDisconnected() {
 				runOnUiThread(new Runnable() {
 
+					@Override
 					public void run() {
 						Button connect = (Button) findViewById(R.id.connectButton);
 						connect.setText(getString(R.string.action_connect));
@@ -62,9 +64,11 @@ public class ConnectActivity extends Activity implements InitializationListener,
 
 			}
 
+			@Override
 			public void teachviewConnected() {
 				runOnUiThread(new Runnable() {
 
+					@Override
 					public void run() {
 						Button connect = (Button) findViewById(R.id.connectButton);
 						connect.setText(getString(R.string.action_disconnect));
@@ -84,6 +88,7 @@ public class ConnectActivity extends Activity implements InitializationListener,
 		Button connect = (Button) findViewById(R.id.connectButton);
 		connect.setOnClickListener(new OnClickListener() {
 
+			@Override
 			public void onClick(View _v) {
 				// connect
 
@@ -139,6 +144,7 @@ public class ConnectActivity extends Activity implements InitializationListener,
 				dlgAlert.setTitle("Info");
 				dlgAlert.setPositiveButton("OK", new android.content.DialogInterface.OnClickListener() {
 
+					@Override
 					public void onClick(DialogInterface _dialog, int _which) {
 						wifi.setWifiEnabled(true);
 						connectToPlc(_host);
@@ -171,6 +177,7 @@ public class ConnectActivity extends Activity implements InitializationListener,
 		// always read host from preferences, just in case someone has modified
 		// it in the meantime
 		// String host = PreferenceManager.getInstance().getHostname();
+		PreferenceManager.getInstance().setHostname(_host);
 		mStartTime = System.currentTimeMillis();
 		InitializationTask itask = new InitializationTask(this, getBaseContext());
 		itask.execute(_host);
@@ -188,10 +195,12 @@ public class ConnectActivity extends Activity implements InitializationListener,
 	 * com.keba.teachdroid.app.data.InitializationTask.InitializationListener
 	 * #initializationBegin()
 	 */
+	@Override
 	public void initializationBegin() {
 
 		runOnUiThread(new Runnable() {
 
+			@Override
 			public void run() {
 
 				// m_dlg = ProgressDialog.show(MainActivity.this,
@@ -222,9 +231,11 @@ public class ConnectActivity extends Activity implements InitializationListener,
 	 * com.keba.teachdroid.app.data.InitializationTask.InitializationListener
 	 * #initializationComplete()
 	 */
+	@Override
 	public void initializationComplete(final boolean _success) {
 
 		runOnUiThread(new Runnable() {
+			@Override
 			public void run() {
 				long duration = System.currentTimeMillis() - mStartTime;
 				Toast.makeText(getBaseContext(), "Connecting took me " + duration / 1000 + " seconds", Toast.LENGTH_SHORT).show();
@@ -244,8 +255,10 @@ public class ConnectActivity extends Activity implements InitializationListener,
 	 * com.keba.teachdroid.app.data.InitializationTask.InitializationListener
 	 * #setInitializationProgress(int)
 	 */
+	@Override
 	public void setInitializationProgress(final Object _progress) {
 		runOnUiThread(new Runnable() {
+			@Override
 			public void run() {
 				if (_progress instanceof Integer)
 					m_dlg.setProgress((Integer) _progress);
@@ -260,11 +273,13 @@ public class ConnectActivity extends Activity implements InitializationListener,
 		});
 	}
 
+	@Override
 	public void connect(String _host) {
 		checkWifiAndConnect(_host);
 
 	}
 
+	@Override
 	public void disconnect() {
 		disconnectFromPLC();
 
