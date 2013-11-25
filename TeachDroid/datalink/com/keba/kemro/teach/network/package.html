@@ -1,0 +1,86 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+    
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+    
+  <meta name="Author" content="Christian Mayrhofer">
+    
+  <meta name="GENERATOR"
+ content="Mozilla/4.7 [de] (WinNT; I) [Netscape]">
+  <title>Beschreibung der Java - Schnittstelle zum Laufzeitsystem</title>
+</head>
+  <body>
+ Dieses package liefert die Java-Schnittstelle zum TeachControl. 
+<p><b><font size="+1">Allgemeines</font></b> </p>
+<p>Die Funktionalit&auml;t des TeachControls kann in f&uuml;nf Hauptgruppen, 
+</p>
+<ul>
+ <li> die Verbindung,</li>
+  <li> das Dateisystems,</li>
+  <li> das Auslesen des Strukturbaumes,</li>
+  <li> das Ablaufsystem und</li>
+  <li> das Editieren von TeachTalk-Dateien</li>
+ 
+</ul>
+ unterteilt werden. 
+<p>Diese Funktionalit&auml;t wird mit Hilfe von RPC &uuml;ber das Netzwerk 
+verl&auml;ngert und mit den Java-Klassen (in der nachfolgenden Grafik der 
+graue Bereich)&nbsp; in diesem package zur Verf&uuml;gung gestellt. </p>
+<center> 
+<p><img src="RPC%20Verbindung.gif" height="472" width="276">
+ </p>
+<p>Schematische Darstellung der Schnittstelle zum TeachControl (LZS)</p>
+</center>
+  
+<p><b>Verbindung zum TeachControl</b> </p>
+<p>Der Auf- bzw. der Abbau der Verbindung erfolgt mit der Klasse <i>TcConnectionManager</i>. 
+Dabei mu&szlig; der Methode <i>connect</i> der Name des Rechners, auf welchen 
+das TeachControl l&auml;uft, und die Art (Controller oder Observer) der Verbindung 
+mitgegeben werden. Bei einer Controller-Verbindung kann das Dialogsystem alle
+Informationen auslesen, &Auml;nderungen durchf&uuml;hren und Programme starten.
+Bei einer Observer-Verbindung kann das Dialogsystem nur Informationen abfragen. 
+</p>
+<p>Zugriffe auf das Dateisystem, den strukturellen Aufbau und das Ablaufsystem 
+k&ouml;nnen erst nach einer erfolgreichen Verbindungsherstellung und Anmeldungen 
+erfolgen. </p>
+<p><b>Dateisystem</b> </p>
+<p>Das Auslesen und die Manipulation des Dateisystems erfolgt mit der Klasse
+<i>TcDirectoryModel</i>. Die Methode <i>getRoot</i> liefert das Wurzelobjekt
+vom Typ <i>TcDirEntry</i> des Dateisystems. Beginnend mit dem Wurzelobjekt
+k&ouml;nnen die Verzeichniseintr&auml;ge rekursiv mit <i>getEntries</i> ausgelesen
+werden. Das Anlegen, Kopieren, Umbenennen und L&ouml;schen von Verzeichniseintr&auml;gen
+erm&ouml;glichen die Methoden <i>add</i>, <i>copy</i>, <i>rename</i> und
+<i>delete</i>. Die Methode <i>build</i> der Klasse <i>TcStructuralModel</i>
+hat die Aufgabe die &Auml;nderung des Dateisystems in den strukturellen Aufbau
+(Strukturbaum) zu &uuml;bertragen, dabei werden nur der angegeben Verzeichniseintrag
+und die darunter liegenden Eintr&auml;ge betrachtet. Programm- und Bausteindateien 
+werden bei diesem Vorgang kompiliert und das Ergebnis in den Strukturbaum 
+abgelegt. </p>
+<p><b>Strukturbaum</b> </p>
+<p>Der Strukturbaum enth&auml;lt das Kompilationsergebnis des globalen Projekts
+oder Projekts (Programm- u. Bausteindateien). F&uuml;r jedes Projekt, Programm,
+Baustein, Konstante, Typ, Variable und Routine gibt es eine Repr&auml;sentation
+im Strukturbaum. Mit der Methode <i>getNodes</i> der Klasse <i>TcStructuralModel</i>
+k&ouml;nnen rekursiv alle Knoten ausgelesen werden. Die Wurzel liefert die
+Methode <i>getRoot</i> der Klasse. Ein Objekt der Klasse TcStructuralNode
+oder einer abgeleiteten Klasse repr&auml;sentiert einen Eintrag. </p>
+<p><b>Ablaufsystem</b> </p>
+<p>Die Klasse <i>TcExecutionModel </i>liefert die Methoden zur Ausf&uuml;hrung 
+von Programmen, Debuggen von Ablaufen, usw. Um ein Programm auszuf&uuml;hren
+mu&szlig; zuerst ein Projekt geladen (<i>loadProjekt</i>) und anschlie&szlig;enden
+das Programm gestartet (<i>startProgram</i>) werden. Mit <i>interruptExecUnit</i>,
+<i>continueExecUnit</i> bzw. <i>stopExecUnit</i> werden Abl&auml;ufe unterbrochen,
+fortgesetzt bzw. gestoppt. Ein Programmablauf ist die unbenannte Routine
+des gestarteten Programms und alle daraus gestarteten Routinen. <br>
+Mit der Methode <i>getExecutionUnits</i> k&ouml;nnen alle Ausf&uuml;hrungseinheit 
+rekursiv ausgelesen werden. Ausf&uuml;hrungseinheit sind Projekte, Programme
+und Routinen.<br>
+ </p>
+<p><b>Editieren</b> </p>
+<p>Ein Objekt der Klasse <i>TcEditorModel </i>liefert die Methoden zum &Auml;ndern 
+von Programm- und Bausteindateien.</p>
+<br>
+</body>
+</html>
