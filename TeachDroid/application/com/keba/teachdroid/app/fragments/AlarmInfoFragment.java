@@ -3,14 +3,11 @@ package com.keba.teachdroid.app.fragments;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
 import android.app.Activity;
@@ -20,7 +17,6 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,15 +31,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.keba.kemro.kvs.teach.controller.KvtAlarmUpdater;
-import com.keba.kemro.kvs.teach.controller.KvtAlarmUpdater.KvtAlarmUpdaterListener;
 import com.keba.kemro.kvs.teach.util.Log;
 import com.keba.kemro.serviceclient.alarm.KMessage;
-import com.keba.teachdroid.app.AlarmUpdaterThread.AlarmUpdaterListener;
 import com.keba.teachdroid.app.AlarmUpdaterThread;
+import com.keba.teachdroid.app.AlarmUpdaterThread.AlarmUpdaterListener;
 import com.keba.teachdroid.app.Message;
 import com.keba.teachdroid.app.R;
-import com.keba.teachdroid.data.RobotControlProxy;
 
 public class AlarmInfoFragment extends Fragment implements Serializable, Observer, AlarmUpdaterListener/* KvtAlarmUpdaterListener */{
 
@@ -263,6 +256,7 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 		// KvtAlarmUpdater.addListener(this);
 		AlarmUpdaterThread.addListener(this);
 
+
 	}
 
 	@Override
@@ -341,6 +335,7 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 		mList.setAdapter(mAdapter);
 		mList.setOnItemLongClickListener(new OnItemLongClickListener() {
 
+			@Override
 			public boolean onItemLongClick(AdapterView<?> _parent, View _view, final int _position, long _id) {
 
 				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
@@ -350,6 +345,7 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 
 				// set dialog message
 				alertDialogBuilder.setMessage(getString(R.string.dialog_confirm_message_text)).setCancelable(false).setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						Message m = mMessages.get(_position);
 
@@ -375,6 +371,7 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 						Log.i("AlarmInfoFragment", "confirming was " + (success ? "successful" : "unsuccessful"));
 					}
 				}).setNegativeButton("No", new DialogInterface.OnClickListener() {
+					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						// if this button is clicked, just close
 						// the dialog box and do nothing
@@ -435,6 +432,7 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 	 * 
 	 * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
 	 */
+	@Override
 	public void update(Observable _observable, Object _data) {
 
 		if (/* _observable == mMsgUpdaterListener && */_data != null && _data instanceof KMessage) {
@@ -450,6 +448,7 @@ public class AlarmInfoFragment extends Fragment implements Serializable, Observe
 			Handler mainLooper = new Handler(getActivity().getMainLooper());
 			mainLooper.post(new Runnable() {
 
+				@Override
 				public void run() {
 					mAdapter.notifyDataSetChanged();
 					mList.invalidate();

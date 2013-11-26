@@ -10,13 +10,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.teachdroid.app.fragments.Touchable;
+import com.keba.teachdroid.data.RobotControlProxy;
 
 public class MainActivity extends BaseActivity /*
 												 * implements
-												 * InitializationListener,
+												 * InitializationListener ,
 												 * IConnectCallback
 												 */{
 
@@ -96,9 +96,11 @@ public class MainActivity extends BaseActivity /*
 	}
 
 	public void onShowProjects() {
-		KvtProject global = KvtProjectAdministrator.getGlobalProject();
+		// KvtProject global = KvtProjectAdministrator.getGlobalProject();
 
-		if (global != null && global.getProjectState() == KvtProject.SUCCESSFULLY_LOADED) {
+		// if (global != null && global.getProjectState() ==
+		// KvtProject.SUCCESSFULLY_LOADED) {
+		if (RobotControlProxy.isGlobalLoaded()) {
 			Intent projectsActivity = new Intent(this, ProjectActivity.class);
 			startActivity(projectsActivity);
 		} else {

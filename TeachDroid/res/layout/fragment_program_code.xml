@@ -16,23 +16,31 @@
             android:layout_height="wrap_content"
             android:text="PC:"
             android:textAppearance="?android:attr/textAppearanceSmall" />
-
     </FrameLayout>
 
-    <TextView
-        android:id="@+id/programCodeTextView"
+    <ScrollView
+        android:id="@+id/programCodeScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="0.1"
-        android:enabled="true"
-        android:fontFamily="monospace"
-        android:isScrollContainer="true"
-        android:lineSpacingExtra="10sp"
-        android:lineSpacingMultiplier="1"
-        android:text="@string/program_code_dummy"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="15sp" />
-    
+        android:fillViewport="true"
+        android:scrollbars="vertical"
+         android:layout_weight="0.1" >
+
+        <TextView
+            android:id="@+id/programCodeTextView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            
+            android:enabled="true"
+            android:fontFamily="monospace"
+            android:isScrollContainer="true"
+            android:lineSpacingExtra="10sp"
+            android:lineSpacingMultiplier="1"
+            android:text="@string/program_code_dummy"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textSize="15sp" />
+    </ScrollView>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -67,7 +75,6 @@
             android:src="@drawable/teach_icon"
             android:text="Button"
             android:visibility="invisible" />
-        
     </LinearLayout>
 
 </LinearLayout>

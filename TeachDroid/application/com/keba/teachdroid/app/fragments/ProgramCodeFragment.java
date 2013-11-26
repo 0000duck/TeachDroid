@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.text.SpannableString;
+import android.text.method.ScrollingMovementMethod;
 import android.text.style.BackgroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -99,6 +100,21 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 				public void onClick(View _v) {
 					if (mProgram != null) {
 						KvtExecutionMonitor.startProgram(mProgram);
+
+						// String varname =
+						// "_system.RcHtControl.simuKeys.progStart";
+						// KStructVarWrapper wrp =
+						// KvtSystemCommunicator.getTcDfl().variable.createKStructVarWrapper(varname);
+						// if (wrp != null) {
+						// wrp.setActualValue(Boolean.TRUE); // set
+						// try {
+						// Thread.sleep(100);
+						// } catch (InterruptedException e) {
+						// // do nothing
+						// }
+						// wrp.setActualValue(Boolean.FALSE); // reset
+						// }
+
 						mStop.setEnabled(true);
 						mStart.setEnabled(false);
 					}
@@ -153,6 +169,7 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 
 		callback = (ProjectActivity) getArguments().getSerializable("connector");
 		codeTextView = (TextView) mRootView.findViewById(R.id.programCodeTextView);
+		codeTextView.setMovementMethod(new ScrollingMovementMethod());
 		codeTextView.setText(callback.getProgramCode());
 		codeTextView.setOnTouchListener(new OnTouchListener() {
 
@@ -177,7 +194,6 @@ public class ProgramCodeFragment extends Fragment implements Serializable, KvtEx
 				return false;
 			}
 		});
-
 
 		mMainflowSpanObj = new BackgroundColorSpan(mContext.getResources().getColor(android.R.color.holo_blue_light));
 

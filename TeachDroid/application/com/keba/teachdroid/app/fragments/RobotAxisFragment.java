@@ -5,12 +5,6 @@ import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
-import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
-import com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener;
-import com.keba.teachdroid.app.CustomPosition;
-import com.keba.teachdroid.app.R;
-import com.keba.teachdroid.app.fragments.RobotCartesianFragment.CartesianArrayAdapter;
-
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -22,6 +16,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.keba.kemro.kvs.teach.util.KvtPositionMonitor;
+import com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener;
+import com.keba.teachdroid.app.CustomPosition;
+import com.keba.teachdroid.app.R;
 
 public class RobotAxisFragment extends Fragment implements KvtPositionMonitorListener {
 
@@ -152,7 +151,7 @@ public class RobotAxisFragment extends Fragment implements KvtPositionMonitorLis
 	}
 
 	@Override
-	public void axisPositionChanged(int axisNo, Number _value, String _axisName) {
+	public synchronized void axisPositionChanged(int axisNo, Number _value, String _axisName) {
 		getPositions();
 		if (getActivity() != null) {
 			getActivity().runOnUiThread(new Runnable() {

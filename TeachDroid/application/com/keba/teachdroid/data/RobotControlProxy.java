@@ -352,6 +352,7 @@ public class RobotControlProxy {
 		private float mPathVelocity;
 		private String mJogTool = KvtPositionMonitor.getJogTool();
 		private String mJogRefsys = KvtPositionMonitor.getJogRefSys();
+		private boolean								mGlobalLoaded;
 
 		@Override
 		public void teachviewConnected() {
@@ -422,6 +423,9 @@ public class RobotControlProxy {
 			Log.d(ROBOT_CONTROL_LOGTAG, "Project " + _prj.getName() + "'s state is " + _prj.getProjectStateString());
 			if (_prj.isSystemProject())
 				return;
+			if (_prj.isGlobalProject() || _prj.getName().equalsIgnoreCase("_global")) {
+				mGlobalLoaded = true;
+			}
 			int prgCount = _prj.getProgramCount();
 			for (int i = 0; i < prgCount; i++) {
 				KvtProgram prg = _prj.getProgram(i);
@@ -830,6 +834,10 @@ public class RobotControlProxy {
 		public void setJogTool(String jogTool) {
 			mJogTool = jogTool;
 		}
+
+		public boolean isGlobalLoaded() {
+			return mGlobalLoaded;
+		}
 	}
 
 	/**
@@ -857,6 +865,10 @@ public class RobotControlProxy {
 	 */
 	public static List<KvtProject> getProjects() {
 		return mDataListener.mProjects;
+	}
+
+	public static boolean isGlobalLoaded() {
+		return mDataListener.isGlobalLoaded();
 	}
 
 }

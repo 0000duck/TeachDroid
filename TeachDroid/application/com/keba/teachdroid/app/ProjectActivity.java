@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -19,6 +20,8 @@ import android.support.v4.view.PagerTitleStrip;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -34,6 +37,7 @@ import com.keba.teachdroid.app.fragments.ProgramInfoFragment;
 import com.keba.teachdroid.app.fragments.ProgramListFragment;
 import com.keba.teachdroid.app.fragments.ProjectListFragment;
 
+@SuppressLint("UseSparseArrays")
 public class ProjectActivity extends BaseActivity implements InnerListFragment.SelectionCallback, ProgramListFragment.SelectionCallback, AlarmUpdaterListener {
 
 	/**
@@ -42,15 +46,35 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 	private static final long serialVersionUID = -1859827857696981188L;
 	private transient ViewPager mViewPager;
 	private transient SectionsPagerAdapter mSectionsPagerAdapter;
-	private transient ProgressDialog m_dlg;
-
-	// dummy contents for the Pages!
-	// String[] projects = { "Project1", "Project2", "Project3" };
-	// Vector<String[]> programs = new Vector<String[]>();
+	@SuppressLint("UseSparseArrays")
 	private Map<Integer, String> programCodes = new HashMap<Integer, String>();
 	private Map<Integer, String> programInfos = new HashMap<Integer, String>();
 
 	private transient List<KvtProject> projects = KvtProjectAdministrator.getAllProjectsList();
+	private MenuItem						mRefreshMenuItem;
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu _menu) {
+		mRefreshMenuItem = _menu.add("Refresh");
+		return super.onCreateOptionsMenu(_menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem _item) {
+		if (_item == mRefreshMenuItem) {
+			new AsyncTask<Void, Void, Boolean>() {
+
+				@Override
+				protected Boolean doInBackground(Void... _params) {
+					KvtProjectAdministrator.reloadProjectList();
+					return Boolean.TRUE;
+				}
+
+			}.execute((Void) null);
+		}
+		return super.onOptionsItemSelected(_item);
+	}
+
 	private transient List<List<KvtProgram>> programs = new Vector<List<KvtProgram>>();
 
 	private int selectedProject = 0;
@@ -122,6 +146,7 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 	}
 
 	public List<KvtProject> getProjects() {
+		projects = KvtProjectAdministrator.getAllProjectsList();
 		return projects;
 	}
 
@@ -206,7 +231,6 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 
 						KvtProject parent = prog.getParent();
 						boolean isBuilt = true;
-						boolean startSuccessful = false;
 						if (parent != null) {
 							// first try to build
 							if (parent.getProjectState() <= KvtProject.NOT_BUILDED) {
@@ -224,8 +248,7 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 								}
 							}
 
-							// then try to load program
-							startSuccessful = KvtProjectAdministrator.startProgram(prog);
+							KvtProjectAdministrator.startProgram(prog);
 							while (prog.getProgramState() < KvtProgram.STOPPED) {
 								try {
 									Thread.sleep(100);

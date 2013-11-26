@@ -1,6 +1,7 @@
 package com.keba.teachdroid.app.fragments;
 
 import android.content.res.Resources;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -20,8 +21,9 @@ import com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtOverrideChangedListen
 import com.keba.kemro.kvs.teach.util.KvtPositionMonitor.KvtPositionMonitorListener;
 import com.keba.teachdroid.app.R;
 
-public class RobotStateFragment extends Fragment implements KvtMainModeListener, KvtOverrideChangedListener, KvtPositionMonitorListener, KvtDriveStateListener {
-	private transient View mRootView;
+public class RobotStateFragment extends Fragment implements KvtMainModeListener, KvtOverrideChangedListener, KvtPositionMonitorListener,
+		KvtDriveStateListener {
+	private transient View	mRootView;
 
 	public RobotStateFragment() {
 		KvtPositionMonitor.addListener((KvtOverrideChangedListener) this);
@@ -33,7 +35,7 @@ public class RobotStateFragment extends Fragment implements KvtMainModeListener,
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		mRootView = inflater.inflate(R.layout.fragment_robot_state, container, false);
-		
+
 		mainModeChanged(KvtMainModeAdministrator.getMainMode());
 		drivePowerChanged(KvtDriveStateMonitor.getDrivesPower());
 		overrideChanged(KvtPositionMonitor.getOverride());
@@ -41,7 +43,7 @@ public class RobotStateFragment extends Fragment implements KvtMainModeListener,
 		selectedToolChanged(KvtPositionMonitor.getChosenTool());
 		jogRefsysChanged(KvtPositionMonitor.getJogRefSys());
 		jogToolChanged(KvtPositionMonitor.getJogTool());
-		
+
 		mRootView.findViewById(R.id.powerIndicator).setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -95,8 +97,11 @@ public class RobotStateFragment extends Fragment implements KvtMainModeListener,
 						mainModeString = "";
 						break;
 					}
-					((TextView) mRootView.findViewById(R.id.mainMode)).setText(mainModeString);
-					((TextView) mRootView.findViewById(R.id.mainMode)).setCompoundDrawablesWithIntrinsicBounds(getResources().getDrawable(drawableId), null, null, null);
+					if (drawableId != 0) {
+						((TextView) mRootView.findViewById(R.id.mainMode)).setText(mainModeString);
+						((TextView) mRootView.findViewById(R.id.mainMode)).setCompoundDrawablesWithIntrinsicBounds(
+								getResources().getDrawable(drawableId), null, null, null);
+					}
 				}
 			});
 		}
@@ -216,7 +221,16 @@ public class RobotStateFragment extends Fragment implements KvtMainModeListener,
 	}
 
 	public void toggleDrivesPower() {
-		KvtDriveStateMonitor.toggleDrivesPower();
+		new AsyncTask<Void, Void, Void>() {
+
+			@Override
+			protected Void doInBackground(Void... _params) {
+				KvtDriveStateMonitor.toggleDrivesPower();
+				return null;
+			}
+
+		}.execute((Void) null);
+
 	}
 
 	@Override

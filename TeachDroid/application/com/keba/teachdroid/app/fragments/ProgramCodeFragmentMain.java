@@ -271,7 +271,9 @@ public class ProgramCodeFragmentMain extends Fragment implements KvtProgramState
 							// KvtProjectAdministrator.startProgram(_params[0]);
 							return true;
 						}
+
 					}.execute(program).get();
+					Log.i("ProgramCodeFragmentMain", "Starting program " + program + ": " + (success ? "successful" : "failed"));
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				} catch (ExecutionException e) {
@@ -290,11 +292,13 @@ public class ProgramCodeFragmentMain extends Fragment implements KvtProgramState
 							return true;
 						}
 					}.execute(program).get();
+
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				} catch (ExecutionException e) {
 					e.printStackTrace();
 				}
+
 
 				break;
 			default:

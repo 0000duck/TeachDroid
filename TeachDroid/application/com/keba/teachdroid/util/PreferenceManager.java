@@ -33,6 +33,7 @@ public class PreferenceManager {
 
 	public void setHostname(String _host) {
 		mHost = _host;
+		mPrefs.edit().putString("hostname_ip", mHost);
 	}
 
 }

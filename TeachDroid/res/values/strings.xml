@@ -56,6 +56,7 @@
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
     <string name="emptyMessages">No current alarms</string>
+    <string name="action_activate_t10">Toggle T10</string>
 
     <string-array name="navigation_array">
         <item>Positions</item>

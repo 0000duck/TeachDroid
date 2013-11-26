@@ -96,7 +96,11 @@ public class InnerListFragment extends ListFragment {
 
 		final boolean canClose = _proj.getProjectState() >= KvtProject.SUCCESSFULLY_LOADED;
 
-		String action = canClose ? "close" : "open";
+		if (!canClose)
+			return;
+
+		// String action = canClose ? "close" : "open";
+		String action = "close";
 
 		// set title
 		alertDialogBuilder.setTitle(action + " project?");

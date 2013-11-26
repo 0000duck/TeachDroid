@@ -98,6 +98,17 @@ public class InitializationTask extends AsyncTask<String, Object, Boolean> {
 
 		publishProgress("teachcontrol");
 		KvtSystemCommunicator.connectOnce(host, 20000, "_global");
+
+		publishProgress("waiting for system");
+
+		// while (!RobotControlProxy.isGlobalLoaded()) {
+		// try {
+		// Thread.sleep(100);
+		// } catch (InterruptedException e) {
+		// e.printStackTrace();
+		// }
+		// }
+
 		publishProgress(100);
 
 		return KvtSystemCommunicator.isConnected();

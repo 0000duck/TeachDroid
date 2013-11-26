@@ -137,9 +137,11 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 						mainModeString = "";
 						break;
 					}
-					((TextView) mRootView.findViewById(R.id.mainMode)).setText(mainModeString);
-					((TextView) mRootView.findViewById(R.id.mainMode)).setCompoundDrawablesWithIntrinsicBounds(
-							getResources().getDrawable(drawableId), null, null, null);
+					if (drawableId != 0) {
+						((TextView) mRootView.findViewById(R.id.mainMode)).setText(mainModeString);
+						((TextView) mRootView.findViewById(R.id.mainMode)).setCompoundDrawablesWithIntrinsicBounds(
+								getResources().getDrawable(drawableId), null, null, null);
+					}
 				}
 			});
 		}
@@ -292,7 +294,16 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 		int a = 0;
 		if (rect.contains((int) x, (int) y)) {
 			a = 1;
-			KvtDriveStateMonitor.toggleDrivesPower();
+			new AsyncTask<Void, Void, Void>() {
+
+				@Override
+				protected Void doInBackground(Void... _params) {
+					KvtDriveStateMonitor.toggleDrivesPower();
+					return null;
+				}
+
+			}.execute((Void) null);
+
 		} else {
 			a = 2;
 			((MainActivity) getActivity()).onShowPositions();

@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,11 +33,11 @@ public class ConnectActivity extends Activity implements InitializationListener,
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -3440662095768050268L;
-	private long mStartTime;
-	protected volatile ProgressDialog m_dlg;
-	final String m_connectFormatString = "Connecting... ";
-	private boolean mConnected;
+	private static final long			serialVersionUID		= -3440662095768050268L;
+	private long						mStartTime;
+	protected volatile ProgressDialog	m_dlg;
+	final String						m_connectFormatString	= "Connecting... ";
+	private boolean						mConnected;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +106,8 @@ public class ConnectActivity extends Activity implements InitializationListener,
 		});
 		int id = mConnected ? R.string.action_disconnect : R.string.action_connect;
 		connect.setText(getString(id));
+
+
 	}
 
 	@Override
@@ -177,7 +180,7 @@ public class ConnectActivity extends Activity implements InitializationListener,
 		// always read host from preferences, just in case someone has modified
 		// it in the meantime
 		// String host = PreferenceManager.getInstance().getHostname();
-		PreferenceManager.getInstance().setHostname(_host);
+		// PreferenceManager.getInstance().setHostname(_host);
 		mStartTime = System.currentTimeMillis();
 		InitializationTask itask = new InitializationTask(this, getBaseContext());
 		itask.execute(_host);
@@ -275,6 +278,11 @@ public class ConnectActivity extends Activity implements InitializationListener,
 
 	@Override
 	public void connect(String _host) {
+		if (Build.FINGERPRINT.contains("generic")) // will be true if we're
+													// running on an emulated
+													// device
+			connectToPlc(_host);
+		else
 		checkWifiAndConnect(_host);
 
 	}

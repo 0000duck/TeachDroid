@@ -6,9 +6,9 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Vector;
-import java.util.Map.Entry;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -24,11 +24,15 @@ import com.keba.kemro.kvs.teach.controller.KvtAlarmUpdater;
 import com.keba.kemro.kvs.teach.controller.KvtAlarmUpdater.KvtAlarmUpdaterListener;
 import com.keba.kemro.kvs.teach.controller.KvtTraceUpdater;
 import com.keba.kemro.kvs.teach.controller.KvtTraceUpdater.KvtTraceUpdateListener;
-import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor;
-import com.keba.kemro.kvs.teach.util.KvtDriveStateMonitor.KvtDriveStateListener;
 import com.keba.kemro.serviceclient.alarm.KMessage;
 
 public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListener, KvtTraceUpdateListener {
+
+	/**
+	 * 
+	 */
+	private static final String	FILTER_NAME_RC		= "RC";
+	private static final String	FILTER_NAME_INFO	= "Info";
 
 	public interface AlarmUpdaterListener {
 		public void queueChanged();
@@ -38,32 +42,32 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 		public void traceChanged(String _line);
 	}
 
-	private static final String rcBuffer = "RC_Motion_Info";
+	private static final String							rcBuffer				= "RC_Motion_Info";
 
 	/**
 	 * This list is populated as messages are reported. all past messages are
 	 * stored there, they are never deleted
 	 */
-	private static Hashtable<String, List<KMessage>> mMessageHistory = new Hashtable<String, List<KMessage>>();
-	private Object mMsgHistoryLock = new Object();
-	private Object mMsgBufferLock = new Object();
+	private static Hashtable<String, List<KMessage>>	mMessageHistory			= new Hashtable<String, List<KMessage>>();
+	private Object										mMsgHistoryLock			= new Object();
+	private Object										mMsgBufferLock			= new Object();
 	/**
 	 * new messages are stored here, and are removed from the list when they are
 	 * confirmed via a button
 	 */
-	private static Hashtable<String, List<KMessage>> mMessageQueue = new Hashtable<String, List<KMessage>>();
-	private KMessage mLastMessage = null;
+	private static Hashtable<String, List<KMessage>>	mMessageQueue			= new Hashtable<String, List<KMessage>>();
+	private KMessage									mLastMessage			= null;
 
-	private static List<String> tracedLines = null;
-	private static List<AlarmUpdaterListener> mListeners;
+	private static List<String>							tracedLines				= null;
+	private static List<AlarmUpdaterListener>			mListeners;
 
-	private Context context;
-	private int infoNotificationCount = 1;
-	private int alarmNotificationCount = 1;
-	private int errorNotificationCount = 1;
+	private Context										context;
+	private int											infoNotificationCount	= 1;
+	private int											alarmNotificationCount	= 1;
+	private int											errorNotificationCount	= 1;
 
-	private NotificationCompat.Builder mBuilder;
-	private NotificationManager mNotificationManager;
+	private NotificationCompat.Builder					mBuilder;
+	private NotificationManager							mNotificationManager;
 
 	public AlarmUpdaterThread(Context _context) {
 		super("Notifications");
@@ -80,10 +84,10 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 
 	public static List<Message> getMessageQueue() {
 		List<Message> list = new LinkedList<Message>();
-		String filter = "RC";
 		Set<Entry<String, List<KMessage>>> s = mMessageQueue.entrySet();
 		for (Entry<String, List<KMessage>> e : s) {
-			if (e.getKey().contains(filter)) {
+			// if (e.getKey().contains(FILTER_NAME_RC)) {
+			if (!e.getKey().equalsIgnoreCase(FILTER_NAME_INFO)) {
 				for (KMessage msg : e.getValue()) {
 					((LinkedList<Message>) list).addFirst(new Message(msg));
 				}
@@ -94,10 +98,10 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 
 	public static List<KMessage> getKMessageQueue() {
 		List<KMessage> list = new LinkedList<KMessage>();
-		String filter = "RC";
 		Set<Entry<String, List<KMessage>>> s = mMessageQueue.entrySet();
 		for (Entry<String, List<KMessage>> e : s) {
-			if (e.getKey().contains(filter)) {
+			// if (e.getKey().contains(FILTER_NAME_RC)) {
+			if (!e.getKey().equalsIgnoreCase(FILTER_NAME_INFO)) {
 				for (KMessage msg : e.getValue()) {
 					((LinkedList<KMessage>) list).addFirst(msg);
 				}
@@ -121,10 +125,12 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 		return tracedLines;
 	}
 
+	@Override
 	public void messageUpdated(int lastMessageType, Object lastMessage) {
 		// empty interface implementation
 	}
 
+	@Override
 	public void messageAdded(String _bufferName, KMessage _msg) {
 
 		// add to unmodifiable history queue
@@ -160,13 +166,15 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 
 		// set the last message and send notification
 		// if message concerns RC
-		if (_bufferName.contains("RC")) {
+		// if (_bufferName.contains(FILTER_NAME_RC)) {
+		if (!_bufferName.equalsIgnoreCase(FILTER_NAME_INFO)) {
 			mLastMessage = _msg;
 			sendNotification(_msg);
 		} else
 			mLastMessage = null;
 	}
 
+	@Override
 	public void messageRemoved(String _bufferName, KMessage _msg) {
 		synchronized (mMsgBufferLock) {
 			// remove message from queue
@@ -179,7 +187,10 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 			}
 
 			// update last message
-			if (q != null && !q.isEmpty() && _bufferName.contains("RC")) {
+			// if (q != null && !q.isEmpty() &&
+
+			// _bufferName.contains(FILTER_NAME_RC)) {
+			if (!_bufferName.equalsIgnoreCase(FILTER_NAME_INFO)) {
 				mLastMessage = q.get(0);
 			} else
 				mLastMessage = null;
@@ -189,6 +200,7 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 		}
 	}
 
+	@Override
 	public void messageChanged(String _bufferName, KMessage _msg) {
 		messageRemoved(_bufferName, _msg); // first remove the message...
 		synchronized (mMsgBufferLock) {
@@ -267,8 +279,11 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 		if (mListeners == null)
 			mListeners = new Vector<AlarmUpdaterListener>();
 
-		if (!mListeners.contains(_listener))
+		if (!mListeners.contains(_listener)) {
 			mListeners.add(_listener);
+			_listener.queueChanged();
+		}
+
 	}
 
 	public static boolean removeListener(AlarmUpdaterListener _listener) {
