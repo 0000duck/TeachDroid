@@ -2,11 +2,10 @@ package com.keba.kemro.kvs.teach.data.rc;
 
 import java.util.Vector;
 
-import android.util.Log;
-
 import com.keba.kemro.kvs.teach.controller.KvtMessageFilter;
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
 import com.keba.kemro.kvs.teach.util.KvtTeachviewConnectionListener;
+import com.keba.kemro.kvs.teach.util.Log;
 import com.keba.kemro.teach.dfl.KTcDfl;
 import com.keba.kemro.teach.dfl.structural.KStructAdministratorListener;
 import com.keba.kemro.teach.dfl.structural.KStructNode;
@@ -66,12 +65,14 @@ public class KvtMessageFilterAdministrator {
 		}
 
 		KvtSystemCommunicator.addConnectionListener(new KvtTeachviewConnectionListener() {
+			@Override
 			public void teachviewConnected() {
 				dfl = KvtSystemCommunicator.getTcDfl();
 				synchronized (dfl.getLockObject()) {
 					generalVarGroup = dfl.variable.createVariableGroup("Message Filter Gourp");
 					generalVarGroup.setPollInterval(500);
 					generalVarGroup.addListener(new KVariableGroupListener() {
+						@Override
 						public void changed(KStructVarWrapper variable) {
 							if (variable.equals(kinematic)) {
 								Object value = kinematic.getActualValue();
@@ -88,6 +89,7 @@ public class KvtMessageFilterAdministrator {
 							}
 						}
 
+						@Override
 						public void allActualValuesUpdated() {
 							final boolean rFilter = rebuildFilter;
 							final boolean kChanged = kinematicChanged;
@@ -115,6 +117,7 @@ public class KvtMessageFilterAdministrator {
 					});
 
 					dfl.structure.addStructAdministratorListener(new KStructAdministratorListener() {
+						@Override
 						public void treeChanged(KStructNode parent) {
 							if ((parent instanceof KStructSystem) || (parent instanceof KStructRoot)) {
 								clear();
@@ -122,12 +125,14 @@ public class KvtMessageFilterAdministrator {
 							}
 						}
 
+						@Override
 						public void nodeInserted(KStructNode parent, KStructNode node) {
 							if (node instanceof KStructSystem) {
 								createGeneralVariablen();
 							}
 						}
 
+						@Override
 						public void nodeRemoved(KStructNode parent, KStructNode node) {
 							if (node instanceof KStructSystem) {
 								clear();
@@ -141,6 +146,7 @@ public class KvtMessageFilterAdministrator {
 
 			}
 
+			@Override
 			public void teachviewDisconnected() {
 				synchronized (dfl.getLockObject()) {
 					generalVarGroup.release();

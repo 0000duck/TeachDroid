@@ -19,14 +19,13 @@ import java.util.Hashtable;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import android.util.Log;
-
 import com.keba.kemro.kvs.teach.constant.KvtCAttributeKey;
 import com.keba.kemro.kvs.teach.data.project.KvtProgram;
 import com.keba.kemro.kvs.teach.data.project.KvtProject;
 import com.keba.kemro.kvs.teach.data.project.KvtProjectAdministrator;
 import com.keba.kemro.kvs.teach.util.KvtSystemCommunicator;
 import com.keba.kemro.kvs.teach.util.KvtTeachviewConnectionListener;
+import com.keba.kemro.kvs.teach.util.Log;
 import com.keba.kemro.teach.dfl.KTcDfl;
 import com.keba.kemro.teach.dfl.edit.KEditKW;
 import com.keba.kemro.teach.dfl.edit.KEditor;
@@ -62,6 +61,7 @@ import com.keba.kemro.teach.dfl.value.KStructVarWrapper;
  * einzufügende Anweisung Parameter, so werden dafür Variablen im zugehörigen
  * Programm angelegt und beim Entfernen wieder gelöscht.
  */
+
 public class KvtStatementAdministrator implements KStructAdministratorListener {
 	public static interface ChangeListener {
 		public static int	CHANGE	= 0;
@@ -125,6 +125,7 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 		projectScope = (s != null) && !s.equalsIgnoreCase("program");
 		reuseVariables = new Hashtable();
 		KvtSystemCommunicator.addConnectionListener(new KvtTeachviewConnectionListener() {
+			@Override
 			public void teachviewConnected() {
 				dfl = KvtSystemCommunicator.getTcDfl();
 				synchronized (dfl.getLockObject()) {
@@ -136,6 +137,7 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 
 			}
 
+			@Override
 			public void teachviewDisconnected() {
 				synchronized (dfl.getLockObject()) {
 					dfl.structure.removeStructAdministratorListener(m_admin);
@@ -800,6 +802,7 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 	 * 
 	 * @param parent
 	 */
+	@Override
 	public void treeChanged(KStructNode parent) {
 		if (parent instanceof KStructProject) {
 			KvtVarManager.removeAllVariables();
@@ -823,6 +826,7 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 	 * @param node
 	 *            Strukturknoten der neu hinzugefügt wurde
 	 */
+	@Override
 	public void nodeInserted(KStructNode parent, KStructNode node) {
 		if (node instanceof KStructVar) {
 			String prefix = getPrefix((KStructVar) node);
@@ -840,6 +844,7 @@ public class KvtStatementAdministrator implements KStructAdministratorListener {
 	 * 
 	 * @param parent
 	 */
+	@Override
 	public void nodeRemoved(KStructNode parent, KStructNode node) {
 		if (node instanceof KStructVar) {
 			KvtVarManager.removeVariable((KStructVar) node);

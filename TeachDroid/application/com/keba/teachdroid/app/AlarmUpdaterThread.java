@@ -190,7 +190,7 @@ public class AlarmUpdaterThread extends Thread implements KvtAlarmUpdaterListene
 			// if (q != null && !q.isEmpty() &&
 
 			// _bufferName.contains(FILTER_NAME_RC)) {
-			if (!_bufferName.equalsIgnoreCase(FILTER_NAME_INFO)) {
+			if (!_bufferName.equalsIgnoreCase(FILTER_NAME_INFO) && q.size() > 0) {
 				mLastMessage = q.get(0);
 			} else
 				mLastMessage = null;

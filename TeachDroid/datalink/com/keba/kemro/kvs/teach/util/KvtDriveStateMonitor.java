@@ -7,8 +7,6 @@ import java.text.MessageFormat;
 import java.util.List;
 import java.util.Vector;
 
-import android.util.Log;
-
 import com.keba.kemro.teach.dfl.KTcDfl;
 import com.keba.kemro.teach.dfl.value.KStructVarWrapper;
 import com.keba.kemro.teach.dfl.value.KVariableGroup;
@@ -68,22 +66,23 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener, KVa
 
 	}
 
-	private final String mDrivePowerVarname = "_system.gRcDataRobot[{0}].drivesOn";
-	private final String mDriveIsReadyVarname = "_system.gRcDataRobot[{0}].isReady";
-	private final String mDriveIsRefVarname = "_system.gRcDataRobot[{0}].isReferenced";
+	private final String						mDrivePowerVarname		= "_system.gRcDataRobot[{0}].drivesOn";
+	private final String						mDriveIsReadyVarname	= "_system.gRcDataRobot[{0}].isReady";
+	private final String						mDriveIsRefVarname		= "_system.gRcDataRobot[{0}].isReferenced";
 	// private final String mDriveSwitchOnVarname =
 	// "_system.RcHtControl.simuKeys.drivesOn";
 	private final String						mDriveSwitchOnVarname	= "_system.RcHtControl.uiKeys.drivesOn";
+	// private final String mDriveSwitchOnVarname = "_system.foo";
 
-	private KStructVarWrapper mDrivesPowerVar, mDriveIsReadyVar, mDriveIsRefVar;
-	private boolean mDrivesPower, mDriveIsReady, mDriveIsRef;
+	private KStructVarWrapper					mDrivesPowerVar, mDriveIsReadyVar, mDriveIsRefVar;
+	private boolean								mDrivesPower, mDriveIsReady, mDriveIsRef;
 
-	private KTcDfl mDfl;
-	private KVariableGroup mVarGroup;
-	private KStructVarWrapper mDrivesSwitchOnVar;
-	private static List<KvtDriveStateListener> mListeners = new Vector<KvtDriveStateListener>();
+	private KTcDfl								mDfl;
+	private KVariableGroup						mVarGroup;
+	private KStructVarWrapper					mDrivesSwitchOnVar;
+	private static List<KvtDriveStateListener>	mListeners				= new Vector<KvtDriveStateListener>();
 
-	private static KvtDriveStateMonitor mInstance;
+	private static KvtDriveStateMonitor			mInstance;
 
 	/**
 	 * Initializes the KvtDriveStateMonitor by taking note of
@@ -93,19 +92,62 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener, KVa
 		mInstance = new KvtDriveStateMonitor();
 		KvtSystemCommunicator.addConnectionListener(mInstance);
 	}
-	
-	public static boolean getDrivesPower(){
-		return mInstance.mDrivesPower;
-	}
-	
-	public static boolean getDrivesReady(){
-		return mInstance.mDriveIsReady;
+
+	public static Boolean getDrivesPower() {
+		Boolean pwr = mInstance.readDrivesPower();
+		if (pwr == null)
+			pwr = Boolean.FALSE;
+		return pwr;
 	}
 
-	public static boolean getDrivesRef(){
-		return mInstance.mDriveIsRef;
+	/**
+	 * @return a Boolean to indicate whether drives have power or not, and null if the information could not be obtained
+	 */
+	private Boolean readDrivesPower() {
+
+		if (mDrivesPowerVar != null) {
+			Object res = mDrivesPowerVar.readActualValue(null);
+			if (res instanceof Boolean)
+				return (Boolean) res;
+		}
+		return null;
 	}
-	
+
+	public static Boolean getDrivesReady() {
+		// return mInstance.mDriveIsReady;
+		return mInstance.readDrivesReady();
+	}
+
+	/**
+	 * @return
+	 */
+	private Boolean readDrivesReady() {
+		if (mDriveIsReadyVar != null) {
+			Object res = mDriveIsReadyVar.readActualValue(null);
+			if (res instanceof Boolean) {
+				return (Boolean) res;
+			}
+		}
+		return null;
+	}
+
+	public static Boolean getDrivesRef() {
+		return mInstance.readDrivesRef();
+	}
+
+	/**
+	 * @return
+	 */
+	private Boolean readDrivesRef() {
+		if (mDriveIsRefVar != null) {
+			Object res = mDriveIsRefVar.readActualValue(null);
+			if (res instanceof Boolean) {
+				return (Boolean) res;
+			}
+		}
+		return null;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -219,12 +261,13 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener, KVa
 	/**
 	 * @param _listener
 	 */
-	public static synchronized void addListener(KvtDriveStateListener _listener) {
+	public static synchronized Boolean addListener(KvtDriveStateListener _listener) {
 		if (mListeners == null)
 			mListeners = new Vector<KvtDriveStateMonitor.KvtDriveStateListener>();
 
 		if (!mListeners.contains(_listener))
-			mListeners.add(_listener);
+			return mListeners.add(_listener);
+		return false;
 	}
 
 	public static boolean removeListener(KvtDriveStateListener _listener) {
@@ -233,9 +276,10 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener, KVa
 		return false;
 	}
 
-	public static void toggleDrivesPower() {
+	public static boolean toggleDrivesPower() {
+		boolean res = true;
 		if (mInstance.mDrivesSwitchOnVar != null) {
-			mInstance.mDrivesSwitchOnVar.setActualValue(true);
+			res &= mInstance.mDrivesSwitchOnVar.setActualValue(true);
 
 			// wait and reset
 			try {
@@ -243,8 +287,10 @@ public class KvtDriveStateMonitor implements KvtTeachviewConnectionListener, KVa
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			mInstance.mDrivesSwitchOnVar.setActualValue(false);
+			res &= mInstance.mDrivesSwitchOnVar.setActualValue(false);
+
 		}
+		return res;
 
 	}
 }

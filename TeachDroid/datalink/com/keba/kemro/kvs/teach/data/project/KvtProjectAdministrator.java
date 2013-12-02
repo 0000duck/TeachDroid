@@ -204,15 +204,17 @@ public class KvtProjectAdministrator {
 	 * 
 	 * @param prj
 	 *            Das Projekt das entfernt werden soll.
+	 * @return
 	 */
-	public static void destroy(KvtProject prj) {
+	public static boolean destroy(KvtProject prj) {
 		KStructProject structPrj = prj.getStructProject();
 		if (structPrj != null) {
 			KTcDfl d = dfl;
 			if (d != null) {
-				d.structure.destroyProject(structPrj);
+				return d.structure.destroyProject(structPrj);
 			}
 		}
+		return false;
 	}
 
 	/**
@@ -236,14 +238,15 @@ public class KvtProjectAdministrator {
 	 * @param prj
 	 *            Das Projekt das entladen werden soll
 	 */
-	public static void unloadProject(KvtProject prj) {
+	public static boolean unloadProject(KvtProject prj) {
 		KExecUnitProject exeUnitPrj = prj.getExecUnitProject();
 		if (exeUnitPrj != null) {
 			KTcDfl d = dfl;
 			if (d != null) {
-				d.execution.unloadProject(exeUnitPrj);
+				return d.execution.unloadProject(exeUnitPrj);
 			}
 		}
+		return false;
 	}
 
 	/**

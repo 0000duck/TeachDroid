@@ -51,7 +51,7 @@ public class ProjectActivity extends BaseActivity implements InnerListFragment.S
 	private Map<Integer, String> programInfos = new HashMap<Integer, String>();
 
 	private transient List<KvtProject> projects = KvtProjectAdministrator.getAllProjectsList();
-	private MenuItem						mRefreshMenuItem;
+	private transient MenuItem				mRefreshMenuItem;
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu _menu) {

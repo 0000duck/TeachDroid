@@ -4,10 +4,9 @@ import java.util.Enumeration;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import android.util.Log;
-
 import com.keba.kemro.kvs.teach.data.rc.KvtMessageFilterAdministrator;
 import com.keba.kemro.kvs.teach.data.rc.KvtMessageFilterListener;
+import com.keba.kemro.kvs.teach.util.Log;
 import com.keba.kemro.serviceclient.alarm.KAlarmConnectionListener;
 import com.keba.kemro.serviceclient.alarm.KMessage;
 import com.keba.kemro.serviceclient.alarm.KMessageBuffer;
@@ -101,6 +100,7 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 	/**
 	 * @see com.keba.kemro.serviceclient.alarm.KAlarmConnectionListener#connected()
 	 */
+	@Override
 	public void connected() {
 		Vector buffers = KMessageService.getCreatedBuffers();
 		if (buffers != null) {
@@ -118,6 +118,7 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 	 * @see com.keba.kemro.serviceclient.alarm.KMessageChangeListener#messagesChanged(java.lang.String,
 	 *      java.util.Vector, java.util.Vector, java.util.Vector)
 	 */
+	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void messagesChanged(String bufferName, Vector addedMessages, Vector removedMessages, Vector changedMessages) {
 		Enumeration e = addedMessages.elements();
@@ -164,6 +165,7 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 	// updateLastError();
 	// }
 
+	@Override
 	public void messageFilterChanged() {
 		// KvUtilities.invokeLater(new Runnable() {
 		// public void run() {
@@ -171,6 +173,7 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 		// }
 		// });
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				updateLastError();
 			}
@@ -233,6 +236,7 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 	/**
 	 * @see com.keba.kemro.serviceclient.alarm.KMessageChangeListener#allMessagesRemoved(java.lang.String)
 	 */
+	@Override
 	public void allMessagesRemoved(String bufferName) {
 		m_messages.removeAllElements();
 		updateLastError();
@@ -249,6 +253,7 @@ public class KvtAlarmUpdater implements KAlarmConnectionListener, KMessageChange
 	/**
 	 * @see com.keba.kemro.serviceclient.alarm.KAlarmConnectionListener#disconnected()
 	 */
+	@Override
 	public void disconnected() {
 		// interface method not needed
 		m_messages.setSize(0);

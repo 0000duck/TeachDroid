@@ -37,10 +37,12 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 	public static enum SafetyState {
 		eIconSafetyOK, eIconSafetyNOK, // obsolete (deprecated use detailed info
 										// icons instead)
-		eIconSafetyUnknown, eIconSafety2EStopInt, eIconSafety2EStopExt, eIconSafety2EStopBoth, eIconSafetyEStop, eIconSafetySafetyDoor, eIconSafetyEnableSwitch, eIconSafetyPowerRelease;
+		eIconSafetyUnknown, eIconSafety2EStopInt, eIconSafety2EStopExt, eIconSafety2EStopBoth, eIconSafetyEStop, eIconSafetySafetyDoor, eIconSafetyEnableSwitch, eIconSafetyPowerRelease, eSafetyUnknown;
 		private static SafetyState[]	allValues	= values();
 
 		public static SafetyState fromOrdinal(int n) {
+			if (n < 0)
+				return SafetyState.eSafetyUnknown;
 			return allValues[n];
 		}
 	};
@@ -235,9 +237,11 @@ public class KvtMainModeAdministrator implements KMultikinematicListener, KVaria
 	/**
 	 * @param _l
 	 */
-	public static void removeListener(KvtMainModeListener _l) {
+	public static boolean removeListener(KvtMainModeListener _l) {
 		if (m_listeners.contains(_l)) {
 			m_listeners.removeElement(_l);
+			return true;
 		}
+		return false;
 	}
 }

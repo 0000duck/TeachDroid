@@ -85,6 +85,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	 * com.keba.kemro.teach.dfl.value.KVariableGroupListener#changed(com.keba
 	 * .kemro.teach.dfl.value.KStructVarWrapper)
 	 */
+	@Override
 	public void changed(KStructVarWrapper _variable) {
 		int index = mAxisPositionVars.indexOf(_variable);
 		if (index >= 0) {
@@ -172,6 +173,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	 * com.keba.kemro.teach.dfl.value.KVariableGroupListener#allActualValuesUpdated
 	 * ()
 	 */
+	@Override
 	public void allActualValuesUpdated() {
 		// for (KvtPositionMonitorListener l : mListeners) {
 		// for (int i = 0; i < mAxisPositionVars.size(); i++) {
@@ -197,6 +199,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	 * @see com.keba.kemro.kvs.teach.util.KvtTeachviewConnectionListener#
 	 * teachviewConnected()
 	 */
+	@Override
 	public void teachviewConnected() {
 		mDfl = KvtSystemCommunicator.getTcDfl();
 		if (mDfl != null) {
@@ -206,6 +209,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 
 			// create variable group
 			mVarGroup = mDfl.variable.createVariableGroup("KvtPositionMonitor");
+
 			mVarGroup.addListener(this);
 
 			// create variable wrappers
@@ -226,6 +230,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	public static void buildModels() {
 
 		new Thread(new Runnable() {
+			@Override
 			public void run() {
 				synchronized (mInstancelock) {
 
@@ -376,6 +381,7 @@ public class KvtPositionMonitor implements KVariableGroupListener, KvtTeachviewC
 	 * @see com.keba.kemro.kvs.teach.util.KvtTeachviewConnectionListener#
 	 * teachviewDisconnected()
 	 */
+	@Override
 	public void teachviewDisconnected() {
 
 		mAxisPositionVars.clear();

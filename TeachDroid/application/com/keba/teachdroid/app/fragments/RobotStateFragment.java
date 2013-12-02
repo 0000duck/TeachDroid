@@ -1,5 +1,7 @@
 package com.keba.teachdroid.app.fragments;
 
+import java.util.concurrent.ExecutionException;
+
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -36,13 +38,25 @@ public class RobotStateFragment extends Fragment implements KvtMainModeListener,
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		mRootView = inflater.inflate(R.layout.fragment_robot_state, container, false);
 
-		mainModeChanged(KvtMainModeAdministrator.getMainMode());
-		drivePowerChanged(KvtDriveStateMonitor.getDrivesPower());
-		overrideChanged(KvtPositionMonitor.getOverride());
-		selectedRefSysChanged(KvtPositionMonitor.getChosenRefSys());
-		selectedToolChanged(KvtPositionMonitor.getChosenTool());
-		jogRefsysChanged(KvtPositionMonitor.getJogRefSys());
-		jogToolChanged(KvtPositionMonitor.getJogTool());
+		try {
+			new AsyncTask<Void, Void, Void>() {
+				@Override
+				public Void doInBackground(Void... _params) {
+					mainModeChanged(KvtMainModeAdministrator.getMainMode());
+					drivePowerChanged(KvtDriveStateMonitor.getDrivesPower());
+					overrideChanged(KvtPositionMonitor.getOverride());
+					selectedRefSysChanged(KvtPositionMonitor.getChosenRefSys());
+					selectedToolChanged(KvtPositionMonitor.getChosenTool());
+					jogRefsysChanged(KvtPositionMonitor.getJogRefSys());
+					jogToolChanged(KvtPositionMonitor.getJogTool());
+					return null;
+				}
+			}.execute().get();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			e.printStackTrace();
+		}
 
 		mRootView.findViewById(R.id.powerIndicator).setOnClickListener(new OnClickListener() {
 
