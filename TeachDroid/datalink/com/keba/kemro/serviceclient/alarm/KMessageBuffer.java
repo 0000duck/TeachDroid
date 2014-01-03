@@ -17,7 +17,7 @@ package com.keba.kemro.serviceclient.alarm;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import android.util.Log;
+import com.keba.kemro.kvs.teach.util.Log;
 
 /**
  * KAlarmBuffer.java: Verwaltung einer Verbindung zu einem Puffer im UOS
