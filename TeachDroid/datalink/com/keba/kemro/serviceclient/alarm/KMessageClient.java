@@ -11,7 +11,7 @@ import java.util.Hashtable;
 import java.util.Locale;
 import java.util.Vector;
 
-import android.util.Log;
+import com.keba.kemro.kvs.teach.util.Log;
 
 
 public abstract class KMessageClient implements Runnable {

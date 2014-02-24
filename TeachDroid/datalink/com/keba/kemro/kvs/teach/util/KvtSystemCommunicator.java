@@ -52,8 +52,9 @@ public class KvtSystemCommunicator {
 	 * @param _progressPublisher
 	 * @param automaticReconnect
 	 *            Automatisches Reconnect bei Verbindungsabbruch
+	 * @return
 	 */
-	public static void connect(String hostName, int timeout, String globalFilter) {
+	public static boolean connect(String hostName, int timeout, String globalFilter) {
 		m_hostName = hostName;
 
 		TcClient client = null; // TcConnectionManager.getTcClient("Teachview",m_hostName);
@@ -77,8 +78,9 @@ public class KvtSystemCommunicator {
 			client.addConnectionListener(new KTcConnectionListener());
 
 			fireConnected();
-
+			return true;
 		}
+		return false;
 	}
 
 	public static String getHostname() {
@@ -138,6 +140,7 @@ public class KvtSystemCommunicator {
 			dfl = null;
 			fireDisconnected();
 		}
+		Log.i("TC Connection", "Disconnect() done");
 	}
 
 	public static void close() {
@@ -207,13 +210,10 @@ public class KvtSystemCommunicator {
 				listener.teachviewConnected();
 				long dur = System.currentTimeMillis() - start;
 
-				Log.i("KvtSystemCommunicator", "notifying listener " + classname + " took "
-						+ dur
-						+ " ms");
+				Log.i("KvtSystemCommunicator", "notifying listener " + classname + " took " + dur + " ms");
 
 			} catch (Exception ex) {
-				Log.e(KvtSystemCommunicator.class.toString(),
-						"Error in Call of KTeachviewConnectionListener.connected " + m_connectionListeners.elementAt(i) + " Excp: " + ex);
+				Log.e(KvtSystemCommunicator.class.toString(), "Error in Call of KTeachviewConnectionListener.connected " + m_connectionListeners.elementAt(i) + " Excp: " + ex);
 			}
 
 		}
@@ -225,8 +225,7 @@ public class KvtSystemCommunicator {
 			try {
 				((KvtTeachviewConnectionListener) (m_connectionListeners.elementAt(i))).teachviewDisconnected();
 			} catch (Exception ex) {
-				Log.e(KvtSystemCommunicator.class.toString(), "Error in Call of KTeachviewConnectionListener.disconnected "
-						+ m_connectionListeners.elementAt(i) + " Excp: " + ex);
+				Log.e(KvtSystemCommunicator.class.toString(), "Error in Call of KTeachviewConnectionListener.disconnected " + m_connectionListeners.elementAt(i) + " Excp: " + ex);
 			}
 		}
 	}

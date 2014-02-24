@@ -16,8 +16,7 @@ package com.keba.kemro.serviceclient.alarm;
 
 import java.util.Vector;
 
-import android.util.Log;
-
+import com.keba.kemro.kvs.teach.util.Log;
 import com.keba.kemro.serviceclient.alarm.sysrpc.KSysRpcMessageClient;
 
 /**
