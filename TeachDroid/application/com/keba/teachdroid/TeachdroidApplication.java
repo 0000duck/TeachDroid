@@ -20,10 +20,9 @@ public class TeachdroidApplication extends Application {
 		TeachdroidApplication.context = getApplicationContext();
 //		mNotificationThread = new AlarmUpdaterThread(context);
 //		mNotificationThread.start();
-		// InstaReloader._ir_1(this);
 	}
 
 	public static Context getAppContext() {
-		return TeachdroidApplication.context;
+		return context;
 	}
 }

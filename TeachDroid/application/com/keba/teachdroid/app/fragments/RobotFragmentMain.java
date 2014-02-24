@@ -89,7 +89,18 @@ public class RobotFragmentMain extends Fragment implements KvtDriveStateListener
 
 			@Override
 			protected String doInBackground(Void... params) {
-				return KvtMultiKinematikAdministrator.readKinematicFilter();
+				String k= KvtMultiKinematikAdministrator.readKinematicFilter();
+				int cnt = 0;
+				while (k == null || k.equalsIgnoreCase("_global") && cnt < 10) {
+					k= KvtMultiKinematikAdministrator.readKinematicFilter();
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					cnt++;
+				}
+				return k;
 			}
 
 		}.execute((Void) null).get();

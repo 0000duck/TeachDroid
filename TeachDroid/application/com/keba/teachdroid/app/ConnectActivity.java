@@ -82,8 +82,8 @@ public class ConnectActivity extends Activity implements InitializationListener,
 		});
 
 		// set ip address
-		EditText ip = (EditText) findViewById(R.id.ipAddress);
-		ip.setText(PreferenceManager.getInstance().getHostname());
+		// EditText ip = (EditText) findViewById(R.id.ipAddress);
+		// ip.setText(PreferenceManager.getInstance().getHostname());
 
 		// add button callback
 		Button connect = (Button) findViewById(R.id.connectButton);
@@ -106,7 +106,14 @@ public class ConnectActivity extends Activity implements InitializationListener,
 		});
 		int id = mConnected ? R.string.action_disconnect : R.string.action_connect;
 		connect.setText(getString(id));
+	}
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		// set ip address
+		EditText ip = (EditText) findViewById(R.id.ipAddress);
+		ip.setText(PreferenceManager.getInstance().getHostname());
 
 	}
 
